@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+/* The services stack is scroll-driven; hide the raw scrollbar so only the
+   3D card motion reads on screen. */
+.services-scroll {
+  scrollbar-width: none;
+}
+.services-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@font-face {
+  font-family: "Minecraft";
+  src: url("/fonts/Minecraft.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "VCR OSD Mono";
+  src: url("/fonts/VCR_OSD_MONO_1.001.ttf") format("truetype");
+  font-display: swap;
+}
+
+@theme {
+  --color-navy: #0b0e1a;
+  --color-album-blue: #2a46ff;
+  --color-crt-beige: #e6dcc3;
+  --color-crt-beige-dark: #c9bc9c;
+  --color-crt-beige-darker: #a89a78;
+  --color-led-green: #35e05a;
+  --color-lego-red: #d01012;
+  --color-lego-yellow: #f8c300;
+  --color-lego-blue: #0057a8;
+  --color-lego-green: #00852b;
+  --color-lego-orange: #f57d20;
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-serif-elegant: "Playfair Display", serif;
+  --font-serif-display: "DM Serif Display", serif;
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Lilita One", cursive;
+
+  --animate-bob: bob 1.6s ease-in-out infinite;
+}
+
+@keyframes bob {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes crt-sleep-logo {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translate(-4%, 7%);
+  }
+
+  24% {
+    transform: translate(-50%, -50%) translate(6%, 3%);
+  }
+
+  51% {
+    transform: translate(-50%, -50%) translate(5%, -7%);
+  }
+
+  76% {
+    transform: translate(-50%, -50%) translate(-6%, -4%);
+  }
+}
+
+@keyframes crt-sleep-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.68));
+    opacity: 0.82;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.96));
+    opacity: 1;
+  }
+}
+
+/* Two offset star layers over the navy hero background. */
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 25px 35px, rgba(255, 255, 255, 0.5) 50%, transparent 50%),
+    radial-gradient(1px 1px at 110px 90px, rgba(255, 255, 255, 0.35) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 190px 150px, rgba(255, 255, 255, 0.45) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70px 170px, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 150px 40px, rgba(255, 255, 255, 0.4) 50%, transparent 50%);
+  background-size: 220px 220px;
+}
+
+.hero-machine-glow {
+  background: radial-gradient(ellipse 42% 34% at 50% 42%,
+      rgba(27, 48, 255, 0.58),
+      rgba(10, 17, 113, 0.32) 42%,
+      transparent 74%);
+  filter: blur(12px);
+}
+
+.hero-computer {
+  /* Neutral grounding shadow so the machine sits in the scene instead of
+     glowing off the page. */
+  filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.5));
+}
+
+.reference-socials {
+  left: 76.8%;
+  top: clamp(5.75rem, 8.2vh, 6.4rem);
+  transform: translateX(-50%);
+}
+
+.reference-social-nav {
+  gap: clamp(1.05rem, 1.25vw, 1.45rem);
+}
+
+.reference-social-link {
+  color: #fff0dd;
+  line-height: 1;
+}
+
+.reference-hero-content {
+  display: block;
+  inset: 0;
+  position: absolute;
+}
+
+.reference-computer {
+  width: min(82vw, 875px);
+}
+
+.reference-hero-copy {
+  bottom: clamp(4.75rem, 7.5vh, 6rem);
+  left: 50%;
+  max-width: 1100px;
+  position: absolute;
+  transform: translateX(-50%);
+  width: min(92vw, 1080px);
+  font-size: clamp(1.6rem, 2vw, 2.35rem);
+  line-height: 0.9;
+}
+
+.reference-hero-content .hero-computer {
+  left: 50%;
+  position: absolute;
+  top: 55%;
+  transform: translate(-50%, -50%);
+}
+
+.reference-services-button {
+  display: none;
+}
+
+.reference-headline {
+  font-family: "VCR OSD Mono", ui-monospace, "Courier New", monospace;
+  letter-spacing: 0.01em;
+}
+
+.crt-glow {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
+}
+
+/* Our logo sits dead-center in the CRT, glowing white on the dark screen. */
+.computer-logo {
+  left: 50.4%;
+  top: 35.4%;
+  width: 9%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(150, 210, 255, 0.7));
+  animation: logo-flicker 4.5s linear infinite;
+  will-change: opacity;
+}
+
+/* Irregular on/off dips = a CRT/neon that can't quite hold a steady glow. */
+@keyframes logo-flicker {
+  0%, 100% { opacity: 0.92; }
+  2% { opacity: 0.28; }
+  4% { opacity: 1; }
+  5% { opacity: 0.5; }
+  7% { opacity: 1; }
+  30% { opacity: 1; }
+  31% { opacity: 0.22; }
+  32% { opacity: 0.9; }
+  33% { opacity: 0.4; }
+  34% { opacity: 1; }
+  54% { opacity: 1; }
+  55% { opacity: 0.55; }
+  56% { opacity: 1; }
+  72% { opacity: 1; }
+  73% { opacity: 0.18; }
+  74% { opacity: 0.85; }
+  75% { opacity: 1; }
+  91% { opacity: 0.7; }
+  92% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .computer-logo {
+    animation: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .reference-socials {
+    left: 50%;
+    top: 5.25rem;
+  }
+
+  .reference-computer {
+    width: min(96vw, 620px);
+  }
+
+  .reference-hero-copy {
+    bottom: 5.5rem;
+    font-size: clamp(1.5rem, 7.5vw, 2.35rem);
+  }
+}
