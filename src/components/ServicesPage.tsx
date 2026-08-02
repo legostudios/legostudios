@@ -1,8 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { SERVICES } from "../data/services";
+import { SHOWCASE_IMAGES } from "../data/showcaseImages";
+import { HomeLogo } from "./HomeLogo";
 
-// Tight Helvetica-style face for the big titles, matching the reference.
-const DISPLAY = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
+const IMAGES = SHOWCASE_IMAGES;
+const N = IMAGES.length;
 
 interface ServicesPageProps {
   closing: boolean;
@@ -10,17 +14,22 @@ interface ServicesPageProps {
   onCloseFinished: () => void;
 }
 
-// An editorial list of services in the Artists Equity style: black page, giant
-// bold titles, thin dividers, and rows that invert to a white block on hover.
+// The services page: bold service names on the left over a 4:5 image on the
+// right that cycles every 0.5s. The names use mix-blend difference, so they read
+// black on the white field and invert wherever they overlap the photo.
 export function ServicesPage({
   closing,
   onRequestClose,
   onCloseFinished,
 }: ServicesPageProps) {
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
-    closeRef.current?.focus();
+    const id = window.setInterval(() => setActive((a) => (a + 1) % N), 500);
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -43,42 +52,48 @@ export function ServicesPage({
           onCloseFinished();
         }
       }}
-      className={`fixed inset-0 z-[60] overflow-y-auto bg-black text-white transition-opacity duration-500 ease-out motion-reduce:transition-none ${
+      className={`fixed inset-0 z-[60] isolate overflow-y-auto bg-white transition-opacity duration-500 ease-out motion-reduce:transition-none lg:overflow-hidden ${
         closing ? "opacity-0" : "opacity-100 starting:opacity-0"
       }`}
-      style={{ fontFamily: DISPLAY }}
+      style={{ fontFamily: HELV }}
     >
-      <button
-        ref={closeRef}
-        type="button"
-        onClick={onRequestClose}
-        aria-label="Close services"
-        className="fixed right-5 top-5 z-[65] text-[13px] uppercase tracking-widest text-white/60 transition-colors hover:text-white sm:right-8 sm:top-7"
-      >
-        Close ✕
-      </button>
+      <HomeLogo onClick={onRequestClose} align="right" />
 
-      <div className="mx-auto max-w-[1500px] px-5 pb-24 pt-24 sm:px-8 md:pt-28">
+      <div className="flex min-h-full flex-col items-center justify-center gap-[5vh] px-6 py-24 lg:block lg:min-h-0 lg:p-0">
+        {/* 4:5 image — stacked on top for mobile, on the right at lg+. */}
+        <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[9vw] lg:top-1/2 lg:h-[82vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
+        {IMAGES.map((src, i) => {
+          const isActive = i === active;
+          const isPrev = i === (active - 1 + N) % N;
+          return (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-linear"
+              style={{
+                opacity: isActive || isPrev ? 1 : 0,
+                zIndex: isActive ? 2 : isPrev ? 1 : 0,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Service names — centered under the image on mobile; lower-left and
+          inverted where they cross the image at lg+. */}
+      <ul className="relative text-center mix-blend-difference lg:absolute lg:bottom-[8vh] lg:left-[15vw] lg:text-left">
         {SERVICES.map((name) => (
-          <div key={name} className="border-t border-white/15">
-            <a
-              href="#"
-              className="group relative block px-4 py-6 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white sm:px-6 sm:py-8"
-            >
-              {/* White block fades in on enter, out on leave. */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-white opacity-0 transition-opacity duration-[600ms] ease-out group-hover:opacity-100"
-              />
-              {/* Text nudges right on hover — slow, smooth ease. */}
-              <div className="relative transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-3 sm:group-hover:translate-x-6">
-                <h2 className="text-[clamp(2.4rem,7.5vw,5.75rem)] font-bold capitalize leading-[0.92] tracking-tight text-white transition-colors duration-[600ms] ease-out group-hover:text-black">
-                  {name}
-                </h2>
-              </div>
-            </a>
-          </div>
+          <li
+            key={name}
+            className="text-[clamp(1.4rem,3.4vw,4rem)] font-normal leading-[1.12] tracking-[-0.01em] text-white lg:whitespace-nowrap lg:leading-[1.06]"
+          >
+            {name}
+          </li>
         ))}
+        </ul>
       </div>
     </div>
   );

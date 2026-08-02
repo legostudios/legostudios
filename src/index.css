@@ -1,5 +1,58 @@
 @import "tailwindcss";
 
+/* CRT power-on intro: static collapses to a bright line, then a dot, then fades. */
+.crt-intro {
+  transition: opacity 260ms ease-out;
+}
+.crt-intro-reveal {
+  opacity: 0;
+}
+
+/* The bright white line that snaps on, holds, collapses to a dot, and blinks out. */
+.crt-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%) scaleX(0);
+  background: #ffffff;
+  opacity: 0;
+  box-shadow: 0 0 22px 6px rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+.crt-line-on {
+  animation: crt-line 900ms cubic-bezier(0.6, 0, 0.85, 0.4) forwards;
+}
+@keyframes crt-line {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scaleX(0.3);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(1);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(1);
+  }
+  82% {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(0.03);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scaleX(0);
+  }
+}
+
+/* When the custom cursor is active, hide the system cursor everywhere. */
+.cursor-none,
+.cursor-none * {
+  cursor: none !important;
+}
+
 /* The services stack is scroll-driven; hide the raw scrollbar so only the
    3D card motion reads on screen. */
 .services-scroll {
@@ -18,6 +71,27 @@
 @font-face {
   font-family: "VCR OSD Mono";
   src: url("/fonts/VCR_OSD_MONO_1.001.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueRoman.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueMedium.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueBold.otf") format("opentype");
+  font-weight: 700;
   font-display: swap;
 }
 
@@ -109,9 +183,7 @@
 }
 
 .hero-computer {
-  /* Neutral grounding shadow so the machine sits in the scene instead of
-     glowing off the page. */
-  filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.5));
+  /* No shadow — the machine sits flat on the white page. */
 }
 
 .reference-socials {
@@ -130,13 +202,47 @@
 }
 
 .reference-hero-content {
-  display: block;
   inset: 0;
   position: absolute;
 }
 
 .reference-computer {
-  width: min(82vw, 875px);
+  width: 80vw;
+}
+
+/* Image shown through the cut-out CRT. Sized a hair larger than the glass so
+   it fully covers the hole; the machine's bezel (on top) hides the overhang. */
+.crt-screen {
+  position: absolute;
+  left: 50.39%;
+  top: 35.45%;
+  /* 18.75% × 27.5% of the 80vw × 40vw computer = 15vw × 11vw on desktop,
+     and stays aligned to the screen on any viewport. */
+  width: 18.75%;
+  height: 27.5%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.crt-screen > img {
+  /* Dim, slightly desaturated vintage-CRT tone. */
+  filter: brightness(0.86) contrast(1.05) saturate(0.85) sepia(0.06);
+}
+
+/* Soft edge vignette + faint scanlines + a diagonal glass glare. */
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 132% 132% at 50% 42%, transparent 50%, rgba(0, 0, 0, 0.42) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(122deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 40%);
 }
 
 .reference-hero-copy {
@@ -153,7 +259,7 @@
 .reference-hero-content .hero-computer {
   left: 50%;
   position: absolute;
-  top: 55%;
+  top: 52.5%;
   transform: translate(-50%, -50%);
 }
 
@@ -212,14 +318,17 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .reference-socials {
     left: 50%;
     top: 5.25rem;
   }
 
   .reference-computer {
-    width: min(96vw, 620px);
+    /* Bigger on phones/tablets, and square so object-contain scales it by
+       width (the 2:1 box would otherwise cap it at half the width). */
+    width: min(84vw, 460px);
+    aspect-ratio: 1 / 1;
   }
 
   .reference-hero-copy {
