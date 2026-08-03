@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { CustomCursor } from "./components/CustomCursor";
 import { Hero } from "./components/Hero";
@@ -7,7 +7,17 @@ import { TimeLine } from "./components/TimeLine";
 import { ServicesPage } from "./components/ServicesPage";
 import { CaseStudiesPage } from "./components/CaseStudiesPage";
 import { ContactPage } from "./components/ContactPage";
+import { SHOWCASE_IMAGES } from "./data/showcaseImages";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
+
+// Warm the browser cache with the services/case-study photos once the home page
+// is idle, so opening those pages shows the images with no load time.
+function preloadShowcase() {
+  SHOWCASE_IMAGES.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+}
 
 type Page = "services" | "caseStudies" | "contact" | null;
 
@@ -18,6 +28,19 @@ export default function App() {
   const [menuClosing, setMenuClosing] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
   const open = page !== null;
+
+  useEffect(() => {
+    const ric = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void;
+      }
+    ).requestIdleCallback;
+    if (ric) ric(preloadShowcase, { timeout: 2500 });
+    else {
+      const t = window.setTimeout(preloadShowcase, 1500);
+      return () => window.clearTimeout(t);
+    }
+  }, []);
 
   const finishClose = useCallback(() => {
     flushSync(() => {

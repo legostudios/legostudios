@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const N = 8;
-const IMAGES = Array.from({ length: N }, (_, i) => `/computer_images/${i + 1}.png`);
+const IMAGES = Array.from({ length: N }, (_, i) => `/computer_images/${i + 1}.webp`);
 
 interface ComputerShowcaseProps {
   /** When false, cycling pauses and the current frame is held. */
