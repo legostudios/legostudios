@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { HomeLogo } from "./HomeLogo";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
-const EMAIL = "hello@legostudios.com";
+const EMAIL = "hello@legostudios.co";
 const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
 const INSTAGRAM =
   "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnlncw==";
