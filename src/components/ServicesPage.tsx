@@ -57,11 +57,11 @@ export function ServicesPage({
       }`}
       style={{ fontFamily: HELV }}
     >
-      <HomeLogo onClick={onRequestClose} align="right" />
+      <HomeLogo onClick={onRequestClose} align="center" />
 
       <div className="flex min-h-full flex-col items-center justify-center gap-[5vh] px-6 py-24 lg:block lg:min-h-0 lg:p-0">
         {/* 4:5 image — stacked on top for mobile, on the right at lg+. */}
-        <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[9vw] lg:top-1/2 lg:h-[82vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
+        <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[2.5vw] lg:top-[57%] lg:h-[72vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
         {IMAGES.map((src, i) => {
           const isActive = i === active;
           const isPrev = i === (active - 1 + N) % N;
@@ -84,11 +84,11 @@ export function ServicesPage({
 
       {/* Service names — centered under the image on mobile; lower-left and
           inverted where they cross the image at lg+. */}
-      <ul className="relative text-center mix-blend-difference lg:absolute lg:bottom-[8vh] lg:left-[15vw] lg:text-left">
+      <ul className="relative text-center mix-blend-difference lg:absolute lg:bottom-[7vh] lg:left-[7vw] lg:text-left">
         {SERVICES.map((name) => (
           <li
             key={name}
-            className="text-[clamp(1.4rem,3.4vw,4rem)] font-normal leading-[1.12] tracking-[-0.01em] text-white lg:whitespace-nowrap lg:leading-[1.06]"
+            className="text-[clamp(1.6rem,5.1vw,7.5rem)] font-normal leading-[1.12] tracking-[-0.015em] text-white lg:whitespace-nowrap lg:leading-[1.06]"
           >
             {name}
           </li>

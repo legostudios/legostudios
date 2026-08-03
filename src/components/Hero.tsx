@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ComputerShowcase } from "./ComputerShowcase";
+import { CenterReveal } from "./CenterReveal";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const LABEL = "text-[13px] font-normal text-[#111111] sm:text-[14px]";
@@ -10,7 +11,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative isolate min-h-dvh overflow-hidden bg-white"
+      className="relative min-h-dvh overflow-hidden bg-white"
       style={{ fontFamily: HELV }}
     >
       {/* LEGO logo — top-center on every size. */}
@@ -19,7 +20,7 @@ export function Hero() {
         alt="LEGO"
         draggable={false}
         className="absolute left-1/2 top-[6.5%] z-10 -translate-x-1/2 select-none"
-        style={{ width: "clamp(2.5rem, 4vw, 4.25rem)", height: "auto" }}
+        style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
       />
 
       {/* MOBILE + TABLET (< lg): centered column — computer with labels below. */}
@@ -45,6 +46,11 @@ export function Hero() {
           Of Today
         </span>
       </div>
+
+      {/* Invisible centered headline, revealed under the cursor (laptop only).
+          Placed after the computer so it paints on top and — with no z-index of
+          its own — blends (difference) against the white page and the machine. */}
+      <CenterReveal />
 
       {/* Play / Pause — bottom-right on every size. */}
       <button

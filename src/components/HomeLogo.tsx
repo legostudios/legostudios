@@ -20,7 +20,7 @@ export function HomeLogo({ onClick, align = "center" }: HomeLogoProps) {
         alt="LEGO"
         draggable={false}
         className="select-none"
-        style={{ width: "clamp(2.5rem, 4vw, 4.25rem)", height: "auto" }}
+        style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
       />
     </button>
   );

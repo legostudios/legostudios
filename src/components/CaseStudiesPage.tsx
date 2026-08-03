@@ -8,9 +8,6 @@ const DISPLAY = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const N = SHOWCASE_IMAGES.length;
 
-const subline = (cs: CaseStudy) =>
-  cs.stats.map((s) => `${s.value} ${s.label}`).join("  ·  ");
-
 // The 4:5 photo that sits on the left of the case-study list, cycling every
 // 0.5s — mirror of the services page.
 function CyclingPhotos() {
@@ -20,7 +17,7 @@ function CyclingPhotos() {
     return () => window.clearInterval(id);
   }, []);
   return (
-    <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:left-[12vw] lg:top-[46%] lg:h-[72vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
+    <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[2.5vw] lg:top-[57%] lg:h-[72vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
       {SHOWCASE_IMAGES.map((src, i) => {
         const isActive = i === active;
         const isPrev = i === (active - 1 + N) % N;
@@ -101,30 +98,25 @@ export function CaseStudiesPage({
       }`}
       style={{ fontFamily: DISPLAY }}
     >
-      <HomeLogo onClick={onRequestClose} align="right" />
+      <HomeLogo onClick={onRequestClose} align="center" />
 
       {selected === null ? (
         <div className="flex min-h-full flex-col items-center justify-center gap-8 px-6 py-24 lg:block lg:p-0">
           {/* Cycling photo — on top for mobile, on the left at lg+. */}
           <CyclingPhotos />
 
-          {/* Case-study titles + stat sublines. Centered under the photo on
-              mobile; on the right and inverted where they cross the photo at
-              lg+. Clicking one opens its detail. */}
-          <ul className="relative flex w-full flex-col items-center gap-7 text-center mix-blend-difference lg:absolute lg:left-[41vw] lg:top-[68%] lg:w-auto lg:-translate-y-1/2 lg:items-start lg:gap-[clamp(1.4rem,4vh,3rem)] lg:text-left">
+          {/* Case-study titles. Centered under the photo on mobile; big on the
+              lower-left and inverted where they cross the photo at lg+, stacked
+              like the services names. Clicking one opens its detail. */}
+          <ul className="relative text-center mix-blend-difference lg:absolute lg:bottom-[7vh] lg:left-[7vw] lg:text-left">
             {CASE_STUDIES.map((cs, i) => (
-              <li key={cs.name} className="w-full">
+              <li key={cs.name}>
                 <button
                   type="button"
                   onClick={() => setSelected(i)}
-                  className="block w-full text-center text-white outline-none transition-opacity duration-300 hover:opacity-70 lg:text-left"
+                  className="block w-full text-center text-[clamp(1.4rem,5.1vw,7.5rem)] font-normal leading-[1.12] tracking-[-0.015em] text-white outline-none transition-opacity duration-300 hover:opacity-60 lg:whitespace-nowrap lg:text-left lg:leading-[1.06]"
                 >
-                  <span className="block text-[clamp(1.4rem,3.4vw,3.6rem)] font-normal leading-[1.05] tracking-[-0.01em] lg:whitespace-nowrap lg:leading-[1.02]">
-                    {cs.name}
-                  </span>
-                  <span className="mx-auto mt-2 block max-w-[82vw] text-[clamp(0.62rem,0.72vw,0.7rem)] uppercase leading-snug tracking-[0.1em] text-white/85 lg:mx-0 lg:max-w-none lg:whitespace-nowrap lg:leading-normal">
-                    {subline(cs)}
-                  </span>
+                  {cs.name}
                 </button>
               </li>
             ))}

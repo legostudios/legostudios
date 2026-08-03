@@ -32,7 +32,7 @@ export function NavMenu({
 
   const items: Array<{ label: string; onClick?: () => void }> = [
     { label: "Services", onClick: onServices },
-    { label: "Casestudies", onClick: onCaseStudies },
+    { label: "Case studies", onClick: onCaseStudies },
     { label: "Magazine" }, // non-functional for now
     { label: "Contact", onClick: onContact },
   ];
@@ -45,7 +45,7 @@ export function NavMenu({
           onCloseFinished();
         }
       }}
-      className={`fixed bottom-[6vh] left-[2.2vw] top-[13vh] z-[80] flex flex-col items-start justify-center gap-[clamp(1.25rem,3.2vh,2.5rem)] transition-opacity duration-500 ease-out ${
+      className={`fixed bottom-[6vh] left-9 top-[5.25rem] z-[80] flex flex-col items-start justify-start gap-[clamp(1.25rem,3.2vh,2.5rem)] transition-opacity duration-500 ease-out ${
         closing ? "opacity-0" : "opacity-100 starting:opacity-0"
       }`}
       style={{ fontFamily: HELV }}
@@ -55,7 +55,7 @@ export function NavMenu({
           key={item.label}
           type="button"
           onClick={item.onClick ?? undefined}
-          className="uppercase leading-none tracking-[0.06em] text-black"
+          className="normal-case leading-none tracking-normal text-black"
           style={{
             writingMode: "vertical-rl",
             textOrientation: "sideways",
