@@ -116,7 +116,7 @@ export function CaseStudiesPage({
                   onClick={() => setSelected(i)}
                   className="block w-full text-center text-[clamp(1.4rem,5.1vw,7.5rem)] font-normal leading-[1.12] tracking-[-0.015em] text-white outline-none transition-opacity duration-300 hover:opacity-60 lg:whitespace-nowrap lg:text-left lg:leading-[1.06]"
                 >
-                  {cs.name}
+                  {cs.name}.
                 </button>
               </li>
             ))}

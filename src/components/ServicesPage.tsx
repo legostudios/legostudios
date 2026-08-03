@@ -90,7 +90,7 @@ export function ServicesPage({
             key={name}
             className="text-[clamp(1.6rem,5.1vw,7.5rem)] font-normal leading-[1.12] tracking-[-0.015em] text-white lg:whitespace-nowrap lg:leading-[1.06]"
           >
-            {name}
+            {name}.
           </li>
         ))}
         </ul>
