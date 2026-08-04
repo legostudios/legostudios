@@ -60,7 +60,7 @@ export function ServicesPage({
 
       <div className="flex min-h-full flex-col items-center justify-center gap-10 px-6 py-24 lg:block lg:p-0">
         {/* 4:5 photo — stacked on top for mobile, on the right at lg+. */}
-        <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[2.5vw] lg:top-1/2 lg:h-[72vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
+        <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[6vw] lg:top-[56%] lg:h-[64vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
           {IMAGES.map((src, i) => {
             const isActive = i === active;
             const isPrev = i === (active - 1 + N) % N;
@@ -86,7 +86,7 @@ export function ServicesPage({
           {SERVICES.map((name) => (
             <li
               key={name}
-              className="text-[clamp(1.5rem,3.3vw,4rem)] font-bold leading-[1.12] tracking-[-0.02em] text-black lg:whitespace-nowrap lg:leading-[1.08]"
+              className="text-[clamp(1.5rem,3.3vw,4rem)] font-normal leading-[1.5] tracking-[-0.01em] text-black lg:whitespace-nowrap lg:leading-[1.45]"
             >
               {name}
             </li>
