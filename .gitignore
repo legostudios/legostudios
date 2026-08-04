@@ -26,3 +26,7 @@ dist-ssr
 # Local tooling / scratch files
 .claude/
 Pinterest reference.mp4
+
+# local reference videos (not part of the site)
+/services_ref.mp4
+/Pinterest reference.mp4
