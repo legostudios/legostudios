@@ -18,7 +18,7 @@ export interface CursorConfig {
 }
 
 export const DEFAULT_CURSOR: CursorConfig = {
-  size: 16,
+  size: 22,
   color: "255, 255, 255",
   blend: "difference",
   smoothing: 20,
