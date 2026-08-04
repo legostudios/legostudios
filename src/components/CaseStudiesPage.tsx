@@ -3,40 +3,54 @@ import { CASE_STUDIES, type CaseStudy } from "../data/caseStudies";
 import { SHOWCASE_IMAGES } from "../data/showcaseImages";
 import { HomeLogo } from "./HomeLogo";
 
-// Tight Helvetica-style face for the big titles, matching the services page.
+// Helvetica for the detail view; thin geometric Jost for the two-odd-style list.
 const DISPLAY = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const THIN = '"Jost", "Century Gothic", sans-serif';
 
-const N = SHOWCASE_IMAGES.length;
+// One photo per case study, shown on the left; hovering a name swaps it in.
+const CASE_IMAGES = CASE_STUDIES.map(
+  (_, i) => SHOWCASE_IMAGES[i % SHOWCASE_IMAGES.length],
+);
 
-// The 4:5 photo that sits on the left of the case-study list, cycling every
-// 0.5s — mirror of the services page.
-function CyclingPhotos() {
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setActive((a) => (a + 1) % N), 500);
-    return () => window.clearInterval(id);
-  }, []);
+// Each study's photo gets its own size + placement on the left half, so the
+// image jumps around as you move between names (like the reference).
+const FRAMES = [
+  "lg:left-[5vw] lg:top-[9vh] lg:h-[80vh] lg:w-[40vw]",
+  "lg:left-[10vw] lg:top-[20vh] lg:h-[55vh] lg:w-[38vw]",
+  "lg:left-[3vw] lg:top-[7vh] lg:h-[85vh] lg:w-[33vw]",
+  "lg:left-[9vw] lg:top-[15vh] lg:h-[66vh] lg:w-[44vw]",
+];
+
+// The left-hand photo. Mobile: one stacked image. Desktop: each study's image
+// lives in its own frame and crossfades in when that name is active.
+function LeftImage({ active }: { active: number }) {
   return (
-    <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:absolute lg:right-[2.5vw] lg:top-[57%] lg:h-[72vh] lg:w-auto lg:max-w-none lg:-translate-y-1/2">
-      {SHOWCASE_IMAGES.map((src, i) => {
-        const isActive = i === active;
-        const isPrev = i === (active - 1 + N) % N;
-        return (
+    <>
+      <div className="relative aspect-[4/5] w-[64vw] max-w-[340px] shrink-0 overflow-hidden lg:hidden">
+        {CASE_IMAGES.map((src, i) => (
           <img
-            key={src}
+            key={`m${i}`}
             src={src}
             alt=""
             aria-hidden="true"
             draggable={false}
-            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-linear"
-            style={{
-              opacity: isActive || isPrev ? 1 : 0,
-              zIndex: isActive ? 2 : isPrev ? 1 : 0,
-            }}
+            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
+            style={{ opacity: i === active ? 1 : 0 }}
           />
-        );
-      })}
-    </div>
+        ))}
+      </div>
+      {CASE_IMAGES.map((src, i) => (
+        <img
+          key={`d${i}`}
+          src={src}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className={`pointer-events-none absolute hidden object-cover transition-opacity duration-500 ease-out lg:block ${FRAMES[i % FRAMES.length]}`}
+          style={{ opacity: i === active ? 1 : 0 }}
+        />
+      ))}
+    </>
   );
 }
 
@@ -46,14 +60,16 @@ interface CaseStudiesPageProps {
   onCloseFinished: () => void;
 }
 
-// Case studies: white page, giant bold titles. The list inverts to a black
-// block on hover; clicking a row swaps in the full detail for that study.
+// Case studies: photo(s) on the left, thin names on the right. Hovering a name
+// slides it right past a black bar and swaps in that study's photo. Clicking a
+// name opens the full detail.
 export function CaseStudiesPage({
   closing,
   onRequestClose,
   onCloseFinished,
 }: CaseStudiesPageProps) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,7 +78,6 @@ export function CaseStudiesPage({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      // Esc backs out of a detail first, then closes the page.
       setSelected((cur) => {
         if (cur !== null) return null;
         onRequestClose();
@@ -76,7 +91,6 @@ export function CaseStudiesPage({
     };
   }, [onRequestClose]);
 
-  // Jump back to the top when switching between list and detail.
   useEffect(() => {
     rootRef.current?.scrollTo({ top: 0 });
   }, [selected]);
@@ -93,7 +107,7 @@ export function CaseStudiesPage({
           onCloseFinished();
         }
       }}
-      className={`fixed inset-0 z-[60] isolate overflow-y-auto bg-white text-black outline-none transition-opacity duration-500 ease-out motion-reduce:transition-none ${
+      className={`fixed inset-0 z-[60] overflow-y-auto bg-white text-black outline-none transition-opacity duration-500 ease-out motion-reduce:transition-none ${
         closing ? "opacity-0" : "opacity-100 starting:opacity-0"
       }`}
       style={{ fontFamily: DISPLAY }}
@@ -101,22 +115,31 @@ export function CaseStudiesPage({
       <HomeLogo onClick={onRequestClose} align="center" />
 
       {selected === null ? (
-        <div className="flex min-h-full flex-col items-center justify-center gap-8 px-6 py-24 lg:block lg:p-0">
-          {/* Cycling photo — on top for mobile, on the left at lg+. */}
-          <CyclingPhotos />
+        <div className="flex min-h-full flex-col items-center justify-center gap-10 px-6 py-24 lg:block lg:p-0">
+          <LeftImage active={hovered ?? 0} />
 
-          {/* Case-study titles. Centered under the photo on mobile; big on the
-              lower-left and inverted where they cross the photo at lg+, stacked
-              like the services names. Clicking one opens its detail. */}
-          <ul className="relative text-center mix-blend-difference lg:absolute lg:bottom-[7vh] lg:left-[7vw] lg:text-left">
+          {/* Names on the right (same placement as the reference). */}
+          <ul
+            onMouseLeave={() => setHovered(null)}
+            className="relative flex flex-col items-center gap-[clamp(0.9rem,3vh,2.25rem)] text-center lg:absolute lg:left-[58vw] lg:top-1/2 lg:max-w-[40vw] lg:-translate-y-1/2 lg:items-start lg:text-left"
+            style={{ fontFamily: THIN }}
+          >
             {CASE_STUDIES.map((cs, i) => (
-              <li key={cs.name}>
+              <li key={cs.name} className="w-full">
                 <button
                   type="button"
                   onClick={() => setSelected(i)}
-                  className="block w-full text-center text-[clamp(1.4rem,5.1vw,7.5rem)] font-normal leading-[1.12] tracking-[-0.015em] text-white outline-none transition-opacity duration-300 hover:opacity-60 lg:whitespace-nowrap lg:text-left lg:leading-[1.06]"
+                  onMouseEnter={() => setHovered(i)}
+                  className="group relative block w-full text-center text-[clamp(1.5rem,2.5vw,2.9rem)] font-light uppercase leading-[1.1] tracking-[0.03em] text-black outline-none lg:pl-[clamp(1.25rem,2.2vw,2.75rem)] lg:text-left"
                 >
-                  {cs.name}.
+                  {/* black bar beside the name (desktop) */}
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-0 top-1/2 hidden h-[0.72em] w-[3px] -translate-y-1/2 bg-black opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 lg:block"
+                  />
+                  <span className="inline-block transition-transform duration-300 ease-out lg:whitespace-nowrap lg:group-hover:translate-x-[1.1vw]">
+                    {cs.name}
+                  </span>
                 </button>
               </li>
             ))}
