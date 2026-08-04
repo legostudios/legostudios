@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { SHOWCASE_IMAGES } from "../data/showcaseImages";
 
-const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const FONT = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
 // ---- data ------------------------------------------------------------------
 
@@ -12,14 +12,6 @@ const LABELS = [
   "ruby", "sider", "sony", "sun", "seller", "sims", "slides", "simpsons", "sir",
 ];
 
-interface Card {
-  num: number;
-  label: string;
-  side: "left" | "right";
-  img: string;
-  divider?: [string, string];
-}
-
 const DIVIDERS: Record<number, [string, string]> = {
   2: ["O", "010"],
   10: ["P", "012"],
@@ -27,6 +19,14 @@ const DIVIDERS: Record<number, [string, string]> = {
   22: ["R", "002"],
   30: ["S", "002"],
 };
+
+interface Card {
+  num: number;
+  label: string;
+  side: "left" | "right";
+  img: string;
+  divider?: [string, string];
+}
 
 const CARDS: Card[] = LABELS.map((label, i) => ({
   num: 94 + i,
@@ -38,73 +38,267 @@ const CARDS: Card[] = LABELS.map((label, i) => ({
 
 const N = CARDS.length;
 
-// ---- geometry (px) ---------------------------------------------------------
+// ---- geometry --------------------------------------------------------------
 
-const TAB_H = 34; // revealed height of a collapsed folder (its tab strip)
-const OPEN_H = 430; // total height of the active (open) folder
-const ACTIVE_Y = 92; // where the active folder's tab sits in the viewport
-const STEP = 280; // scroll distance (px) per card
+const TAB_H = 36; // revealed tab height of a closed folder
+const OPEN_H = 452; // total height of the active (open) folder
+const ACTIVE_Y = 96; // screen-y where the active folder's tab sits
+const STEP = 300; // scroll distance per card (px)
+const LIP_H = 46; // drawer front lip height
+const CORNER = 15; // folder top corner radius
 
-// ---------------------------------------------------------------------------
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t);
 
-// A scroll-driven filing drawer. Rendering (the folders) is static markup;
-// animation is a scroll -> transform mapping applied imperatively each frame so
-// nothing re-renders and everything stays locked to the scroll position.
+// A scroll-driven filing drawer rendered on canvas. Every folder is drawn as a
+// trapezoid slice so the stack forms a real perspective drawer; the active
+// folder opens (linearly with scroll) to reveal a photo + "label / details".
 export function FilingDrawer() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const scroller = scrollRef.current;
-    if (!scroller) return;
+    const canvas = canvasRef.current;
+    if (!scroller || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    let raf = 0;
-    let queued = false;
+    // Preload photos.
+    const imgs = CARDS.map((c) => {
+      const im = new Image();
+      im.src = c.img;
+      im.onload = () => schedule();
+      return im;
+    });
 
-    const apply = () => {
-      queued = false;
-      const idx = scroller.scrollTop / STEP; // fractional active index
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
 
-      // Cumulative layout: each folder occupies TAB_H when closed, OPEN_H when
-      // fully open, interpolated by how close it is to the active index.
-      const ys: number[] = new Array(N);
-      const es: number[] = new Array(N);
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.clientWidth;
+      H = canvas.clientHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    };
+
+    // Perspective: half-width of the drawer at a given screen-y.
+    const geomFor = () => {
+      const DW = Math.min(760, W * 0.94);
+      const cx = W / 2;
+      const yBottom = H - LIP_H;
+      const halfW = (y: number) => {
+        const t = clamp01(y / yBottom);
+        return lerp(DW * 0.205, DW * 0.5, t);
+      };
+      return { cx, yBottom, halfW };
+    };
+
+    // Trace a folder outline: a trapezoid from yTop down to yBottom whose left
+    // and right edges follow the drawer perspective, with a rounded top.
+    const folderPath = (
+      yTop: number,
+      yBot: number,
+      cx: number,
+      halfW: (y: number) => number,
+    ) => {
+      const lT = cx - halfW(yTop);
+      const rT = cx + halfW(yTop);
+      const lB = cx - halfW(yBot);
+      const rB = cx + halfW(yBot);
+      const r = CORNER;
+      ctx.beginPath();
+      ctx.moveTo(lT + r, yTop);
+      ctx.lineTo(rT - r, yTop);
+      ctx.quadraticCurveTo(rT, yTop, rT, yTop + r);
+      ctx.lineTo(rB, yBot);
+      ctx.lineTo(lB, yBot);
+      ctx.lineTo(lT, yTop + r);
+      ctx.quadraticCurveTo(lT, yTop, lT + r, yTop);
+      ctx.closePath();
+    };
+
+    const draw = () => {
+      if (!W || !H) return;
+      const { cx, yBottom, halfW } = geomFor();
+      const idx = scroller.scrollTop / STEP;
+
+      // Cumulative vertical layout (closed = TAB_H, open = OPEN_H).
+      const ys = new Array<number>(N);
+      const es = new Array<number>(N);
       let y = 0;
       for (let i = 0; i < N; i++) {
-        const e = Math.max(0, 1 - Math.abs(i - idx));
+        const e = clamp01(1 - Math.abs(i - idx));
         es[i] = e;
         ys[i] = y;
         y += TAB_H + e * (OPEN_H - TAB_H);
       }
-
-      // Translate the whole stack so the active card's tab stays at ACTIVE_Y.
       const fl = Math.min(Math.floor(idx), N - 1);
-      const fr = idx - Math.floor(idx);
       const gapFl = TAB_H + es[fl] * (OPEN_H - TAB_H);
-      const yRef = ys[fl] + fr * gapFl;
+      const yRef = ys[fl] + (idx - Math.floor(idx)) * gapFl;
       const shift = ACTIVE_Y - yRef;
 
+      ctx.clearRect(0, 0, W, H);
+      ctx.lineJoin = "round";
+
       for (let i = 0; i < N; i++) {
-        const el = cardRefs.current[i];
-        if (el) el.style.transform = `translate3d(0, ${(ys[i] + shift).toFixed(2)}px, 0)`;
-        const c = contentRefs.current[i];
-        if (c) c.style.opacity = es[i].toFixed(3);
+        const card = CARDS[i];
+        const yTop = ys[i] + shift;
+        if (yTop > yBottom) continue; // below the drawer
+        const nextTop = i < N - 1 ? ys[i + 1] + shift : yBottom;
+        if (nextTop < -4) continue; // fully scrolled off the top
+
+        // Fill + stroke the folder down to the drawer bottom.
+        folderPath(yTop, yBottom + 2, cx, halfW);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#111111";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const wTop = halfW(yTop) * 2;
+        const lT = cx - halfW(yTop);
+
+        // Active content — clipped to the folder shape, faded by openness.
+        if (es[i] > 0.02) {
+          ctx.save();
+          folderPath(yTop, yBottom + 2, cx, halfW);
+          ctx.clip();
+          ctx.globalAlpha = es[i];
+
+          const padX = wTop * 0.07 + 18;
+          const titleX = lT + padX;
+          const titleY = yTop + TAB_H + 22;
+          ctx.fillStyle = "#111111";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "alphabetic";
+          ctx.font = `13px ${FONT}`;
+          ctx.fillText(card.label, titleX, titleY);
+          ctx.fillStyle = "rgba(17,17,17,0.4)";
+          ctx.fillText("details", titleX, titleY + 17);
+
+          // Photo, object-contain in the open area below the title.
+          const im = imgs[i];
+          if (im.complete && im.naturalWidth > 0) {
+            const boxTop = titleY + 30;
+            const boxBot = yTop + OPEN_H - 16;
+            const midY = (boxTop + boxBot) / 2;
+            const availLeft = cx - halfW(midY) + padX;
+            const availRight = cx + halfW(midY) - padX;
+            const boxW = availRight - availLeft;
+            const boxH = boxBot - boxTop;
+            if (boxH > 20 && boxW > 20) {
+              const scale = Math.min(boxW / im.naturalWidth, boxH / im.naturalHeight);
+              const dw = im.naturalWidth * scale;
+              const dh = im.naturalHeight * scale;
+              ctx.drawImage(im, cx - dw / 2, boxTop, dw, dh);
+            }
+          }
+          ctx.restore();
+        }
+
+        // Divider (black tab) on the left.
+        if (card.divider) {
+          const dx1 = lT + wTop * 0.1;
+          const dw = wTop * 0.3;
+          const dTop = yTop - 1;
+          const dBot = yTop + TAB_H - 7;
+          const r = 11;
+          ctx.beginPath();
+          ctx.moveTo(dx1 + r, dTop);
+          ctx.lineTo(dx1 + dw - r, dTop);
+          ctx.quadraticCurveTo(dx1 + dw, dTop, dx1 + dw + 3, dTop + r);
+          ctx.lineTo(dx1 + dw + 6, dBot);
+          ctx.lineTo(dx1 - 6, dBot);
+          ctx.lineTo(dx1 - 3, dTop + r);
+          ctx.quadraticCurveTo(dx1, dTop, dx1 + r, dTop);
+          ctx.closePath();
+          ctx.fillStyle = "#111111";
+          ctx.fill();
+          ctx.fillStyle = "#ffffff";
+          ctx.textBaseline = "middle";
+          ctx.textAlign = "left";
+          ctx.font = `11px ${FONT}`;
+          ctx.fillText(card.divider[0], dx1 + 8, (dTop + dBot) / 2 + 1);
+          ctx.textAlign = "right";
+          ctx.fillText(card.divider[1], dx1 + dw - 4, (dTop + dBot) / 2 + 1);
+        }
+
+        // Number + label on the tab.
+        ctx.fillStyle = "#111111";
+        ctx.textBaseline = "middle";
+        ctx.font = `13px ${FONT}`;
+        const cy = yTop + TAB_H / 2 + 0.5;
+        let nx: number;
+        let tx: number;
+        if (card.side === "left") {
+          nx = lT + wTop * 0.28;
+          tx = lT + wTop * 0.42;
+        } else {
+          nx = lT + wTop * 0.58;
+          tx = lT + wTop * 0.72;
+        }
+        ctx.textAlign = "left";
+        ctx.fillText(String(card.num), nx, cy);
+        ctx.fillText(card.label, tx, cy);
       }
+
+      // Drawer front lip.
+      const lipTopHalf = halfW(yBottom);
+      ctx.beginPath();
+      ctx.moveTo(0, yBottom);
+      ctx.lineTo(W, yBottom);
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - lipTopHalf, yBottom);
+      ctx.lineTo(cx + lipTopHalf, yBottom);
+      ctx.lineTo(cx + lipTopHalf + W * 0.06, H);
+      ctx.lineTo(cx - lipTopHalf - W * 0.06, H);
+      ctx.closePath();
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.stroke();
+
+      // Yellow title tab.
+      const tabW = 168;
+      const tabH = 30;
+      const tabX = cx - tabW / 2;
+      const tabY = H - tabH - 10;
+      roundRect(ctx, tabX, tabY, tabW, tabH, 7);
+      ctx.fillStyle = "#efe94b";
+      ctx.fill();
+      ctx.strokeStyle = "#111111";
+      ctx.stroke();
+      ctx.fillStyle = "#111111";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `13px ${FONT}`;
+      ctx.fillText("sam's secret files", cx, tabY + tabH / 2 + 1);
     };
 
-    const onScroll = () => {
+    let queued = false;
+    let raf = 0;
+    const schedule = () => {
       if (queued) return;
       queued = true;
-      raf = requestAnimationFrame(apply);
+      raf = requestAnimationFrame(() => {
+        queued = false;
+        draw();
+      });
     };
 
-    apply();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", apply);
+    resize();
+    scroller.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", resize);
     return () => {
-      scroller.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", apply);
+      scroller.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
     };
   }, []);
@@ -113,93 +307,29 @@ export function FilingDrawer() {
     <div
       ref={scrollRef}
       className="absolute inset-0 overflow-y-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      style={{ fontFamily: HELV }}
     >
-      {/* Spacer that provides the scroll distance. */}
       <div style={{ height: `calc(100vh + ${(N - 1) * STEP}px)` }}>
-        {/* Sticky viewport that the folders are drawn into. */}
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <div className="relative mx-auto h-full w-[min(660px,92vw)]">
-            {CARDS.map((card, i) => (
-              <div
-                key={card.num}
-                ref={(el) => {
-                  cardRefs.current[i] = el;
-                }}
-                className="absolute left-0 top-0 w-full will-change-transform"
-                style={{ height: OPEN_H, zIndex: i }}
-              >
-                <div className="relative h-full rounded-t-[26px] border border-black bg-white">
-                  {/* Tab: number + label, left or right. */}
-                  <div
-                    className={`absolute top-[9px] flex items-center gap-4 text-[13px] leading-none text-black ${
-                      card.side === "left" ? "left-[15%]" : "right-[15%]"
-                    }`}
-                  >
-                    <span className="tabular-nums">{card.num}</span>
-                    <span>{card.label}</span>
-                  </div>
-
-                  {/* Section divider tab. */}
-                  {card.divider && (
-                    <div className="absolute left-[7%] top-[-2px] z-10 flex items-center gap-6 rounded-t-[14px] border border-black bg-black px-4 py-[4px] text-[11px] leading-none text-white">
-                      <span>{card.divider[0]}</span>
-                      <span className="tabular-nums">{card.divider[1]}</span>
-                    </div>
-                  )}
-
-                  {/* Content — revealed only while the folder is open. */}
-                  <div
-                    ref={(el) => {
-                      contentRefs.current[i] = el;
-                    }}
-                    className="absolute inset-x-0 top-[44px] bottom-0 px-8 opacity-0"
-                  >
-                    <div className="text-[13px] leading-tight text-black">
-                      {card.label}
-                      <br />
-                      <span className="text-black/40">details</span>
-                    </div>
-                    <div className="absolute inset-x-8 top-[42px] bottom-2 overflow-hidden">
-                      <img
-                        src={card.img}
-                        alt=""
-                        loading="lazy"
-                        draggable={false}
-                        className="mx-auto h-full w-auto max-w-full object-contain"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Drawer front lip — folders slide behind it. */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[55]">
-              <div className="h-px w-full bg-black" />
-              <svg
-                viewBox="0 0 100 10"
-                preserveAspectRatio="none"
-                className="block h-10 w-full"
-                aria-hidden="true"
-              >
-                <polygon
-                  points="4,0 96,0 100,10 0,10"
-                  fill="#ffffff"
-                  stroke="black"
-                  strokeWidth="1"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </svg>
-            </div>
-
-            {/* Yellow title tab. */}
-            <div className="absolute bottom-[10px] left-1/2 z-[65] -translate-x-1/2 rounded-[7px] border border-black bg-[#efe94b] px-6 py-[7px] text-[13px] leading-none text-black">
-              sam&apos;s secret files
-            </div>
-          </div>
+        <div className="sticky top-0 h-screen">
+          <canvas ref={canvasRef} className="h-full w-full" />
         </div>
       </div>
     </div>
   );
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
 }
