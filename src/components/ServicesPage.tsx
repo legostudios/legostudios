@@ -10,7 +10,7 @@ interface ServicesPageProps {
   onCloseFinished: () => void;
 }
 
-// The services page: a filing-drawer of folder tabs (all labelled "sample").
+// The services page: a scroll-driven filing drawer of folder cards.
 export function ServicesPage({
   closing,
   onRequestClose,
@@ -39,13 +39,13 @@ export function ServicesPage({
           onCloseFinished();
         }
       }}
-      className={`fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-[#e3e2de] py-24 text-black transition-opacity duration-500 ease-out motion-reduce:transition-none ${
+      className={`fixed inset-0 z-[60] overflow-hidden bg-white text-black transition-opacity duration-500 ease-out motion-reduce:transition-none ${
         closing ? "opacity-0" : "opacity-100 starting:opacity-0"
       }`}
       style={{ fontFamily: HELV }}
     >
-      <HomeLogo onClick={onRequestClose} align="center" />
       <FilingDrawer />
+      <HomeLogo onClick={onRequestClose} align="right" />
     </div>
   );
 }
