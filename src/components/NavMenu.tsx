@@ -38,7 +38,6 @@ export function NavMenu({
   }, [onRequestClose]);
 
   const open = entered && !closing;
-  const [hovered, setHovered] = useState<number | null>(null);
 
   const items: Array<{ label: string; onClick?: () => void }> = [
     { label: "Services", onClick: onServices },
@@ -58,8 +57,6 @@ export function NavMenu({
           key={item.label}
           type="button"
           onClick={item.onClick ?? undefined}
-          onMouseEnter={() => setHovered(i)}
-          onMouseLeave={() => setHovered(null)}
           onTransitionEnd={
             i === items.length - 1
               ? (e) => {
@@ -67,7 +64,7 @@ export function NavMenu({
                 }
               : undefined
           }
-          className="relative normal-case leading-none tracking-normal text-black"
+          className="normal-case leading-none tracking-normal text-black"
           style={{
             writingMode: "vertical-rl",
             textOrientation: "sideways",
@@ -75,30 +72,11 @@ export function NavMenu({
             cursor: item.onClick ? undefined : "default",
             opacity: open ? 1 : 0,
             transform: "rotate(180deg)", // read bottom-to-top
-            // fade in place (no movement), gently eased with a slight stagger
+            // fade in place — no movement, gently eased
             transition: "opacity 520ms cubic-bezier(0.22, 1, 0.36, 1)",
-            transitionDelay: open ? `${i * 75}ms` : "0ms",
           }}
         >
           {item.label}
-          {/* underline beside the label that grows from the centre outward on
-              hover. Reset to horizontal-tb so top/bottom size it properly. */}
-          <span
-            aria-hidden="true"
-            style={{
-              writingMode: "horizontal-tb",
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: "-0.42em",
-              width: "2px",
-              background: "black",
-              transformOrigin: "center",
-              transform: hovered === i ? "scaleY(1)" : "scaleY(0)",
-              transition: "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)",
-              pointerEvents: "none",
-            }}
-          />
         </button>
       ))}
     </nav>
