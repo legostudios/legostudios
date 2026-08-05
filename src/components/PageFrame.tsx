@@ -237,7 +237,7 @@ function CaseStudyRows({ onSelect }: { onSelect: (index: number) => void }) {
           }}
           className="group relative flex flex-1 basis-0 flex-col justify-center overflow-hidden border-t-2 border-black pl-5 text-left outline-none"
         >
-          <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black transition-[padding-left] duration-300 ease-out group-hover:pl-3">
+          <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black">
             {cs.name}
           </span>
           <span
@@ -351,6 +351,7 @@ export function PageFrame({
     left: number;
     right: number;
     full: number;
+    index: number;
   } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [collapsing, setCollapsing] = useState(false);
@@ -434,6 +435,7 @@ export function PageFrame({
     if (collapsing) return;
     setCollapsing(true);
     setRevealed(false);
+    setHovered(null); // let the columns underneath ease back to equal widths
     collapseTimer.current = window.setTimeout(() => {
       setSelected(null);
       setSelGeo(null);
@@ -466,11 +468,24 @@ export function PageFrame({
   const anySel = selected !== null;
   const selTarget = selected !== null ? ITEMS[selected].target : null;
   const selPanel = selTarget ? PANELS[selTarget] : undefined;
-  // The page is bracketed by two dividers: a left one that slides from the
-  // clicked column's left edge out to the frame line (x = 0), and a right one
-  // that slides from the column's right edge off the screen.
-  const leftPos = selGeo ? (revealed ? 0 : selGeo.left) : 0;
-  const rightPos = selGeo ? (revealed ? selGeo.full + 60 : selGeo.right) : 0;
+  // The page is bracketed by two dividers. Opening, it grows out of the clicked
+  // column: the left divider slides to the frame line (x = 0), the right slides
+  // off-screen. Collapsing, both ease back to the column's *equal* partition in
+  // the menu (in sync with the columns underneath returning to equal widths).
+  let leftPos = 0;
+  let rightPos = 0;
+  if (selGeo) {
+    if (collapsing) {
+      const w = selGeo.full / ITEMS.length;
+      leftPos = selGeo.index * w;
+      rightPos = (selGeo.index + 1) * w;
+    } else if (revealed) {
+      rightPos = selGeo.full + 60;
+    } else {
+      leftPos = selGeo.left;
+      rightPos = selGeo.right;
+    }
+  }
 
   return (
     <>
@@ -511,7 +526,12 @@ export function PageFrame({
                 const full =
                   menuEl?.clientWidth ?? window.innerWidth - geo.vx;
                 const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                setSelGeo({ left: r.left - menuLeft, right: r.right - menuLeft, full });
+                setSelGeo({
+                  left: r.left - menuLeft,
+                  right: r.right - menuLeft,
+                  full,
+                  index: i,
+                });
                 setCollapsing(false);
                 setRevealed(false);
                 setSelected(i);
