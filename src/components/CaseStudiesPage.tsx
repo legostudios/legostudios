@@ -130,14 +130,14 @@ export function CaseStudiesPage({
                   type="button"
                   onClick={() => setSelected(i)}
                   onMouseEnter={() => setHovered(i)}
-                  className="group relative block w-full text-center text-[clamp(1.5rem,2.5vw,2.9rem)] font-bold uppercase leading-[1.1] tracking-[0.02em] text-black outline-none lg:pl-[0.7em] lg:text-left"
+                  className="group relative block w-full text-center text-[clamp(1.5rem,2.5vw,2.9rem)] font-bold leading-[1.1] tracking-[0.01em] text-black outline-none lg:pl-[0.4em] lg:text-left"
                 >
                   {/* black bar beside the name (desktop) */}
                   <span
                     aria-hidden="true"
                     className="pointer-events-none absolute left-0 top-1/2 hidden h-[0.72em] w-[3px] -translate-y-1/2 bg-black opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 lg:block"
                   />
-                  <span className="inline-block transition-transform duration-300 ease-out lg:whitespace-nowrap lg:group-hover:translate-x-[1.1vw]">
+                  <span className="inline-block transition-transform duration-300 ease-out lg:whitespace-nowrap lg:group-hover:translate-x-[0.45vw]">
                     {cs.name}
                   </span>
                 </button>
