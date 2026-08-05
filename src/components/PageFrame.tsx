@@ -43,8 +43,17 @@ const PANELS: Record<string, { title: string; items: string[] }> = {
 };
 
 // A column heading. Collapsed, its words stack onto lines (clipped). Active, the
-// words glide onto one line.
-function ColumnName({ label, active }: { label: string; active: boolean }) {
+// words glide onto one line. On mobile the menu is a horizontal band, so the
+// name is just shown on one line, vertically centered.
+function ColumnName({
+  label,
+  active,
+  mobile,
+}: {
+  label: string;
+  active: boolean;
+  mobile: boolean;
+}) {
   const words = label.split(" ");
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [stacked, setStacked] = useState<string[]>(() =>
@@ -72,6 +81,14 @@ function ColumnName({ label, active }: { label: string; active: boolean }) {
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [label]);
+
+  if (mobile) {
+    return (
+      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold tracking-[-0.02em] text-black">
+        {label}
+      </span>
+    );
+  }
 
   return (
     <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
@@ -355,6 +372,15 @@ export function PageFrame({
   } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [collapsing, setCollapsing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const on = () => setIsMobile(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
 
   useEffect(() => {
     const h = hRef.current;
@@ -368,7 +394,10 @@ export function PageFrame({
       const clock = document.querySelector('[aria-label="Menu"]') as HTMLElement | null;
       const lr = logo?.getBoundingClientRect();
       const cr = clock?.getBoundingClientRect();
-      const vx = Math.round(cr ? cr.right + CLOCK_GAP : 84);
+      const mobile = window.matchMedia("(max-width: 1023px)").matches;
+      // Mobile: no left vertical line — the frame is just the top horizontal
+      // line, and the menu spans the full width (vx = 0).
+      const vx = mobile ? 0 : Math.round(cr ? cr.right + CLOCK_GAP : 84);
       const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14);
       setGeo({ vx, hy });
 
@@ -386,7 +415,7 @@ export function PageFrame({
       h.style.strokeDasharray = String(hLen);
       v.style.strokeDasharray = String(vLen);
       h.style.opacity = "1";
-      v.style.opacity = "1";
+      v.style.opacity = mobile ? "0" : "1";
 
       if (draw) {
         h.style.transition = "none";
@@ -427,7 +456,7 @@ export function PageFrame({
     setSelGeo(null);
     setRevealed(false);
     setCollapsing(false);
-  }, [open]);
+  }, [open, isMobile]);
 
   // Reverse the expansion: shrink the page back to its column and, when the
   // width animation is done, drop back to the menu.
@@ -487,6 +516,37 @@ export function PageFrame({
     }
   }
 
+  const panelNode =
+    selTarget === "contact" ? (
+      <PagePanel
+        title="Contact"
+        collapsing={collapsing}
+        onHeadingClick={collapsePanel}
+      >
+        <ContactBody />
+      </PagePanel>
+    ) : selTarget === "magazine" ? (
+      <PagePanel
+        title="Magazine"
+        collapsing={collapsing}
+        onHeadingClick={collapsePanel}
+      >
+        <MagazineBody />
+      </PagePanel>
+    ) : selPanel ? (
+      <PagePanel
+        title={selPanel.title}
+        collapsing={collapsing}
+        onHeadingClick={collapsePanel}
+      >
+        {selTarget === "caseStudies" ? (
+          <CaseStudyRows onSelect={onOpenCaseStudy} />
+        ) : (
+          <ListRows items={selPanel.items} />
+        )}
+      </PagePanel>
+    ) : null;
+
   return (
     <>
       {/* Content area. */}
@@ -509,7 +569,7 @@ export function PageFrame({
             stay opaque and are simply overdrawn (and non-interactive) while a
             page is open. */}
         <div
-          className="flex h-full w-full"
+          className={`flex h-full w-full ${isMobile ? "flex-col" : ""}`}
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {ITEMS.map((item, i) => (
@@ -540,73 +600,56 @@ export function PageFrame({
                 );
               }}
               style={{
-                flexGrow: hovered === i ? 3 : 1,
+                flexGrow: !isMobile && hovered === i ? 3 : 1,
                 transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
                 cursor: item.target ? undefined : "default",
               }}
-              className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
+              className={`relative flex-1 basis-0 overflow-hidden border-black text-left outline-none ${
+                isMobile
+                  ? "border-b-2 last:border-b-0"
+                  : "border-r-2 last:border-r-0"
+              }`}
             >
-              <ColumnName label={item.label} active={hovered === i} />
+              <ColumnName
+                label={item.label}
+                active={hovered === i}
+                mobile={isMobile}
+              />
             </button>
           ))}
         </div>
 
-        {/* Expanded page. Its left/right borders are the two dividers; the page
-            grows out of the clicked column as they slide apart. The inner div is
-            counter-offset so the content stays pinned to the frame's left. */}
-        {anySel && selGeo && (
-          <div
-            className="absolute inset-y-0 overflow-hidden border-l-2 border-r-2 border-black bg-white"
-            style={{
-              left: leftPos,
-              width: Math.max(0, rightPos - leftPos),
-              transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
-            }}
-          >
+        {/* Expanded page. Desktop: the left/right borders are two dividers and
+            the page grows horizontally out of the clicked column (inner div
+            counter-offset so the content stays pinned to the frame's left).
+            Mobile: the page simply covers the horizontal band menu. */}
+        {anySel &&
+          selGeo &&
+          (isMobile ? (
+            <div className="absolute inset-0 overflow-hidden bg-white">
+              {panelNode}
+            </div>
+          ) : (
             <div
-              className="absolute inset-y-0"
+              className="absolute inset-y-0 overflow-hidden border-l-2 border-r-2 border-black bg-white"
               style={{
-                // While opening/open, pin the content to the frame's left so it
-                // fills the page. While collapsing, let it ride with the page
-                // (left = 0) so the heading travels back into the column instead
-                // of being clipped by the shrinking window.
-                left: collapsing ? 0 : -leftPos,
-                width: selGeo.full,
-                transition: `left ${EXPAND}ms ${SMOOTH}`,
+                left: leftPos,
+                width: Math.max(0, rightPos - leftPos),
+                transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
               }}
             >
-              {selTarget === "contact" ? (
-                <PagePanel
-                  title="Contact"
-                  collapsing={collapsing}
-                  onHeadingClick={collapsePanel}
-                >
-                  <ContactBody />
-                </PagePanel>
-              ) : selTarget === "magazine" ? (
-                <PagePanel
-                  title="Magazine"
-                  collapsing={collapsing}
-                  onHeadingClick={collapsePanel}
-                >
-                  <MagazineBody />
-                </PagePanel>
-              ) : selPanel ? (
-                <PagePanel
-                  title={selPanel.title}
-                  collapsing={collapsing}
-                  onHeadingClick={collapsePanel}
-                >
-                  {selTarget === "caseStudies" ? (
-                    <CaseStudyRows onSelect={onOpenCaseStudy} />
-                  ) : (
-                    <ListRows items={selPanel.items} />
-                  )}
-                </PagePanel>
-              ) : null}
+              <div
+                className="absolute inset-y-0"
+                style={{
+                  left: collapsing ? 0 : -leftPos,
+                  width: selGeo.full,
+                  transition: `left ${EXPAND}ms ${SMOOTH}`,
+                }}
+              >
+                {panelNode}
+              </div>
             </div>
-          </div>
-        )}
+          ))}
       </div>
 
       {/* Frame lines, drawn on top. */}
