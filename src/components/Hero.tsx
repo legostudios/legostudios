@@ -5,7 +5,7 @@ import { CenterReveal } from "./CenterReveal";
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const LABEL = "text-[13px] font-normal text-[#111111] sm:text-[14px]";
 
-export function Hero() {
+export function Hero({ onHome }: { onHome: () => void }) {
   const [playing, setPlaying] = useState(true);
 
   return (
@@ -14,14 +14,21 @@ export function Hero() {
       className="relative min-h-dvh overflow-hidden bg-white"
       style={{ fontFamily: HELV }}
     >
-      {/* LEGO logo — top-center on every size. */}
-      <img
-        src="/lego-logo.png"
-        alt="LEGO"
-        draggable={false}
-        className="absolute left-1/2 top-[6.5%] z-10 -translate-x-1/2 select-none"
-        style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
-      />
+      {/* LEGO logo — top-center on every size; doubles as a home button. z-[80]
+          keeps it clickable above the menu frame. */}
+      <button
+        type="button"
+        onClick={onHome}
+        aria-label="Home"
+        className="absolute left-1/2 top-[6.5%] z-[80] -translate-x-1/2 select-none outline-none"
+      >
+        <img
+          src="/lego-logo.png"
+          alt="LEGO"
+          draggable={false}
+          style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
+        />
+      </button>
 
       {/* MOBILE + TABLET (< lg): centered column — computer with labels below. */}
       <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 lg:hidden">
