@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
+const SMOOTH = "cubic-bezier(0.22, 1, 0.36, 1)"; // gentle, premium deceleration
+const EXPAND = 700; // column expansion duration
+const WORD = 580; // per-word glide duration
 const DRAW = 1000; // frame draw duration
 const OUT = 460; // retract duration
 
@@ -119,13 +122,32 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
             onClick={() => item.target && onNavigate(item.target)}
             style={{
               flexGrow: hovered === i ? 3 : 1,
-              transition: `flex-grow 520ms ${EASE}`,
+              transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
               cursor: item.target ? undefined : "default",
             }}
             className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
           >
             <span className="absolute bottom-6 left-0 w-full pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
-              {item.label}
+              {item.label.split(" ").map((word, wi) => (
+                <span
+                  key={wi}
+                  className="block whitespace-nowrap"
+                  style={{
+                    // On hover each word glides home: first word drops down, the
+                    // rest slide in from the left (Studies -> right).
+                    transform:
+                      hovered === i
+                        ? "translate(0, 0)"
+                        : wi === 0
+                          ? "translateY(-0.4em)"
+                          : "translateX(-0.75em)",
+                    transition: `transform ${WORD}ms ${EASE}`,
+                    transitionDelay: hovered === i ? `${wi * 70}ms` : "0ms",
+                  }}
+                >
+                  {word}
+                </span>
+              ))}
             </span>
           </button>
         ))}
