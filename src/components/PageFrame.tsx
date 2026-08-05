@@ -83,8 +83,10 @@ function ColumnName({
   }, [label]);
 
   if (mobile) {
+    // Anchored top-left like the page heading, so the heading lands exactly on
+    // it when a page collapses back to the band.
     return (
-      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold tracking-[-0.02em] text-black">
+      <span className="absolute left-5 top-5 whitespace-nowrap pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
         {label}
       </span>
     );
@@ -117,11 +119,13 @@ function ColumnName({
 function PagePanel({
   title,
   collapsing,
+  mobile,
   onHeadingClick,
   children,
 }: {
   title: string;
   collapsing: boolean;
+  mobile: boolean;
   onHeadingClick: () => void;
   children: ReactNode;
 }) {
@@ -140,8 +144,10 @@ function PagePanel({
     const h = headingRef.current;
     if (!h) return;
     const measure = () => {
-      setRowsTop(20 + h.offsetHeight + 64);
-      if (!shown) {
+      setRowsTop(20 + h.offsetHeight + (mobile ? 36 : 64));
+      // Desktop parks the heading at the bottom to slide it up. On mobile the
+      // vertical reveal moves the heading, so leave it in place at the top.
+      if (!mobile && !shown) {
         h.style.transition = "none";
         h.style.transform = `translateY(${parkedY()}px)`;
       }
@@ -153,6 +159,10 @@ function PagePanel({
   }, []);
 
   useEffect(() => {
+    if (mobile) {
+      setShown(true);
+      return;
+    }
     const raf = requestAnimationFrame(() => {
       const h = headingRef.current;
       if (h) {
@@ -162,15 +172,19 @@ function PagePanel({
       setShown(true);
     });
     return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reverse: slide the heading back down and fade the body out.
+  // Reverse: slide the heading back down and fade the body out. (Desktop only;
+  // on mobile the vertical reveal carries the heading back into the band.)
   useEffect(() => {
     if (!collapsing) return;
-    const h = headingRef.current;
-    if (h) {
-      h.style.transition = `transform ${EXPAND}ms ${SMOOTH}`;
-      h.style.transform = `translateY(${parkedY()}px)`;
+    if (!mobile) {
+      const h = headingRef.current;
+      if (h) {
+        h.style.transition = `transform ${EXPAND}ms ${SMOOTH}`;
+        h.style.transform = `translateY(${parkedY()}px)`;
+      }
     }
     setShown(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,7 +197,7 @@ function PagePanel({
         onClick={onHeadingClick}
         role="button"
         aria-label={`Close ${title}`}
-        className="absolute left-5 top-5 z-10 cursor-pointer whitespace-nowrap text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black will-change-transform"
+        className="absolute left-5 top-5 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black will-change-transform lg:text-[clamp(2.5rem,7vw,7rem)]"
       >
         {title}
       </h1>
@@ -237,42 +251,52 @@ function ListRows({
 
 // Case-study rows. Hovering a row grows it and reveals that study's headline
 // stats under its name; clicking opens the detail.
-function CaseStudyRows({ onSelect }: { onSelect: (index: number) => void }) {
+function CaseStudyRows({
+  onSelect,
+  mobile,
+}: {
+  onSelect: (index: number) => void;
+  mobile: boolean;
+}) {
   const [hover, setHover] = useState<number | null>(null);
   return (
     <>
-      {CASE_STUDIES.map((cs, i) => (
-        <button
-          key={cs.name}
-          type="button"
-          onClick={() => onSelect(i)}
-          onMouseEnter={() => setHover(i)}
-          onMouseLeave={() => setHover(null)}
-          style={{
-            flexGrow: hover === i ? 2.4 : 1,
-            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
-          }}
-          className="group relative flex flex-1 basis-0 flex-col justify-center overflow-hidden border-t-2 border-black pl-5 text-left outline-none"
-        >
-          <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black">
-            {cs.name}
-          </span>
-          <span
-            className="mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.85rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
+      {CASE_STUDIES.map((cs, i) => {
+        // No hover on touch — the highlights are shown by default on mobile.
+        const showStats = mobile || hover === i;
+        return (
+          <button
+            key={cs.name}
+            type="button"
+            onClick={() => onSelect(i)}
+            onMouseEnter={mobile ? undefined : () => setHover(i)}
+            onMouseLeave={mobile ? undefined : () => setHover(null)}
             style={{
-              opacity: hover === i ? 1 : 0,
-              transition: "opacity 320ms ease 120ms",
+              flexGrow: !mobile && hover === i ? 2.4 : 1,
+              transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
             }}
+            className="group relative flex flex-1 basis-0 flex-col justify-center overflow-hidden border-t-2 border-black pl-5 text-left outline-none"
           >
-            {cs.stats.map((s) => (
-              <span key={s.label}>
-                <span className="font-medium text-black">{s.value}</span>{" "}
-                {s.label}
-              </span>
-            ))}
-          </span>
-        </button>
-      ))}
+            <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black">
+              {cs.name}
+            </span>
+            <span
+              className="mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.9rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
+              style={{
+                opacity: showStats ? 1 : 0,
+                transition: "opacity 320ms ease 120ms",
+              }}
+            >
+              {cs.stats.map((s) => (
+                <span key={s.label}>
+                  <span className="font-medium text-black">{s.value}</span>{" "}
+                  {s.label}
+                </span>
+              ))}
+            </span>
+          </button>
+        );
+      })}
     </>
   );
 }
@@ -364,10 +388,12 @@ export function PageFrame({
   const [geo, setGeo] = useState({ vx: 86, hy: 120 });
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
+  // start/end are the clicked band's edges along the menu axis (x on desktop,
+  // y on mobile); size is the menu's extent along that axis.
   const [selGeo, setSelGeo] = useState<{
-    left: number;
-    right: number;
-    full: number;
+    start: number;
+    end: number;
+    size: number;
     index: number;
   } | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -497,22 +523,22 @@ export function PageFrame({
   const anySel = selected !== null;
   const selTarget = selected !== null ? ITEMS[selected].target : null;
   const selPanel = selTarget ? PANELS[selTarget] : undefined;
-  // The page is bracketed by two dividers. Opening, it grows out of the clicked
-  // column: the left divider slides to the frame line (x = 0), the right slides
-  // off-screen. Collapsing, both ease back to the column's *equal* partition in
-  // the menu (in sync with the columns underneath returning to equal widths).
-  let leftPos = 0;
-  let rightPos = 0;
+  // The page is bracketed by two dividers along the menu axis. Opening, it grows
+  // out of the clicked band: the near divider slides to the frame line (0), the
+  // far one slides off-screen. Collapsing, both ease back to the band's *equal*
+  // partition (in sync with the bands underneath returning to equal size).
+  let pos1 = 0;
+  let pos2 = 0;
   if (selGeo) {
     if (collapsing) {
-      const w = selGeo.full / ITEMS.length;
-      leftPos = selGeo.index * w;
-      rightPos = (selGeo.index + 1) * w;
+      const seg = selGeo.size / ITEMS.length;
+      pos1 = selGeo.index * seg;
+      pos2 = (selGeo.index + 1) * seg;
     } else if (revealed) {
-      rightPos = selGeo.full + 60;
+      pos2 = selGeo.size + 60;
     } else {
-      leftPos = selGeo.left;
-      rightPos = selGeo.right;
+      pos1 = selGeo.start;
+      pos2 = selGeo.end;
     }
   }
 
@@ -521,6 +547,7 @@ export function PageFrame({
       <PagePanel
         title="Contact"
         collapsing={collapsing}
+        mobile={isMobile}
         onHeadingClick={collapsePanel}
       >
         <ContactBody />
@@ -529,6 +556,7 @@ export function PageFrame({
       <PagePanel
         title="Magazine"
         collapsing={collapsing}
+        mobile={isMobile}
         onHeadingClick={collapsePanel}
       >
         <MagazineBody />
@@ -537,10 +565,11 @@ export function PageFrame({
       <PagePanel
         title={selPanel.title}
         collapsing={collapsing}
+        mobile={isMobile}
         onHeadingClick={collapsePanel}
       >
         {selTarget === "caseStudies" ? (
-          <CaseStudyRows onSelect={onOpenCaseStudy} />
+          <CaseStudyRows onSelect={onOpenCaseStudy} mobile={isMobile} />
         ) : (
           <ListRows items={selPanel.items} />
         )}
@@ -581,17 +610,23 @@ export function PageFrame({
               onClick={(e) => {
                 if (!item.target) return;
                 const menuEl = menuRef.current;
-                const menuLeft =
-                  menuEl?.getBoundingClientRect().left ?? geo.vx;
-                const full =
-                  menuEl?.clientWidth ?? window.innerWidth - geo.vx;
+                const rect = menuEl?.getBoundingClientRect();
                 const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                setSelGeo({
-                  left: r.left - menuLeft,
-                  right: r.right - menuLeft,
-                  full,
-                  index: i,
-                });
+                let start: number;
+                let end: number;
+                let size: number;
+                if (isMobile) {
+                  const menuTop = rect?.top ?? geo.hy;
+                  size = menuEl?.clientHeight ?? window.innerHeight - geo.hy;
+                  start = r.top - menuTop;
+                  end = r.bottom - menuTop;
+                } else {
+                  const menuLeft = rect?.left ?? geo.vx;
+                  size = menuEl?.clientWidth ?? window.innerWidth - geo.vx;
+                  start = r.left - menuLeft;
+                  end = r.right - menuLeft;
+                }
+                setSelGeo({ start, end, size, index: i });
                 setCollapsing(false);
                 setRevealed(false);
                 setSelected(i);
@@ -626,23 +661,39 @@ export function PageFrame({
         {anySel &&
           selGeo &&
           (isMobile ? (
-            <div className="absolute inset-0 overflow-hidden bg-white">
-              {panelNode}
+            <div
+              className="absolute inset-x-0 overflow-hidden border-t-2 border-b-2 border-black bg-white"
+              style={{
+                top: pos1,
+                height: Math.max(0, pos2 - pos1),
+                transition: `top ${EXPAND}ms ${SMOOTH}, height ${EXPAND}ms ${SMOOTH}`,
+              }}
+            >
+              <div
+                className="absolute inset-x-0"
+                style={{
+                  top: collapsing ? 0 : -pos1,
+                  height: selGeo.size,
+                  transition: `top ${EXPAND}ms ${SMOOTH}`,
+                }}
+              >
+                {panelNode}
+              </div>
             </div>
           ) : (
             <div
               className="absolute inset-y-0 overflow-hidden border-l-2 border-r-2 border-black bg-white"
               style={{
-                left: leftPos,
-                width: Math.max(0, rightPos - leftPos),
+                left: pos1,
+                width: Math.max(0, pos2 - pos1),
                 transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
               }}
             >
               <div
                 className="absolute inset-y-0"
                 style={{
-                  left: collapsing ? 0 : -leftPos,
-                  width: selGeo.full,
+                  left: collapsing ? 0 : -pos1,
+                  width: selGeo.size,
                   transition: `left ${EXPAND}ms ${SMOOTH}`,
                 }}
               >
