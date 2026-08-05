@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { SERVICES } from "../data/services";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
@@ -20,63 +21,38 @@ const ITEMS: { label: string; target: Target | null }[] = [
 ];
 
 // A column heading. Collapsed, its words stack onto lines (clipped). Active, the
-// words glide onto one line. Expanded (the column became a page), the whole name
-// slides up to the top of the column.
-function ColumnName({
-  label,
-  active,
-  expanded,
-}: {
-  label: string;
-  active: boolean;
-  expanded: boolean;
-}) {
+// words glide onto one line.
+function ColumnName({ label, active }: { label: string; active: boolean }) {
   const words = label.split(" ");
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const outerRef = useRef<HTMLSpanElement>(null);
   const [stacked, setStacked] = useState<string[]>(() =>
     words.map(() => "translate(0, 0)"),
   );
-  const [topSlide, setTopSlide] = useState(0);
 
   useLayoutEffect(() => {
     const measure = () => {
       const els = wordRefs.current;
       const first = els[0];
-      if (first) {
-        const n = words.length;
-        const lineHeight = first.offsetHeight;
-        const left0 = first.offsetLeft;
-        setStacked(
-          words.map((_, i) => {
-            const el = els[i];
-            const dx = el ? -(el.offsetLeft - left0) : 0;
-            const dy = -((n - 1 - i) * lineHeight);
-            return `translate(${dx}px, ${dy}px)`;
-          }),
-        );
-      }
-      const outer = outerRef.current;
-      const parent = outer?.offsetParent as HTMLElement | null;
-      if (outer && parent) {
-        setTopSlide(-(parent.clientHeight - outer.offsetHeight - 44));
-      }
+      if (!first) return;
+      const n = words.length;
+      const lineHeight = first.offsetHeight;
+      const left0 = first.offsetLeft;
+      setStacked(
+        words.map((_, i) => {
+          const el = els[i];
+          const dx = el ? -(el.offsetLeft - left0) : 0;
+          const dy = -((n - 1 - i) * lineHeight);
+          return `translate(${dx}px, ${dy}px)`;
+        }),
+      );
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [label]);
 
-  const oneLine = active || expanded;
   return (
-    <span
-      ref={outerRef}
-      className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black"
-      style={{
-        transform: expanded ? `translateY(${topSlide}px)` : "translateY(0)",
-        transition: `transform ${EXPAND}ms ${SMOOTH}`,
-      }}
-    >
+    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
       {words.map((word, i) => (
         <span
           key={i}
@@ -85,7 +61,7 @@ function ColumnName({
           }}
           className="inline-block"
           style={{
-            transform: oneLine ? "translate(0, 0)" : stacked[i],
+            transform: active ? "translate(0, 0)" : stacked[i],
             transition: `transform ${EXPAND}ms ${SMOOTH}`,
           }}
         >
@@ -93,6 +69,73 @@ function ColumnName({
         </span>
       ))}
     </span>
+  );
+}
+
+// The expanded Services page: the "Services" heading slides up to the top, then
+// the area below splits into five equal rows (horizontal dividers), one per
+// service name.
+function ServicesPanel() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [rowsTop, setRowsTop] = useState(120);
+  const [shown, setShown] = useState(false);
+
+  useLayoutEffect(() => {
+    const h = headingRef.current;
+    if (!h) return;
+    const measure = () => {
+      setRowsTop(20 + h.offsetHeight + 10);
+      const parent = h.offsetParent as HTMLElement | null;
+      if (parent && !shown) {
+        const bottomY = Math.max(0, parent.clientHeight - h.offsetHeight - 44);
+        h.style.transition = "none";
+        h.style.transform = `translateY(${bottomY}px)`;
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      const h = headingRef.current;
+      if (h) {
+        h.style.transition = `transform 780ms ${SMOOTH}`;
+        h.style.transform = "translateY(0)";
+      }
+      setShown(true);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div className="absolute inset-0">
+      <h1
+        ref={headingRef}
+        className="absolute left-5 top-5 whitespace-nowrap text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black will-change-transform"
+      >
+        Services
+      </h1>
+      <div
+        className="absolute inset-x-0 bottom-0 flex flex-col"
+        style={{
+          top: rowsTop,
+          opacity: shown ? 1 : 0,
+          transition: "opacity 520ms ease 380ms",
+        }}
+      >
+        {SERVICES.map((name) => (
+          <div
+            key={name}
+            className="flex flex-1 items-center border-t-2 border-black pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black"
+          >
+            {name}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -236,11 +279,11 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
               }}
               className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
             >
-              <ColumnName
-                label={item.label}
-                active={hovered === i}
-                expanded={isSel}
-              />
+              {isSel ? (
+                <ServicesPanel />
+              ) : (
+                <ColumnName label={item.label} active={hovered === i} />
+              )}
             </button>
           );
         })}
