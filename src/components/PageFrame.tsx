@@ -152,7 +152,7 @@ function PagePanel({
     if (!collapsing) return;
     const h = headingRef.current;
     if (h) {
-      h.style.transition = `transform 560ms ${SMOOTH}`;
+      h.style.transition = `transform ${EXPAND}ms ${SMOOTH}`;
       h.style.transform = `translateY(${parkedY()}px)`;
     }
     setShown(false);
@@ -566,7 +566,11 @@ export function PageFrame({
             <div
               className="absolute inset-y-0"
               style={{
-                left: -leftPos,
+                // While opening/open, pin the content to the frame's left so it
+                // fills the page. While collapsing, let it ride with the page
+                // (left = 0) so the heading travels back into the column instead
+                // of being clipped by the shrinking window.
+                left: collapsing ? 0 : -leftPos,
                 width: selGeo.full,
                 transition: `left ${EXPAND}ms ${SMOOTH}`,
               }}
