@@ -1,36 +1,44 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// easeOutCubic
+const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
 const DRAW = 1000; // frame draw duration
-const PART = 820; // partition draw duration
-const PART_DELAY = 220;
 const OUT = 460; // retract duration
 
 const LOGO_GAP = 18;
 const CLOCK_GAP = 16;
 
+type Target = "services" | "caseStudies" | "contact";
+
+const ITEMS: { label: string; target: Target | null }[] = [
+  { label: "Services", target: "services" },
+  { label: "Case Studies", target: "caseStudies" },
+  { label: "Magazine", target: null },
+  { label: "Contact", target: "contact" },
+];
+
 interface PageFrameProps {
   open: boolean;
+  onNavigate: (t: Target) => void;
+  onClose: () => void;
 }
 
 // The clock opens this framed menu: a horizontal line under the logo meeting a
-// vertical line right of the clock, the content area whited out, and split into
-// four equal columns. Lines draw themselves in on open and retract on close.
-export function PageFrame({ open }: PageFrameProps) {
-  const rectRef = useRef<SVGRectElement>(null);
+// vertical line right of the clock, with the content area split into four equal
+// columns. Each column shows a bold name (clipped) at the bottom; hovering a
+// column expands it to reveal the full name. The frame lines draw in on open.
+export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
   const hRef = useRef<SVGLineElement>(null);
   const vRef = useRef<SVGLineElement>(null);
-  const pRefs = useRef<(SVGLineElement | null)[]>([]);
+  const [geo, setGeo] = useState({ vx: 86, hy: 120 });
+  const [hovered, setHovered] = useState<number | null>(null);
 
   useEffect(() => {
-    const rect = rectRef.current;
     const h = hRef.current;
     const v = vRef.current;
-    const parts = pRefs.current;
-    if (!rect || !h || !v) return;
+    if (!h || !v) return;
 
-    const measure = () => {
+    if (open) {
       const W = window.innerWidth;
       const H = window.innerHeight;
       const logo = document.querySelector('img[alt="LEGO"]') as HTMLElement | null;
@@ -39,110 +47,98 @@ export function PageFrame({ open }: PageFrameProps) {
       const cr = clock?.getBoundingClientRect();
       const vx = Math.round(cr ? cr.right + CLOCK_GAP : 84);
       const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14);
-
-      // Content area + 4 equal columns.
-      rect.setAttribute("x", String(vx));
-      rect.setAttribute("y", String(hy));
-      rect.setAttribute("width", String(Math.max(0, W - vx)));
-      rect.setAttribute("height", String(Math.max(0, H - hy)));
+      setGeo({ vx, hy });
 
       h.setAttribute("x1", String(W));
       h.setAttribute("y1", String(hy));
       h.setAttribute("x2", String(vx));
       h.setAttribute("y2", String(hy));
-      const hLen = W - vx;
-
       v.setAttribute("x1", String(vx));
       v.setAttribute("y1", String(H));
       v.setAttribute("x2", String(vx));
       v.setAttribute("y2", String(0));
+
+      const hLen = W - vx;
       const vLen = H;
-
-      const colW = (W - vx) / 4;
-      const partLen = H - hy;
-      parts.forEach((p, i) => {
-        if (!p) return;
-        const x = Math.round(vx + colW * (i + 1));
-        p.setAttribute("x1", String(x));
-        p.setAttribute("y1", String(hy));
-        p.setAttribute("x2", String(x));
-        p.setAttribute("y2", String(H));
-        p.style.strokeDasharray = String(partLen);
-      });
-
       h.style.strokeDasharray = String(hLen);
       v.style.strokeDasharray = String(vLen);
-      return { hLen, vLen, partLen };
-    };
-
-    if (open) {
-      const { hLen, vLen, partLen } = measure();
-      // hidden start
-      for (const el of [h, v, ...parts]) {
-        if (!el) continue;
-        el.style.transition = "none";
-      }
+      h.style.transition = "none";
+      v.style.transition = "none";
       h.style.strokeDashoffset = String(hLen);
       v.style.strokeDashoffset = String(vLen);
-      parts.forEach((p) => p && (p.style.strokeDashoffset = String(partLen)));
-      rect.style.transition = "none";
-      rect.style.opacity = "0";
-      void h.getBoundingClientRect(); // flush
+      void h.getBoundingClientRect();
       requestAnimationFrame(() => {
-        rect.style.transition = `opacity 340ms ${EASE}`;
-        rect.style.opacity = "1";
         h.style.transition = `stroke-dashoffset ${DRAW}ms ${EASE}`;
         v.style.transition = `stroke-dashoffset ${DRAW}ms ${EASE}`;
         h.style.strokeDashoffset = "0";
         v.style.strokeDashoffset = "0";
-        parts.forEach((p) => {
-          if (!p) return;
-          p.style.transition = `stroke-dashoffset ${PART}ms ${EASE} ${PART_DELAY}ms`;
-          p.style.strokeDashoffset = "0";
-        });
       });
     } else {
-      // retract on close
       const hLen = Number(h.style.strokeDasharray) || 0;
       const vLen = Number(v.style.strokeDasharray) || 0;
-      rect.style.transition = `opacity ${OUT}ms ${EASE}`;
-      rect.style.opacity = "0";
       h.style.transition = `stroke-dashoffset ${OUT}ms ${EASE}`;
       v.style.transition = `stroke-dashoffset ${OUT}ms ${EASE}`;
       h.style.strokeDashoffset = String(hLen);
       v.style.strokeDashoffset = String(vLen);
-      parts.forEach((p) => {
-        if (!p) return;
-        const len = Number(p.style.strokeDasharray) || 0;
-        p.style.transition = `stroke-dashoffset ${OUT}ms ${EASE}`;
-        p.style.strokeDashoffset = String(len);
-      });
+      setHovered(null);
     }
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   return (
-    <svg
-      className="pointer-events-none fixed inset-0 z-[76] h-full w-full"
-      aria-hidden="true"
-    >
-      <rect
-        ref={rectRef}
-        fill="#ffffff"
-        style={{ opacity: 0, pointerEvents: open ? "auto" : "none" }}
-      />
-      {[0, 1, 2].map((i) => (
-        <line
-          key={i}
-          ref={(el) => {
-            pRefs.current[i] = el;
-          }}
-          stroke="#000000"
-          strokeWidth={2}
-          shapeRendering="crispEdges"
-        />
-      ))}
-      <line ref={hRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
-      <line ref={vRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
-    </svg>
+    <>
+      {/* Content columns. */}
+      <div
+        aria-hidden={!open}
+        className={`fixed z-[74] flex bg-white transition-opacity duration-300 ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        style={{
+          left: geo.vx,
+          top: geo.hy,
+          right: 0,
+          bottom: 0,
+          transitionDelay: open ? "240ms" : "0ms",
+          fontFamily: HELV,
+        }}
+      >
+        {ITEMS.map((item, i) => (
+          <button
+            key={item.label}
+            type="button"
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => item.target && onNavigate(item.target)}
+            style={{
+              flexGrow: hovered === i ? 3 : 1,
+              transition: `flex-grow 520ms ${EASE}`,
+              cursor: item.target ? undefined : "default",
+            }}
+            className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
+          >
+            <span className="absolute bottom-6 left-0 w-full pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+              {item.label}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Frame lines, drawn on top. */}
+      <svg
+        className="pointer-events-none fixed inset-0 z-[76] h-full w-full"
+        aria-hidden="true"
+      >
+        <line ref={hRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
+        <line ref={vRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
+      </svg>
+    </>
   );
 }

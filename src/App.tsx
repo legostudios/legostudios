@@ -3,7 +3,6 @@ import { flushSync } from "react-dom";
 import { CustomCursor } from "./components/CustomCursor";
 import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
-import { NavMenu } from "./components/NavMenu";
 import { TimeLine } from "./components/TimeLine";
 import { ServicesPage } from "./components/ServicesPage";
 import { CaseStudiesPage } from "./components/CaseStudiesPage";
@@ -26,7 +25,6 @@ export default function App() {
   const [page, setPage] = useState<Page>(null);
   const [closing, setClosing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuClosing, setMenuClosing] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
   const open = page !== null;
 
@@ -58,44 +56,21 @@ export default function App() {
     }
   }, [reducedMotion, finishClose]);
 
-  const finishMenuClose = useCallback(() => {
-    flushSync(() => {
-      setMenuOpen(false);
-      setMenuClosing(false);
-    });
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    if (reducedMotion) finishMenuClose();
-    else setMenuClosing(true);
-  }, [reducedMotion, finishMenuClose]);
-
-  const toggleMenu = useCallback(() => {
-    if (menuOpen && !menuClosing) closeMenu();
-    else {
-      setMenuClosing(false);
-      setMenuOpen(true);
-    }
-  }, [menuOpen, menuClosing, closeMenu]);
+  const toggleMenu = useCallback(() => setMenuOpen((o) => !o), []);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   // Selecting a page from the menu dismisses the menu and opens that page.
-  const menuGo = useCallback(
-    (target: Exclude<Page, null>) => {
-      flushSync(() => {
-        setMenuOpen(false);
-        setMenuClosing(false);
-      });
-      setPage(target);
-    },
-    [],
-  );
+  const menuGo = useCallback((target: Exclude<Page, null>) => {
+    setMenuOpen(false);
+    setPage(target);
+  }, []);
 
   return (
     <>
       <CustomCursor />
 
-      {/* Framed menu — draws in when the clock opens the menu. */}
-      <PageFrame open={menuOpen && !menuClosing} />
+      {/* Framed expanding-column menu — draws in when the clock opens it. */}
+      <PageFrame open={menuOpen} onNavigate={menuGo} onClose={closeMenu} />
 
       {/* The time-line clock sits on every page; clicking it opens the menu. */}
       <TimeLine onClick={toggleMenu} />
@@ -103,17 +78,6 @@ export default function App() {
       <div inert={open}>
         <Hero />
       </div>
-
-      {menuOpen && (
-        <NavMenu
-          closing={menuClosing}
-          onRequestClose={closeMenu}
-          onCloseFinished={finishMenuClose}
-          onServices={() => menuGo("services")}
-          onCaseStudies={() => menuGo("caseStudies")}
-          onContact={() => menuGo("contact")}
-        />
-      )}
 
       {page === "services" && (
         <ServicesPage
