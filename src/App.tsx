@@ -94,8 +94,8 @@ export default function App() {
     <>
       <CustomCursor />
 
-      {/* Permanent architectural divider lines, drawn once on load. */}
-      <PageFrame />
+      {/* Framed menu — draws in when the clock opens the menu. */}
+      <PageFrame open={menuOpen && !menuClosing} />
 
       {/* The time-line clock sits on every page; clicking it opens the menu. */}
       <TimeLine onClick={toggleMenu} />
