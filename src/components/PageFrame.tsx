@@ -28,21 +28,22 @@ export function PageFrame() {
       const lr = logo?.getBoundingClientRect();
       const cr = clock?.getBoundingClientRect();
 
-      // Horizontal: from the right edge, in to just under the logo.
-      const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14) + 0.5;
-      const hxLeft = Math.round(lr ? lr.left : W * 0.5);
+      // Vertical: full height, just right of the clock/menu column.
+      const vx = Math.round(cr ? cr.right + CLOCK_GAP : 84);
+      v.setAttribute("x1", String(vx));
+      v.setAttribute("y1", String(H));
+      v.setAttribute("x2", String(vx));
+      v.setAttribute("y2", String(0));
+
+      // Horizontal: from the right edge, in until it meets the vertical line
+      // (passing just under the logo).
+      const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14);
+      const hxLeft = vx;
       const hxRight = W;
       h.setAttribute("x1", String(hxRight));
       h.setAttribute("y1", String(hy));
       h.setAttribute("x2", String(hxLeft));
       h.setAttribute("y2", String(hy));
-
-      // Vertical: full height, just right of the clock/menu column.
-      const vx = Math.round(cr ? cr.right + CLOCK_GAP : 84) + 0.5;
-      v.setAttribute("x1", String(vx));
-      v.setAttribute("y1", String(H));
-      v.setAttribute("x2", String(vx));
-      v.setAttribute("y2", String(0));
 
       const hLen = hxRight - hxLeft;
       const vLen = H;
@@ -86,14 +87,14 @@ export function PageFrame() {
       <line
         ref={hRef}
         stroke="#000000"
-        strokeWidth={1}
+        strokeWidth={2}
         shapeRendering="crispEdges"
         style={{ opacity: 0 }}
       />
       <line
         ref={vRef}
         stroke="#000000"
-        strokeWidth={1}
+        strokeWidth={2}
         shapeRendering="crispEdges"
         style={{ opacity: 0 }}
       />
