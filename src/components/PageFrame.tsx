@@ -127,25 +127,22 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
             }}
             className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
           >
-            <span className="absolute bottom-6 left-0 w-full pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
-              {item.label.split(" ").map((word, wi) => (
+            {/* Single line (like the other headings), clipped until expanded.
+                On hover the words glide in: first word drops down, the rest
+                slide in from the left (so "Studies" glides right). */}
+            <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+              {item.label.split(" ").map((word, wi, arr) => (
                 <span
                   key={wi}
-                  className="block whitespace-nowrap"
+                  className="inline-block"
                   style={{
-                    // On hover each word glides home: first word drops down, the
-                    // rest slide in from the left (Studies -> right).
-                    transform:
+                    animation:
                       hovered === i
-                        ? "translate(0, 0)"
-                        : wi === 0
-                          ? "translateY(-0.4em)"
-                          : "translateX(-0.75em)",
-                    transition: `transform ${WORD}ms ${EASE}`,
-                    transitionDelay: hovered === i ? `${wi * 70}ms` : "0ms",
+                        ? `${wi === 0 ? "name-drop" : "name-slide"} ${WORD}ms ${EASE} both`
+                        : "none",
                   }}
                 >
-                  {word}
+                  {wi < arr.length - 1 ? `${word} ` : word}
                 </span>
               ))}
             </span>
