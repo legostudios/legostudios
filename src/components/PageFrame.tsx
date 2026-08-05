@@ -83,10 +83,10 @@ function ColumnName({
   }, [label]);
 
   if (mobile) {
-    // Anchored top-left like the page heading, so the heading lands exactly on
-    // it when a page collapses back to the band.
+    // Left-aligned, vertically centred in the band. The page heading parks at
+    // the band centre too, so it lands exactly here when a page collapses.
     return (
-      <span className="absolute left-5 top-5 whitespace-nowrap pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
         {label}
       </span>
     );
@@ -120,12 +120,14 @@ function PagePanel({
   title,
   collapsing,
   mobile,
+  bands,
   onHeadingClick,
   children,
 }: {
   title: string;
   collapsing: boolean;
   mobile: boolean;
+  bands: number;
   onHeadingClick: () => void;
   children: ReactNode;
 }) {
@@ -133,10 +135,18 @@ function PagePanel({
   const [rowsTop, setRowsTop] = useState(120);
   const [shown, setShown] = useState(false);
 
+  // Parked (menu) position of the heading. Desktop: the bottom of the frame, so
+  // it slides straight up. Mobile: the vertical centre of the band — the content
+  // rides to the band top, so this offset drops the heading onto the (centred)
+  // band name, and the heading then travels up with the divider on open.
   const parkedY = () => {
     const h = headingRef.current;
     const parent = h?.offsetParent as HTMLElement | null;
     if (!h || !parent) return 0;
+    if (mobile) {
+      const bandH = parent.clientHeight / bands;
+      return Math.max(0, bandH / 2 - h.offsetHeight / 2 - 20);
+    }
     return Math.max(0, parent.clientHeight - h.offsetHeight - 44);
   };
 
@@ -145,9 +155,7 @@ function PagePanel({
     if (!h) return;
     const measure = () => {
       setRowsTop(20 + h.offsetHeight + (mobile ? 36 : 64));
-      // Desktop parks the heading at the bottom to slide it up. On mobile the
-      // vertical reveal moves the heading, so leave it in place at the top.
-      if (!mobile && !shown) {
+      if (!shown) {
         h.style.transition = "none";
         h.style.transform = `translateY(${parkedY()}px)`;
       }
@@ -159,14 +167,10 @@ function PagePanel({
   }, []);
 
   useEffect(() => {
-    if (mobile) {
-      setShown(true);
-      return;
-    }
     const raf = requestAnimationFrame(() => {
       const h = headingRef.current;
       if (h) {
-        h.style.transition = `transform 780ms ${SMOOTH}`;
+        h.style.transition = `transform ${mobile ? EXPAND : 780}ms ${SMOOTH}`;
         h.style.transform = "translateY(0)";
       }
       setShown(true);
@@ -175,16 +179,13 @@ function PagePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reverse: slide the heading back down and fade the body out. (Desktop only;
-  // on mobile the vertical reveal carries the heading back into the band.)
+  // Reverse: slide the heading back to its parked position and fade the body out.
   useEffect(() => {
     if (!collapsing) return;
-    if (!mobile) {
-      const h = headingRef.current;
-      if (h) {
-        h.style.transition = `transform ${EXPAND}ms ${SMOOTH}`;
-        h.style.transform = `translateY(${parkedY()}px)`;
-      }
+    const h = headingRef.current;
+    if (h) {
+      h.style.transition = `transform ${EXPAND}ms ${SMOOTH}`;
+      h.style.transform = `translateY(${parkedY()}px)`;
     }
     setShown(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -281,18 +282,33 @@ function CaseStudyRows({
               {cs.name}
             </span>
             <span
-              className="mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.9rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
+              className={
+                mobile
+                  ? "mt-2 flex gap-x-4 pr-4"
+                  : "mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.9rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
+              }
               style={{
                 opacity: showStats ? 1 : 0,
                 transition: "opacity 320ms ease 120ms",
               }}
             >
-              {cs.stats.map((s) => (
-                <span key={s.label}>
-                  <span className="font-medium text-black">{s.value}</span>{" "}
-                  {s.label}
-                </span>
-              ))}
+              {cs.stats.map((s) =>
+                mobile ? (
+                  // One horizontal row of highlights: value on top, label below.
+                  <span
+                    key={s.label}
+                    className="flex flex-1 flex-col text-[clamp(0.68rem,2.7vw,0.95rem)] leading-tight tracking-[-0.01em]"
+                  >
+                    <span className="font-medium text-black">{s.value}</span>
+                    <span className="mt-0.5 text-black/55">{s.label}</span>
+                  </span>
+                ) : (
+                  <span key={s.label}>
+                    <span className="font-medium text-black">{s.value}</span>{" "}
+                    {s.label}
+                  </span>
+                ),
+              )}
             </span>
           </button>
         );
@@ -548,6 +564,7 @@ export function PageFrame({
         title="Contact"
         collapsing={collapsing}
         mobile={isMobile}
+        bands={ITEMS.length}
         onHeadingClick={collapsePanel}
       >
         <ContactBody />
@@ -557,6 +574,7 @@ export function PageFrame({
         title="Magazine"
         collapsing={collapsing}
         mobile={isMobile}
+        bands={ITEMS.length}
         onHeadingClick={collapsePanel}
       >
         <MagazineBody />
@@ -566,6 +584,7 @@ export function PageFrame({
         title={selPanel.title}
         collapsing={collapsing}
         mobile={isMobile}
+        bands={ITEMS.length}
         onHeadingClick={collapsePanel}
       >
         {selTarget === "caseStudies" ? (
@@ -672,9 +691,10 @@ export function PageFrame({
               <div
                 className="absolute inset-x-0"
                 style={{
-                  top: collapsing ? 0 : -pos1,
+                  // Ride with the page (which carries the top divider) so the
+                  // heading and the line travel to the top together.
+                  top: 0,
                   height: selGeo.size,
-                  transition: `top ${EXPAND}ms ${SMOOTH}`,
                 }}
               >
                 {panelNode}
