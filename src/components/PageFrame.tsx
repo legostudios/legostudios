@@ -84,7 +84,7 @@ function ServicesPanel() {
     const h = headingRef.current;
     if (!h) return;
     const measure = () => {
-      setRowsTop(20 + h.offsetHeight + 10);
+      setRowsTop(20 + h.offsetHeight + 64);
       const parent = h.offsetParent as HTMLElement | null;
       if (parent && !shown) {
         const bottomY = Math.max(0, parent.clientHeight - h.offsetHeight - 44);
@@ -152,9 +152,12 @@ interface PageFrameProps {
 export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
   const hRef = useRef<SVGLineElement>(null);
   const vRef = useRef<SVGLineElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [geo, setGeo] = useState({ vx: 86, hy: 120 });
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
+  const [selGeo, setSelGeo] = useState<{ start: number; full: number } | null>(null);
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
     const h = hRef.current;
@@ -223,30 +226,35 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
     v.style.strokeDashoffset = String(vLen);
     setHovered(null);
     setSelected(null);
+    setSelGeo(null);
+    setRevealed(false);
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      setSelected((cur) => {
-        if (cur !== null) return null; // back out of the page first
+      if (selected !== null) {
+        setSelected(null);
+        setSelGeo(null);
+        setRevealed(false);
+      } else {
         onClose();
-        return cur;
-      });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, selected]);
 
   const anySel = selected !== null;
 
   return (
     <>
-      {/* Content columns. */}
+      {/* Content area. */}
       <div
+        ref={menuRef}
         aria-hidden={!open}
-        className={`fixed z-[74] flex bg-white transition-opacity duration-300 ${
+        className={`fixed z-[74] overflow-hidden bg-white transition-opacity duration-300 ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         style={{
@@ -258,35 +266,61 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
           fontFamily: HELV,
         }}
       >
-        {ITEMS.map((item, i) => {
-          const isSel = selected === i;
-          const hidden = anySel && !isSel;
-          return (
+        {/* Menu columns. */}
+        <div
+          className="flex h-full w-full transition-opacity duration-300"
+          style={{
+            opacity: anySel ? 0 : 1,
+            pointerEvents: anySel ? "none" : undefined,
+          }}
+        >
+          {ITEMS.map((item, i) => (
             <button
               key={item.label}
               type="button"
-              onMouseEnter={() => !anySel && setHovered(i)}
+              onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
-              onClick={() => {
-                if (item.target === "services") setSelected(i);
-                else if (item.target) onNavigate(item.target);
+              onClick={(e) => {
+                if (item.target === "services") {
+                  const start = (e.currentTarget as HTMLElement).offsetWidth;
+                  const full =
+                    menuRef.current?.clientWidth ?? window.innerWidth - geo.vx;
+                  setSelGeo({ start, full });
+                  setRevealed(false);
+                  setSelected(i);
+                  requestAnimationFrame(() =>
+                    requestAnimationFrame(() => setRevealed(true)),
+                  );
+                } else if (item.target) {
+                  onNavigate(item.target);
+                }
               }}
               style={{
-                flexGrow: isSel ? 999 : hidden ? 0 : hovered === i ? 3 : 1,
-                opacity: hidden ? 0 : 1,
-                transition: `flex-grow ${EXPAND}ms ${SMOOTH}, opacity 300ms ${SMOOTH}`,
+                flexGrow: hovered === i ? 3 : 1,
+                transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
                 cursor: item.target ? undefined : "default",
               }}
               className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
             >
-              {isSel ? (
-                <ServicesPanel />
-              ) : (
-                <ColumnName label={item.label} active={hovered === i} />
-              )}
+              <ColumnName label={item.label} active={hovered === i} />
             </button>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Services page — revealed by a divider that slides off the right. */}
+        {anySel && selGeo && (
+          <div
+            className="absolute inset-y-0 left-0 overflow-hidden border-r-2 border-black bg-white"
+            style={{
+              width: revealed ? selGeo.full + 60 : selGeo.start,
+              transition: `width ${EXPAND}ms ${SMOOTH}`,
+            }}
+          >
+            <div className="absolute inset-y-0 left-0" style={{ width: selGeo.full }}>
+              <ServicesPanel />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Frame lines, drawn on top. */}
