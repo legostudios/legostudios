@@ -117,16 +117,6 @@
   --animate-bob: bob 1.6s ease-in-out infinite;
 }
 
-/* Menu heading reveal: first word drops down, following words slide in. */
-@keyframes name-drop {
-  from { transform: translateY(-0.5em); }
-  to { transform: translateY(0); }
-}
-@keyframes name-slide {
-  from { transform: translateX(-0.85em); }
-  to { transform: translateX(0); }
-}
-
 @keyframes bob {
 
   0%,

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
 const SMOOTH = "cubic-bezier(0.22, 1, 0.36, 1)"; // gentle, premium deceleration
-const EXPAND = 700; // column expansion duration
-const WORD = 580; // per-word glide duration
+const EXPAND = 700; // column expansion + name glide duration
 const DRAW = 1000; // frame draw duration
 const OUT = 460; // retract duration
 
@@ -19,6 +18,60 @@ const ITEMS: { label: string; target: Target | null }[] = [
   { label: "Magazine", target: null },
   { label: "Contact", target: "contact" },
 ];
+
+// A column heading. Collapsed, its words stack onto separate lines (clipped by
+// the column). When the column is active the words glide onto a single line —
+// the first word drops down while the rest slide right into place. The stacked
+// offsets are measured from the natural one-line layout so they land exactly.
+function ColumnName({ label, active }: { label: string; active: boolean }) {
+  const words = label.split(" ");
+  const refs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [stacked, setStacked] = useState<string[]>(() =>
+    words.map(() => "translate(0, 0)"),
+  );
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const els = refs.current;
+      const first = els[0];
+      if (!first) return;
+      const n = words.length;
+      const lineHeight = first.offsetHeight;
+      const left0 = first.offsetLeft;
+      setStacked(
+        words.map((_, i) => {
+          const el = els[i];
+          const dx = el ? -(el.offsetLeft - left0) : 0; // left-align each word
+          const dy = -((n - 1 - i) * lineHeight); // put each on its own line
+          return `translate(${dx}px, ${dy}px)`;
+        }),
+      );
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [label]);
+
+  return (
+    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+      {words.map((word, i) => (
+        <span
+          key={i}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
+          className="inline-block"
+          style={{
+            transform: active ? "translate(0, 0)" : stacked[i],
+            transition: `transform ${EXPAND}ms ${SMOOTH}`,
+          }}
+        >
+          {i < words.length - 1 ? `${word} ` : word}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 interface PageFrameProps {
   open: boolean;
@@ -127,25 +180,7 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
             }}
             className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
           >
-            {/* Single line (like the other headings), clipped until expanded.
-                On hover the words glide in: first word drops down, the rest
-                slide in from the left (so "Studies" glides right). */}
-            <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
-              {item.label.split(" ").map((word, wi, arr) => (
-                <span
-                  key={wi}
-                  className="inline-block"
-                  style={{
-                    animation:
-                      hovered === i
-                        ? `${wi === 0 ? "name-drop" : "name-slide"} ${WORD}ms ${EASE} both`
-                        : "none",
-                  }}
-                >
-                  {wi < arr.length - 1 ? `${word} ` : word}
-                </span>
-              ))}
-            </span>
+            <ColumnName label={item.label} active={hovered === i} />
           </button>
         ))}
       </div>
