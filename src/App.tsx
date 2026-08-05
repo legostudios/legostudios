@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { CustomCursor } from "./components/CustomCursor";
-import { FrameLines } from "./components/FrameLines";
 import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { TimeLine } from "./components/TimeLine";
-import { ServicesPage } from "./components/ServicesPage";
 import { CaseStudiesPage } from "./components/CaseStudiesPage";
 import { ContactPage } from "./components/ContactPage";
 import { SHOWCASE_IMAGES } from "./data/showcaseImages";
@@ -70,9 +68,6 @@ export default function App() {
     <>
       <CustomCursor />
 
-      {/* Permanent architectural frame lines, on every page. */}
-      <FrameLines />
-
       {/* Framed expanding-column menu — opens when the clock is clicked. */}
       <PageFrame open={menuOpen} onNavigate={menuGo} onClose={closeMenu} />
 
@@ -83,13 +78,6 @@ export default function App() {
         <Hero />
       </div>
 
-      {page === "services" && (
-        <ServicesPage
-          closing={closing}
-          onRequestClose={requestClose}
-          onCloseFinished={finishClose}
-        />
-      )}
       {page === "caseStudies" && (
         <CaseStudiesPage
           closing={closing}
