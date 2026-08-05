@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SERVICES } from "../data/services";
+import { CASE_STUDIES } from "../data/caseStudies";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
@@ -19,6 +20,15 @@ const ITEMS: { label: string; target: Target | null }[] = [
   { label: "Magazine", target: null },
   { label: "Contact", target: "contact" },
 ];
+
+// Columns that expand into a framed page (heading + rows) rather than routing.
+const PANELS: Record<string, { title: string; items: string[] }> = {
+  services: { title: "Services", items: SERVICES },
+  caseStudies: {
+    title: "Case Studies",
+    items: CASE_STUDIES.map((c) => c.name),
+  },
+};
 
 // A column heading. Collapsed, its words stack onto lines (clipped). Active, the
 // words glide onto one line.
@@ -72,10 +82,9 @@ function ColumnName({ label, active }: { label: string; active: boolean }) {
   );
 }
 
-// The expanded Services page: the "Services" heading slides up to the top, then
-// the area below splits into five equal rows (horizontal dividers), one per
-// service name.
-function ServicesPanel() {
+// An expanded page: the heading slides up to the top, then the area below splits
+// into equal rows (horizontal dividers), one per item.
+function PagePanel({ title, items }: { title: string; items: string[] }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [rowsTop, setRowsTop] = useState(120);
   const [shown, setShown] = useState(false);
@@ -116,7 +125,7 @@ function ServicesPanel() {
         ref={headingRef}
         className="absolute left-5 top-5 whitespace-nowrap text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black will-change-transform"
       >
-        Services
+        {title}
       </h1>
       <div
         className="absolute inset-x-0 bottom-0 flex flex-col"
@@ -126,7 +135,7 @@ function ServicesPanel() {
           transition: "opacity 520ms ease 380ms",
         }}
       >
-        {SERVICES.map((name) => (
+        {items.map((name) => (
           <div
             key={name}
             className="flex flex-1 items-center border-t-2 border-black pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black"
@@ -247,6 +256,8 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
   }, [open, onClose, selected]);
 
   const anySel = selected !== null;
+  const selTarget = selected !== null ? ITEMS[selected].target : null;
+  const selPanel = selTarget ? PANELS[selTarget] : null;
 
   return (
     <>
@@ -281,7 +292,7 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
               onClick={(e) => {
-                if (item.target === "services") {
+                if (item.target && PANELS[item.target]) {
                   const start = (e.currentTarget as HTMLElement).offsetWidth;
                   const full =
                     menuRef.current?.clientWidth ?? window.innerWidth - geo.vx;
@@ -317,7 +328,7 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
             }}
           >
             <div className="absolute inset-y-0 left-0" style={{ width: selGeo.full }}>
-              <ServicesPanel />
+              {selPanel && <PagePanel title={selPanel.title} items={selPanel.items} />}
             </div>
           </div>
         )}

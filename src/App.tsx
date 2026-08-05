@@ -4,7 +4,6 @@ import { CustomCursor } from "./components/CustomCursor";
 import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { TimeLine } from "./components/TimeLine";
-import { CaseStudiesPage } from "./components/CaseStudiesPage";
 import { ContactPage } from "./components/ContactPage";
 import { SHOWCASE_IMAGES } from "./data/showcaseImages";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
@@ -78,13 +77,6 @@ export default function App() {
         <Hero />
       </div>
 
-      {page === "caseStudies" && (
-        <CaseStudiesPage
-          closing={closing}
-          onRequestClose={requestClose}
-          onCloseFinished={finishClose}
-        />
-      )}
       {page === "contact" && (
         <ContactPage
           closing={closing}
