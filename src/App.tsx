@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { CustomCursor } from "./components/CustomCursor";
+import { FrameLines } from "./components/FrameLines";
 import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { TimeLine } from "./components/TimeLine";
@@ -69,7 +70,10 @@ export default function App() {
     <>
       <CustomCursor />
 
-      {/* Framed expanding-column menu — draws in when the clock opens it. */}
+      {/* Permanent architectural frame lines, on every page. */}
+      <FrameLines />
+
+      {/* Framed expanding-column menu — opens when the clock is clicked. */}
       <PageFrame open={menuOpen} onNavigate={menuGo} onClose={closeMenu} />
 
       {/* The time-line clock sits on every page; clicking it opens the menu. */}

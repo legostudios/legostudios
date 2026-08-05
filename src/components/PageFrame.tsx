@@ -1,11 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
-const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
 const SMOOTH = "cubic-bezier(0.22, 1, 0.36, 1)"; // gentle, premium deceleration
 const EXPAND = 700; // column expansion + name glide duration
-const DRAW = 1000; // frame draw duration
-const OUT = 460; // retract duration
 
 const LOGO_GAP = 18;
 const CLOCK_GAP = 16;
@@ -21,8 +18,7 @@ const ITEMS: { label: string; target: Target | null }[] = [
 
 // A column heading. Collapsed, its words stack onto separate lines (clipped by
 // the column). When the column is active the words glide onto a single line —
-// the first word drops down while the rest slide right into place. The stacked
-// offsets are measured from the natural one-line layout so they land exactly.
+// the first word drops down while the rest slide right into place.
 function ColumnName({ label, active }: { label: string; active: boolean }) {
   const words = label.split(" ");
   const refs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -41,8 +37,8 @@ function ColumnName({ label, active }: { label: string; active: boolean }) {
       setStacked(
         words.map((_, i) => {
           const el = els[i];
-          const dx = el ? -(el.offsetLeft - left0) : 0; // left-align each word
-          const dy = -((n - 1 - i) * lineHeight); // put each on its own line
+          const dx = el ? -(el.offsetLeft - left0) : 0;
+          const dy = -((n - 1 - i) * lineHeight);
           return `translate(${dx}px, ${dy}px)`;
         }),
       );
@@ -66,7 +62,7 @@ function ColumnName({ label, active }: { label: string; active: boolean }) {
             transition: `transform ${EXPAND}ms ${SMOOTH}`,
           }}
         >
-          {i < words.length - 1 ? `${word} ` : word}
+          {i < words.length - 1 ? `${word} ` : word}
         </span>
       ))}
     </span>
@@ -79,65 +75,30 @@ interface PageFrameProps {
   onClose: () => void;
 }
 
-// The clock opens this framed menu: a horizontal line under the logo meeting a
-// vertical line right of the clock, with the content area split into four equal
-// columns. Each column shows a bold name (clipped) at the bottom; hovering a
-// column expands it to reveal the full name. The frame lines draw in on open.
+// The clock opens this menu: the content area (right of the vertical line, below
+// the horizontal line) is split into four columns, each a bold name clipped at
+// the bottom; hovering a column expands it to reveal the full name.
 export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
-  const hRef = useRef<SVGLineElement>(null);
-  const vRef = useRef<SVGLineElement>(null);
   const [geo, setGeo] = useState({ vx: 86, hy: 120 });
   const [hovered, setHovered] = useState<number | null>(null);
 
   useEffect(() => {
-    const h = hRef.current;
-    const v = vRef.current;
-    if (!h || !v) return;
-
-    if (open) {
-      const W = window.innerWidth;
-      const H = window.innerHeight;
+    if (!open) {
+      setHovered(null);
+      return;
+    }
+    const measure = () => {
       const logo = document.querySelector('img[alt="LEGO"]') as HTMLElement | null;
       const clock = document.querySelector('[aria-label="Menu"]') as HTMLElement | null;
       const lr = logo?.getBoundingClientRect();
       const cr = clock?.getBoundingClientRect();
       const vx = Math.round(cr ? cr.right + CLOCK_GAP : 84);
-      const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14);
+      const hy = Math.round(lr ? lr.bottom + LOGO_GAP : window.innerHeight * 0.14);
       setGeo({ vx, hy });
-
-      h.setAttribute("x1", String(W));
-      h.setAttribute("y1", String(hy));
-      h.setAttribute("x2", String(vx));
-      h.setAttribute("y2", String(hy));
-      v.setAttribute("x1", String(vx));
-      v.setAttribute("y1", String(H));
-      v.setAttribute("x2", String(vx));
-      v.setAttribute("y2", String(0));
-
-      const hLen = W - vx;
-      const vLen = H;
-      h.style.strokeDasharray = String(hLen);
-      v.style.strokeDasharray = String(vLen);
-      h.style.transition = "none";
-      v.style.transition = "none";
-      h.style.strokeDashoffset = String(hLen);
-      v.style.strokeDashoffset = String(vLen);
-      void h.getBoundingClientRect();
-      requestAnimationFrame(() => {
-        h.style.transition = `stroke-dashoffset ${DRAW}ms ${EASE}`;
-        v.style.transition = `stroke-dashoffset ${DRAW}ms ${EASE}`;
-        h.style.strokeDashoffset = "0";
-        v.style.strokeDashoffset = "0";
-      });
-    } else {
-      const hLen = Number(h.style.strokeDasharray) || 0;
-      const vLen = Number(v.style.strokeDasharray) || 0;
-      h.style.transition = `stroke-dashoffset ${OUT}ms ${EASE}`;
-      v.style.transition = `stroke-dashoffset ${OUT}ms ${EASE}`;
-      h.style.strokeDashoffset = String(hLen);
-      v.style.strokeDashoffset = String(vLen);
-      setHovered(null);
-    }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, [open]);
 
   useEffect(() => {
@@ -150,49 +111,37 @@ export function PageFrame({ open, onNavigate, onClose }: PageFrameProps) {
   }, [open, onClose]);
 
   return (
-    <>
-      {/* Content columns. */}
-      <div
-        aria-hidden={!open}
-        className={`fixed z-[74] flex bg-white transition-opacity duration-300 ${
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        style={{
-          left: geo.vx,
-          top: geo.hy,
-          right: 0,
-          bottom: 0,
-          transitionDelay: open ? "240ms" : "0ms",
-          fontFamily: HELV,
-        }}
-      >
-        {ITEMS.map((item, i) => (
-          <button
-            key={item.label}
-            type="button"
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-            onClick={() => item.target && onNavigate(item.target)}
-            style={{
-              flexGrow: hovered === i ? 3 : 1,
-              transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
-              cursor: item.target ? undefined : "default",
-            }}
-            className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
-          >
-            <ColumnName label={item.label} active={hovered === i} />
-          </button>
-        ))}
-      </div>
-
-      {/* Frame lines, drawn on top. */}
-      <svg
-        className="pointer-events-none fixed inset-0 z-[76] h-full w-full"
-        aria-hidden="true"
-      >
-        <line ref={hRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
-        <line ref={vRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" />
-      </svg>
-    </>
+    <div
+      aria-hidden={!open}
+      className={`fixed z-[74] flex bg-white transition-opacity duration-300 ${
+        open ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+      style={{
+        left: geo.vx,
+        top: geo.hy,
+        right: 0,
+        bottom: 0,
+        transitionDelay: open ? "80ms" : "0ms",
+        fontFamily: HELV,
+      }}
+    >
+      {ITEMS.map((item, i) => (
+        <button
+          key={item.label}
+          type="button"
+          onMouseEnter={() => setHovered(i)}
+          onMouseLeave={() => setHovered(null)}
+          onClick={() => item.target && onNavigate(item.target)}
+          style={{
+            flexGrow: hovered === i ? 3 : 1,
+            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
+            cursor: item.target ? undefined : "default",
+          }}
+          className="relative flex-1 basis-0 overflow-hidden border-r-2 border-black text-left outline-none last:border-r-0"
+        >
+          <ColumnName label={item.label} active={hovered === i} />
+        </button>
+      ))}
+    </div>
   );
 }
