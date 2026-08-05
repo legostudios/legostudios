@@ -18,7 +18,7 @@ const FRAMES = [
   "lg:left-[5vw] lg:top-[9vh] lg:h-[80vh] lg:w-[40vw]",
   "lg:left-[10vw] lg:top-[20vh] lg:h-[55vh] lg:w-[38vw]",
   "lg:left-[3vw] lg:top-[7vh] lg:h-[85vh] lg:w-[33vw]",
-  "lg:left-[9vw] lg:top-[15vh] lg:h-[66vh] lg:w-[44vw]",
+  "lg:left-[8vw] lg:top-[15vh] lg:h-[66vh] lg:w-[40vw]",
 ];
 
 // The left-hand photo. Mobile: one stacked image. Desktop: each study's image
@@ -121,7 +121,7 @@ export function CaseStudiesPage({
           {/* Names on the right (same placement as the reference). */}
           <ul
             onMouseLeave={() => setHovered(null)}
-            className="relative flex flex-col items-center gap-[clamp(0.9rem,3vh,2.25rem)] text-center lg:absolute lg:left-[58vw] lg:top-1/2 lg:max-w-[40vw] lg:-translate-y-1/2 lg:items-start lg:text-left"
+            className="relative flex flex-col items-center gap-[clamp(0.9rem,3vh,2.25rem)] text-center lg:absolute lg:left-[50vw] lg:top-1/2 lg:max-w-[47vw] lg:-translate-y-1/2 lg:items-start lg:text-left"
             style={{ fontFamily: THIN }}
           >
             {CASE_STUDIES.map((cs, i) => (
@@ -130,7 +130,7 @@ export function CaseStudiesPage({
                   type="button"
                   onClick={() => setSelected(i)}
                   onMouseEnter={() => setHovered(i)}
-                  className="group relative block w-full text-center text-[clamp(1.5rem,2.5vw,2.9rem)] font-light uppercase leading-[1.1] tracking-[0.03em] text-black outline-none lg:pl-[clamp(1.25rem,2.2vw,2.75rem)] lg:text-left"
+                  className="group relative block w-full text-center text-[clamp(1.5rem,2.5vw,2.9rem)] font-bold uppercase leading-[1.1] tracking-[0.02em] text-black outline-none lg:pl-[0.7em] lg:text-left"
                 >
                   {/* black bar beside the name (desktop) */}
                   <span
