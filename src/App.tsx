@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { CustomCursor } from "./components/CustomCursor";
+import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { NavMenu } from "./components/NavMenu";
 import { TimeLine } from "./components/TimeLine";
@@ -92,6 +93,9 @@ export default function App() {
   return (
     <>
       <CustomCursor />
+
+      {/* Permanent architectural divider lines, drawn once on load. */}
+      <PageFrame />
 
       {/* The time-line clock sits on every page; clicking it opens the menu. */}
       <TimeLine onClick={toggleMenu} />
