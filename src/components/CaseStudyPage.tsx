@@ -11,19 +11,22 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 interface CaseStudyPageProps {
   index: number;
+  left: number;
+  top: number;
   onBack: () => void;
-  onHome: () => void;
   onOpen: (index: number) => void;
 }
 
-// A full-page case-study detail, laid out in the editorial "author page" style:
-// a top bar (Back + home logo + counter), a big uppercase title with the head
-// stat, a photo, the challenge / approach copy, a stat band, the impact list
-// (each with a red progress accent), and a "Next Case Study" hand-off.
+// The case-study detail, opened inside the frame boundary (below the horizontal
+// line, right of the vertical line). Laid out in the editorial "author page"
+// style: a top bar (Back + counter), a big uppercase title with the head stat,
+// a photo, the challenge / approach copy, a stat band, the impact list (each
+// with a red progress accent), and a "Next Case Study" hand-off.
 export function CaseStudyPage({
   index,
+  left,
+  top,
   onBack,
-  onHome,
   onOpen,
 }: CaseStudyPageProps) {
   const cs = CASE_STUDIES[index];
@@ -48,8 +51,8 @@ export function CaseStudyPage({
       role="dialog"
       aria-modal="true"
       aria-label={cs.name}
-      className="fixed inset-0 z-[90] overflow-y-auto bg-white text-black opacity-100 transition-opacity duration-500 ease-out starting:opacity-0 motion-reduce:transition-none"
-      style={{ fontFamily: HELV }}
+      className="fixed z-[75] overflow-y-auto bg-white text-black opacity-100 transition-opacity duration-500 ease-out starting:opacity-0 motion-reduce:transition-none"
+      style={{ left, top, right: 0, bottom: 0, fontFamily: HELV }}
     >
       {/* Top bar. */}
       <div className="sticky top-0 z-10 flex items-center justify-between border-b-2 border-black bg-white px-5 py-4 sm:px-8">
@@ -59,19 +62,6 @@ export function CaseStudyPage({
           className="text-[14px] tracking-wide text-black transition-opacity hover:opacity-60"
         >
           Back ←
-        </button>
-        <button
-          type="button"
-          onClick={onHome}
-          aria-label="Home"
-          className="absolute left-1/2 -translate-x-1/2 outline-none"
-        >
-          <img
-            src="/lego-logo.png"
-            alt="LEGO"
-            draggable={false}
-            style={{ width: "clamp(1.8rem, 2.6vw, 2.6rem)", height: "auto" }}
-          />
         </button>
         <span className="text-[13px] tracking-widest text-black/55">
           {pad(index + 1)} / {pad(CASE_STUDIES.length)}

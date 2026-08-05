@@ -3,6 +3,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type MutableRefObject,
   type ReactNode,
 } from "react";
 import { SERVICES } from "../data/services";
@@ -23,12 +24,12 @@ const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
 const INSTAGRAM =
   "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnlncw==";
 
-type Target = "services" | "caseStudies" | "contact";
+type Target = "services" | "caseStudies" | "magazine" | "contact";
 
 const ITEMS: { label: string; target: Target | null }[] = [
   { label: "Services", target: "services" },
   { label: "Case Studies", target: "caseStudies" },
-  { label: "Magazine", target: null },
+  { label: "Magazine", target: "magazine" },
   { label: "Contact", target: "contact" },
 ];
 
@@ -217,6 +218,57 @@ function ListRows({
   );
 }
 
+// Case-study rows. Hovering a row grows it and reveals that study's headline
+// stats under its name; clicking opens the detail.
+function CaseStudyRows({ onSelect }: { onSelect: (index: number) => void }) {
+  const [hover, setHover] = useState<number | null>(null);
+  return (
+    <>
+      {CASE_STUDIES.map((cs, i) => (
+        <button
+          key={cs.name}
+          type="button"
+          onClick={() => onSelect(i)}
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(null)}
+          style={{
+            flexGrow: hover === i ? 2.4 : 1,
+            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
+          }}
+          className="group relative flex flex-1 basis-0 flex-col justify-center overflow-hidden border-t-2 border-black pl-5 text-left outline-none"
+        >
+          <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black transition-[padding-left] duration-300 ease-out group-hover:pl-3">
+            {cs.name}
+          </span>
+          <span
+            className="mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.85rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
+            style={{
+              opacity: hover === i ? 1 : 0,
+              transition: "opacity 320ms ease 120ms",
+            }}
+          >
+            {cs.stats.map((s) => (
+              <span key={s.label}>
+                <span className="font-medium text-black">{s.value}</span>{" "}
+                {s.label}
+              </span>
+            ))}
+          </span>
+        </button>
+      ))}
+    </>
+  );
+}
+
+// The magazine page's body — a placeholder until it launches.
+function MagazineBody() {
+  return (
+    <div className="flex flex-1 items-center pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black/45">
+      Coming Soon
+    </div>
+  );
+}
+
 // The contact page's body — email + social icons, filling the area below the
 // "Contact" heading.
 function ContactBody() {
@@ -266,6 +318,13 @@ interface PageFrameProps {
   open: boolean;
   onClose: () => void;
   onOpenCaseStudy: (index: number) => void;
+  // Reports whether a page (Services/Case Studies/Contact) is expanded, and
+  // hands the parent a live collapse-to-menu function for the clock button.
+  onPanelOpenChange: (open: boolean) => void;
+  collapseRef: MutableRefObject<() => void>;
+  // The live frame origin (right of the clock, below the logo) so other pages
+  // can open inside the same boundary.
+  onGeoChange: (g: { vx: number; hy: number }) => void;
 }
 
 // The clock opens this menu: a horizontal line under the logo meets a vertical
@@ -273,7 +332,14 @@ interface PageFrameProps {
 // into four columns. Hovering expands a column; clicking one expands it to a
 // blank framed page (the divider slides off the right) with the heading at the
 // top. Clicking the heading collapses the page back to the menu.
-export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
+export function PageFrame({
+  open,
+  onClose,
+  onOpenCaseStudy,
+  onPanelOpenChange,
+  collapseRef,
+  onGeoChange,
+}: PageFrameProps) {
   const hRef = useRef<SVGLineElement>(null);
   const vRef = useRef<SVGLineElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -281,7 +347,11 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
   const [geo, setGeo] = useState({ vx: 86, hy: 120 });
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
-  const [selGeo, setSelGeo] = useState<{ start: number; full: number } | null>(null);
+  const [selGeo, setSelGeo] = useState<{
+    left: number;
+    right: number;
+    full: number;
+  } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [collapsing, setCollapsing] = useState(false);
 
@@ -371,6 +441,16 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
     }, EXPAND);
   };
 
+  // Keep the parent's collapse handle pointing at the latest closure, and let it
+  // know when a page opens/closes (so the clock can route correctly).
+  collapseRef.current = collapsePanel;
+  useEffect(() => {
+    onPanelOpenChange(selected !== null);
+  }, [selected, onPanelOpenChange]);
+  useEffect(() => {
+    onGeoChange(geo);
+  }, [geo, onGeoChange]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -384,9 +464,13 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
   }, [open, onClose, selected, collapsing]);
 
   const anySel = selected !== null;
-  const menuHidden = anySel && !collapsing;
   const selTarget = selected !== null ? ITEMS[selected].target : null;
   const selPanel = selTarget ? PANELS[selTarget] : undefined;
+  // The page is bracketed by two dividers: a left one that slides from the
+  // clicked column's left edge out to the frame line (x = 0), and a right one
+  // that slides from the column's right edge off the screen.
+  const leftPos = selGeo ? (revealed ? 0 : selGeo.left) : 0;
+  const rightPos = selGeo ? (revealed ? selGeo.full + 60 : selGeo.right) : 0;
 
   return (
     <>
@@ -406,13 +490,12 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
           fontFamily: HELV,
         }}
       >
-        {/* Menu columns. */}
+        {/* Menu columns. The expanding page covers them physically, so they
+            stay opaque and are simply overdrawn (and non-interactive) while a
+            page is open. */}
         <div
-          className="flex h-full w-full transition-opacity duration-300"
-          style={{
-            opacity: menuHidden ? 0 : 1,
-            pointerEvents: menuHidden ? "none" : undefined,
-          }}
+          className="flex h-full w-full"
+          style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {ITEMS.map((item, i) => (
             <button
@@ -422,10 +505,13 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
               onMouseLeave={() => setHovered(null)}
               onClick={(e) => {
                 if (!item.target) return;
-                const start = (e.currentTarget as HTMLElement).offsetWidth;
+                const menuEl = menuRef.current;
+                const menuLeft =
+                  menuEl?.getBoundingClientRect().left ?? geo.vx;
                 const full =
-                  menuRef.current?.clientWidth ?? window.innerWidth - geo.vx;
-                setSelGeo({ start, full });
+                  menuEl?.clientWidth ?? window.innerWidth - geo.vx;
+                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                setSelGeo({ left: r.left - menuLeft, right: r.right - menuLeft, full });
                 setCollapsing(false);
                 setRevealed(false);
                 setSelected(i);
@@ -445,16 +531,26 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
           ))}
         </div>
 
-        {/* Expanded page — revealed by a divider that slides off the right. */}
+        {/* Expanded page. Its left/right borders are the two dividers; the page
+            grows out of the clicked column as they slide apart. The inner div is
+            counter-offset so the content stays pinned to the frame's left. */}
         {anySel && selGeo && (
           <div
-            className="absolute inset-y-0 left-0 overflow-hidden border-r-2 border-black bg-white"
+            className="absolute inset-y-0 overflow-hidden border-l-2 border-r-2 border-black bg-white"
             style={{
-              width: revealed ? selGeo.full + 60 : selGeo.start,
-              transition: `width ${EXPAND}ms ${SMOOTH}`,
+              left: leftPos,
+              width: Math.max(0, rightPos - leftPos),
+              transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
             }}
           >
-            <div className="absolute inset-y-0 left-0" style={{ width: selGeo.full }}>
+            <div
+              className="absolute inset-y-0"
+              style={{
+                left: -leftPos,
+                width: selGeo.full,
+                transition: `left ${EXPAND}ms ${SMOOTH}`,
+              }}
+            >
               {selTarget === "contact" ? (
                 <PagePanel
                   title="Contact"
@@ -463,18 +559,25 @@ export function PageFrame({ open, onClose, onOpenCaseStudy }: PageFrameProps) {
                 >
                   <ContactBody />
                 </PagePanel>
+              ) : selTarget === "magazine" ? (
+                <PagePanel
+                  title="Magazine"
+                  collapsing={collapsing}
+                  onHeadingClick={collapsePanel}
+                >
+                  <MagazineBody />
+                </PagePanel>
               ) : selPanel ? (
                 <PagePanel
                   title={selPanel.title}
                   collapsing={collapsing}
                   onHeadingClick={collapsePanel}
                 >
-                  <ListRows
-                    items={selPanel.items}
-                    onSelect={
-                      selTarget === "caseStudies" ? onOpenCaseStudy : undefined
-                    }
-                  />
+                  {selTarget === "caseStudies" ? (
+                    <CaseStudyRows onSelect={onOpenCaseStudy} />
+                  ) : (
+                    <ListRows items={selPanel.items} />
+                  )}
                 </PagePanel>
               ) : null}
             </div>
