@@ -240,28 +240,57 @@ function ListRows({ items }: { items: string[] }) {
   );
 }
 
-// Case-study rows — styled like the Services rows (bottom-left names that grow
-// on hover), but each is a button that opens the full detail.
-function CaseStudyRows({ onSelect }: { onSelect: (index: number) => void }) {
+// Case-study rows — bottom-left names like the Services rows, but hovering grows
+// the box and reveals that study's headline stats beneath the name (shown by
+// default on mobile, where there's no hover). Clicking opens the full detail.
+function CaseStudyRows({
+  onSelect,
+  mobile,
+}: {
+  onSelect: (index: number) => void;
+  mobile: boolean;
+}) {
   const [hover, setHover] = useState<number | null>(null);
   return (
     <>
-      {CASE_STUDIES.map((cs, i) => (
-        <button
-          key={cs.name}
-          type="button"
-          onClick={() => onSelect(i)}
-          onMouseEnter={() => setHover(i)}
-          onMouseLeave={() => setHover(null)}
-          style={{
-            flexGrow: hover === i ? 2.4 : 1,
-            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
-          }}
-          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-left text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black outline-none lg:text-[70px]"
-        >
-          {cs.name}
-        </button>
-      ))}
+      {CASE_STUDIES.map((cs, i) => {
+        const show = mobile || hover === i;
+        return (
+          <button
+            key={cs.name}
+            type="button"
+            onClick={() => onSelect(i)}
+            onMouseEnter={mobile ? undefined : () => setHover(i)}
+            onMouseLeave={mobile ? undefined : () => setHover(null)}
+            style={{
+              flexGrow: !mobile && hover === i ? 2.4 : 1,
+              transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
+            }}
+            className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-1 pl-7 text-left outline-none"
+          >
+            <span className="whitespace-nowrap text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black lg:text-[70px]">
+              {cs.name}
+            </span>
+            <span
+              className="flex flex-wrap gap-x-8 gap-y-1 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
+              style={{
+                maxHeight: show ? "4em" : 0,
+                opacity: show ? 1 : 0,
+                marginTop: show ? "0.55rem" : 0,
+                overflow: "hidden",
+                transition: `max-height ${EXPAND}ms ${SMOOTH}, margin-top ${EXPAND}ms ${SMOOTH}, opacity 360ms ease`,
+              }}
+            >
+              {cs.stats.map((s) => (
+                <span key={s.label} className="whitespace-nowrap">
+                  <span className="font-medium text-black">{s.value}</span>{" "}
+                  {s.label}
+                </span>
+              ))}
+            </span>
+          </button>
+        );
+      })}
     </>
   );
 }
@@ -543,7 +572,7 @@ export function PageFrame({
         onHeadingClick={collapsePanel}
       >
         {selTarget === "caseStudies" ? (
-          <CaseStudyRows onSelect={onOpenCaseStudy} />
+          <CaseStudyRows onSelect={onOpenCaseStudy} mobile={isMobile} />
         ) : (
           <ListRows items={selPanel.items} />
         )}
