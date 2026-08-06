@@ -154,7 +154,7 @@ function PagePanel({
     const h = headingRef.current;
     if (!h) return;
     const measure = () => {
-      setRowsTop(20 + h.offsetHeight + (mobile ? 36 : 64));
+      setRowsTop(20 + h.offsetHeight + (mobile ? 36 : 90));
       if (!shown) {
         h.style.transition = "none";
         h.style.transform = `translateY(${parkedY()}px)`;
@@ -198,7 +198,7 @@ function PagePanel({
         onClick={onHeadingClick}
         role="button"
         aria-label={`Close ${title}`}
-        className="absolute left-5 top-5 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black will-change-transform lg:text-[clamp(2.5rem,7vw,7rem)]"
+        className="absolute left-5 top-5 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black will-change-transform lg:text-[103px]"
       >
         {title}
       </h1>
@@ -224,7 +224,7 @@ function ListRows({ items }: { items: string[] }) {
       {items.map((name) => (
         <div
           key={name}
-          className="flex flex-1 basis-0 items-end border-t-2 border-black pb-4 pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4]"
+          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-2 pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4] lg:text-[70px]"
         >
           {name}
         </div>

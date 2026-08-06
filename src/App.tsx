@@ -84,7 +84,7 @@ export default function App() {
           className="chrome-fade-in fixed z-[86] flex items-center gap-2 text-[15px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
           style={{
             left: Math.max(frameGeo.vx, 60) + 20,
-            top: frameGeo.logoMid,
+            top: frameGeo.logoMid + 5,
             transform: "translateY(-50%)",
             fontFamily: HELV,
           }}
