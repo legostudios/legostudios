@@ -145,7 +145,7 @@ function PagePanel({
     if (!h || !parent) return 0;
     if (mobile) {
       const bandH = parent.clientHeight / bands;
-      return Math.max(0, bandH / 2 - h.offsetHeight / 2 - 20);
+      return Math.max(0, bandH / 2 - h.offsetHeight / 2 - 28);
     }
     return Math.max(0, parent.clientHeight - h.offsetHeight - 44);
   };
@@ -154,7 +154,7 @@ function PagePanel({
     const h = headingRef.current;
     if (!h) return;
     const measure = () => {
-      setRowsTop(20 + h.offsetHeight + (mobile ? 36 : 90));
+      setRowsTop(28 + h.offsetHeight + (mobile ? 36 : 90));
       if (!shown) {
         h.style.transition = "none";
         h.style.transform = `translateY(${parkedY()}px)`;
@@ -198,7 +198,7 @@ function PagePanel({
         onClick={onHeadingClick}
         role="button"
         aria-label={`Close ${title}`}
-        className="absolute left-5 top-5 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black will-change-transform lg:text-[103px]"
+        className="absolute left-7 top-7 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black will-change-transform lg:text-[103px]"
       >
         {title}
       </h1>
