@@ -216,36 +216,19 @@ function PagePanel({
   );
 }
 
-// The equal rows below a list page's heading (one per service / case study).
-// When `onSelect` is given, each row is a button that opens its detail.
-function ListRows({
-  items,
-  onSelect,
-}: {
-  items: string[];
-  onSelect?: (index: number) => void;
-}) {
+// The rows below the Services heading: bottom-left aligned names in equal boxes
+// that grow on hover (like the case-study rows).
+function ListRows({ items }: { items: string[] }) {
   return (
     <>
-      {items.map((name, i) =>
-        onSelect ? (
-          <button
-            key={name}
-            type="button"
-            onClick={() => onSelect(i)}
-            className="flex flex-1 items-center border-t-2 border-black pl-5 text-left text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black outline-none transition-[padding-left] duration-300 ease-out hover:pl-8"
-          >
-            {name}
-          </button>
-        ) : (
-          <div
-            key={name}
-            className="flex flex-1 items-center border-t-2 border-black pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black"
-          >
-            {name}
-          </div>
-        ),
-      )}
+      {items.map((name) => (
+        <div
+          key={name}
+          className="flex flex-1 basis-0 items-end border-t-2 border-black pb-4 pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4]"
+        >
+          {name}
+        </div>
+      ))}
     </>
   );
 }
