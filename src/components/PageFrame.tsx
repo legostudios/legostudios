@@ -380,8 +380,9 @@ interface PageFrameProps {
   onPanelOpenChange: (open: boolean) => void;
   collapseRef: MutableRefObject<() => void>;
   // The live frame origin (right of the clock, below the logo) so other pages
-  // can open inside the same boundary.
-  onGeoChange: (g: { vx: number; hy: number }) => void;
+  // can open inside the same boundary. logoMid is the logo's vertical centre so
+  // the Back button can align to it.
+  onGeoChange: (g: { vx: number; hy: number; logoMid: number }) => void;
 }
 
 // The clock opens this menu: a horizontal line under the logo meets a vertical
@@ -401,7 +402,7 @@ export function PageFrame({
   const vRef = useRef<SVGLineElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const collapseTimer = useRef<number | null>(null);
-  const [geo, setGeo] = useState({ vx: 86, hy: 120 });
+  const [geo, setGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   // start/end are the clicked band's edges along the menu axis (x on desktop,
@@ -445,7 +446,8 @@ export function PageFrame({
       const inset = Math.max(clockRight, logoBottom);
       const vx = mobile ? 0 : Math.round(inset);
       const hy = Math.round(mobile ? logoBottom : inset);
-      setGeo({ vx, hy });
+      const logoMid = lr ? Math.round(lr.top + lr.height / 2) : Math.round(hy / 2);
+      setGeo({ vx, hy, logoMid });
 
       h.setAttribute("x1", String(W));
       h.setAttribute("y1", String(hy));

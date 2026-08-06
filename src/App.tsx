@@ -11,7 +11,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [caseDetail, setCaseDetail] = useState<number | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [frameGeo, setFrameGeo] = useState({ vx: 86, hy: 120 });
+  const [frameGeo, setFrameGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
   const collapsePanel = useRef<() => void>(() => {});
 
   // Warm the horizontal wordmark so it's ready to fade in the moment the menu
@@ -81,15 +81,23 @@ export default function App() {
         <button
           type="button"
           onClick={onBack}
-          className="chrome-fade-in fixed z-[86] flex items-center gap-2 text-[15px] tracking-wide text-black transition-opacity hover:opacity-60"
+          className="chrome-fade-in fixed z-[86] flex items-center gap-2 text-[15px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
           style={{
             left: Math.max(frameGeo.vx, 60) + 20,
-            top: frameGeo.hy / 2,
+            top: frameGeo.logoMid,
             transform: "translateY(-50%)",
             fontFamily: HELV,
           }}
         >
-          <span aria-hidden="true">←</span> Back
+          <img
+            src="/arrow.png"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            className="w-auto"
+            style={{ height: "0.72em" }}
+          />
+          Back
         </button>
       )}
 
