@@ -37,8 +37,9 @@ export function Hero({
             src="/Logo-Horizontal.png"
             alt="LEGO"
             draggable={false}
+            className="opacity-100 transition-opacity duration-700 ease-out starting:opacity-0"
             style={{
-              width: "clamp(6rem, 13vw, 11rem)",
+              height: "clamp(1.5rem, 2.3vw, 2.5rem)",
               aspectRatio: "3918 / 1194",
             }}
           />
