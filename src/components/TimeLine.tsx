@@ -58,7 +58,7 @@ export function TimeLine({ onClick }: TimeLineProps) {
       type="button"
       onClick={onClick}
       aria-label="Menu"
-      className="fixed left-6 top-6 z-[85] block"
+      className="fixed left-6 top-8 z-[85] block"
     >
       <svg
         width="34"

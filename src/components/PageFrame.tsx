@@ -240,69 +240,28 @@ function ListRows({ items }: { items: string[] }) {
   );
 }
 
-// Case-study rows. Hovering a row grows it and reveals that study's headline
-// stats under its name; clicking opens the detail.
-function CaseStudyRows({
-  onSelect,
-  mobile,
-}: {
-  onSelect: (index: number) => void;
-  mobile: boolean;
-}) {
+// Case-study rows — styled like the Services rows (bottom-left names that grow
+// on hover), but each is a button that opens the full detail.
+function CaseStudyRows({ onSelect }: { onSelect: (index: number) => void }) {
   const [hover, setHover] = useState<number | null>(null);
   return (
     <>
-      {CASE_STUDIES.map((cs, i) => {
-        // No hover on touch — the highlights are shown by default on mobile.
-        const showStats = mobile || hover === i;
-        return (
-          <button
-            key={cs.name}
-            type="button"
-            onClick={() => onSelect(i)}
-            onMouseEnter={mobile ? undefined : () => setHover(i)}
-            onMouseLeave={mobile ? undefined : () => setHover(null)}
-            style={{
-              flexGrow: !mobile && hover === i ? 2.4 : 1,
-              transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
-            }}
-            className="group relative flex flex-1 basis-0 flex-col justify-center overflow-hidden border-t-2 border-black pl-5 text-left outline-none"
-          >
-            <span className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black">
-              {cs.name}
-            </span>
-            <span
-              className={
-                mobile
-                  ? "mt-2 flex gap-x-4 pr-4"
-                  : "mt-3 flex flex-wrap gap-x-7 gap-y-1 pr-4 text-[clamp(0.9rem,1.5vw,1.2rem)] tracking-[-0.01em] text-black/55"
-              }
-              style={{
-                opacity: showStats ? 1 : 0,
-                transition: "opacity 320ms ease 120ms",
-              }}
-            >
-              {cs.stats.map((s) =>
-                mobile ? (
-                  // One horizontal row of highlights: value on top, label below.
-                  <span
-                    key={s.label}
-                    className="flex flex-1 flex-col text-[clamp(0.68rem,2.7vw,0.95rem)] leading-tight tracking-[-0.01em]"
-                  >
-                    <span className="font-medium text-black">{s.value}</span>
-                    <span className="mt-0.5 text-black/55">{s.label}</span>
-                  </span>
-                ) : (
-                  <span key={s.label}>
-                    <span className="font-medium text-black">{s.value}</span>{" "}
-                    {s.label}
-                  </span>
-                ),
-              )}
-            </span>
-          </button>
-        );
-      })}
+      {CASE_STUDIES.map((cs, i) => (
+        <button
+          key={cs.name}
+          type="button"
+          onClick={() => onSelect(i)}
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(null)}
+          style={{
+            flexGrow: hover === i ? 2.4 : 1,
+            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
+          }}
+          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-left text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black outline-none lg:text-[70px]"
+        >
+          {cs.name}
+        </button>
+      ))}
     </>
   );
 }
@@ -584,7 +543,7 @@ export function PageFrame({
         onHeadingClick={collapsePanel}
       >
         {selTarget === "caseStudies" ? (
-          <CaseStudyRows onSelect={onOpenCaseStudy} mobile={isMobile} />
+          <CaseStudyRows onSelect={onOpenCaseStudy} />
         ) : (
           <ListRows items={selPanel.items} />
         )}

@@ -41,7 +41,7 @@ export function Hero({
           type="button"
           onClick={onHome}
           aria-label="Home"
-          className="absolute left-1/2 top-[3.5%] z-[80] -translate-x-1/2 select-none outline-none"
+          className="absolute left-1/2 top-[4.5%] z-[80] -translate-x-1/2 select-none outline-none"
         >
           <img
             src="/logo-studios.png"

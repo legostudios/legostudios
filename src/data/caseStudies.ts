@@ -15,43 +15,6 @@ export interface CaseStudy {
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    name: "Female Health Tracking App",
-    stats: [
-      { value: "123M+", label: "Organic Views" },
-      { value: "200K+", label: "App Downloads" },
-      { value: "40%", label: "Lower CAC" },
-    ],
-    challenge:
-      "45M+ negative views online led to declining trust, website traffic, app installs, and subscriptions.",
-    approach:
-      "Built an organic performance engine powered by creator-led content, rapid creative testing, and multi-platform distribution.",
-    impact: [
-      "Restored organic visibility",
-      "Rebuilt consumer trust",
-      "Reduced acquisition costs",
-      "Created a scalable content engine",
-    ],
-  },
-  {
-    name: "Premium Skincare Brand",
-    stats: [
-      { value: "7.9M+", label: "Organic Views" },
-      { value: "600+", label: "Content Pieces Produced" },
-      { value: "11.3%", label: "Peak Engagement Rate" },
-      { value: "30K+", label: "Content Saves" },
-    ],
-    challenge:
-      "The brand wanted to stand out in a highly competitive skincare market by building trust, educating consumers, and driving organic product discovery through creator-led content.",
-    approach:
-      "Built a data-driven organic content engine focused on educational storytelling, continuous creative testing, and performance optimization to identify and scale winning content formats.",
-    impact: [
-      "Generated 7.9M+ organic views through scalable content production.",
-      "Reached the brand's ideal audience with highly targeted educational content.",
-      "Increased product consideration through high-value, save-worthy content.",
-      "Built a repeatable content engine that consistently scaled organic growth.",
-    ],
-  },
-  {
     name: "Global Outdoor Apparel Brand",
     stats: [
       { value: "10.7M+", label: "Organic Views" },
@@ -71,6 +34,24 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
   },
   {
+    name: "Female Health Tracking App",
+    stats: [
+      { value: "123M+", label: "Organic Views" },
+      { value: "200K+", label: "App Downloads" },
+      { value: "40%", label: "Lower CAC" },
+    ],
+    challenge:
+      "45M+ negative views online led to declining trust, website traffic, app installs, and subscriptions.",
+    approach:
+      "Built an organic performance engine powered by creator-led content, rapid creative testing, and multi-platform distribution.",
+    impact: [
+      "Restored organic visibility",
+      "Rebuilt consumer trust",
+      "Reduced acquisition costs",
+      "Created a scalable content engine",
+    ],
+  },
+  {
     name: "Global HR SaaS Platform",
     stats: [
       { value: "118.9M+", label: "Organic Views" },
@@ -87,6 +68,25 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Increased global brand visibility and website traffic.",
       "Strengthened category leadership before the IPO.",
       "Built a scalable creator-powered growth engine.",
+    ],
+  },
+  {
+    name: "Premium Skincare Brand",
+    stats: [
+      { value: "7.9M+", label: "Organic Views" },
+      { value: "600+", label: "Content Pieces Produced" },
+      { value: "11.3%", label: "Peak Engagement Rate" },
+      { value: "30K+", label: "Content Saves" },
+    ],
+    challenge:
+      "The brand wanted to stand out in a highly competitive skincare market by building trust, educating consumers, and driving organic product discovery through creator-led content.",
+    approach:
+      "Built a data-driven organic content engine focused on educational storytelling, continuous creative testing, and performance optimization to identify and scale winning content formats.",
+    impact: [
+      "Generated 7.9M+ organic views through scalable content production.",
+      "Reached the brand's ideal audience with highly targeted educational content.",
+      "Increased product consideration through high-value, save-worthy content.",
+      "Built a repeatable content engine that consistently scaled organic growth.",
     ],
   },
 ];
