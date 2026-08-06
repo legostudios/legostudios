@@ -30,14 +30,14 @@ export function Hero({
         type="button"
         onClick={onHome}
         aria-label="Home"
-        className="absolute left-1/2 top-[4.5%] z-[80] -translate-x-1/2 select-none outline-none"
+        className="absolute left-1/2 top-[3.5%] z-[80] -translate-x-1/2 select-none outline-none"
       >
         {pageLogo ? (
           <img
             src="/Logo-Horizontal.png"
             alt="LEGO"
             draggable={false}
-            className="opacity-100 transition-opacity duration-700 ease-out starting:opacity-0"
+            className="chrome-fade-in"
             style={{
               // Height chosen so the single-row letters render at the same size
               // as the stacked mark's letters (~0.62x the home logo's width).

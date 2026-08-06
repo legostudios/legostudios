@@ -54,15 +54,9 @@ export function CaseStudyPage({
       className="fixed z-[75] overflow-y-auto bg-white text-black opacity-100 transition-opacity duration-500 ease-out starting:opacity-0 motion-reduce:transition-none"
       style={{ left, top, right: 0, bottom: 0, fontFamily: HELV }}
     >
-      {/* Top bar. */}
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b-2 border-black bg-white px-5 py-4 sm:px-8">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-[14px] tracking-wide text-black transition-opacity hover:opacity-60"
-        >
-          Back ←
-        </button>
+      {/* Top bar — just the counter; the global Back button (top band) handles
+          navigation. */}
+      <div className="sticky top-0 z-10 flex items-center justify-end border-b-2 border-black bg-white px-5 py-4 sm:px-8">
         <span className="text-[13px] tracking-widest text-black/55">
           {pad(index + 1)} / {pad(CASE_STUDIES.length)}
         </span>

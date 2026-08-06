@@ -47,6 +47,21 @@
   }
 }
 
+/* Off-home chrome (horizontal logo + Back button) fades in on mount. A keyframe
+   animation runs reliably on insertion (unlike @starting-style transitions) and
+   `backwards` fill leaves normal opacity afterwards so :hover still works. */
+@keyframes chrome-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.chrome-fade-in {
+  animation: chrome-fade-in 650ms ease-out backwards;
+}
+
 /* When the custom cursor is active, hide the system cursor everywhere. */
 .cursor-none,
 .cursor-none * {
@@ -207,7 +222,7 @@
 }
 
 .reference-computer {
-  width: 80vw;
+  width: 86vw;
 }
 
 /* Image shown through the cut-out CRT. Sized a hair larger than the glass so
@@ -327,7 +342,7 @@
   .reference-computer {
     /* Bigger on phones/tablets, and square so object-contain scales it by
        width (the 2:1 box would otherwise cap it at half the width). */
-    width: min(84vw, 460px);
+    width: min(90vw, 500px);
     aspect-ratio: 1 / 1;
   }
 

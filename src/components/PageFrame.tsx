@@ -437,10 +437,14 @@ export function PageFrame({
       const lr = logo?.getBoundingClientRect();
       const cr = clock?.getBoundingClientRect();
       const mobile = window.matchMedia("(max-width: 1023px)").matches;
-      // Mobile: no left vertical line — the frame is just the top horizontal
-      // line, and the menu spans the full width (vx = 0).
-      const vx = mobile ? 0 : Math.round(cr ? cr.right + CLOCK_GAP : 84);
-      const hy = Math.round(lr ? lr.bottom + LOGO_GAP : H * 0.14);
+      const clockRight = cr ? cr.right + CLOCK_GAP : 84;
+      const logoBottom = lr ? lr.bottom + LOGO_GAP : H * 0.14;
+      // Equal inset for the corner: the space left of the vertical line matches
+      // the space above the horizontal line. Mobile has no vertical line, so the
+      // horizontal line just sits below the logo and the menu spans full width.
+      const inset = Math.max(clockRight, logoBottom);
+      const vx = mobile ? 0 : Math.round(inset);
+      const hy = Math.round(mobile ? logoBottom : inset);
       setGeo({ vx, hy });
 
       h.setAttribute("x1", String(W));
