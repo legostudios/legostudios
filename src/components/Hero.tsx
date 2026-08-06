@@ -5,7 +5,13 @@ import { CenterReveal } from "./CenterReveal";
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const LABEL = "text-[13px] font-normal text-[#111111] sm:text-[14px]";
 
-export function Hero({ onHome }: { onHome: () => void }) {
+export function Hero({
+  onHome,
+  pageLogo,
+}: {
+  onHome: () => void;
+  pageLogo: boolean;
+}) {
   const [playing, setPlaying] = useState(true);
 
   return (
@@ -15,19 +21,35 @@ export function Hero({ onHome }: { onHome: () => void }) {
       style={{ fontFamily: HELV }}
     >
       {/* LEGO logo — top-center on every size; doubles as a home button. z-[80]
-          keeps it clickable above the menu frame. */}
+          keeps it clickable above the menu frame. On the home page it's the
+          stacked mark; elsewhere it swaps to the horizontal wordmark. Both keep
+          alt="LEGO" so the frame geometry can measure it, and set an explicit
+          aspect-ratio so the height (and the frame line under it) is stable
+          before the image loads. */}
       <button
         type="button"
         onClick={onHome}
         aria-label="Home"
         className="absolute left-1/2 top-[4.5%] z-[80] -translate-x-1/2 select-none outline-none"
       >
-        <img
-          src="/lego-logo.png"
-          alt="LEGO"
-          draggable={false}
-          style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
-        />
+        {pageLogo ? (
+          <img
+            src="/Logo-Horizontal.png"
+            alt="LEGO"
+            draggable={false}
+            style={{
+              width: "clamp(6rem, 13vw, 11rem)",
+              aspectRatio: "3918 / 1194",
+            }}
+          />
+        ) : (
+          <img
+            src="/lego-logo.png"
+            alt="LEGO"
+            draggable={false}
+            style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
+          />
+        )}
       </button>
 
       {/* MOBILE + TABLET (< lg): centered column — computer with labels below. */}

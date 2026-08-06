@@ -58,8 +58,10 @@ export default function App() {
       {/* The time-line clock sits on every page; clicking it steps back a level. */}
       <TimeLine onClick={onClock} />
 
-      {/* The LEGO logo doubles as a home button — clicking it dismisses the menu. */}
-      <Hero onHome={goHome} />
+      {/* The LEGO logo doubles as a home button — clicking it dismisses the menu.
+          Off the home page (menu or a detail open) it swaps to the horizontal
+          wordmark. */}
+      <Hero onHome={goHome} pageLogo={menuOpen || caseDetail !== null} />
 
       {caseDetail !== null && (
         <CaseStudyPage
