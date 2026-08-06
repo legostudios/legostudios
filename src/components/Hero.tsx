@@ -20,40 +20,37 @@ export function Hero({
       className="relative min-h-dvh overflow-hidden bg-white"
       style={{ fontFamily: HELV }}
     >
-      {/* LEGO logo — top-center on every size; doubles as a home button. z-[80]
-          keeps it clickable above the menu frame. On the home page it's the
-          stacked mark; elsewhere it swaps to the horizontal wordmark. Both keep
-          alt="LEGO" so the frame geometry can measure it, and set an explicit
-          aspect-ratio so the height (and the frame line under it) is stable
-          before the image loads. */}
-      <button
-        type="button"
-        onClick={onHome}
-        aria-label="Home"
-        className="absolute left-1/2 top-[3.5%] z-[80] -translate-x-1/2 select-none outline-none"
-      >
-        {pageLogo ? (
-          <img
-            src="/Logo-Horizontal.png"
-            alt="LEGO"
-            draggable={false}
-            className="chrome-fade-in"
-            style={{
-              // Height chosen so the single-row letters render at the same size
-              // as the stacked mark's letters (~0.62x the home logo's width).
-              height: "clamp(1.25rem, 1.85vw, 2rem)",
-              aspectRatio: "3918 / 1194",
-            }}
-          />
-        ) : (
+      {/* LEGO logo — only on the home page (top-center), doubling as a home
+          button. On inner pages the logo is hidden; an invisible placeholder of
+          the same footprint stays in the DOM (still alt="LEGO") so the frame
+          geometry can keep measuring where the line and Back button sit. */}
+      {pageLogo ? (
+        <img
+          src="/Logo-Horizontal.png"
+          alt="LEGO"
+          aria-hidden="true"
+          draggable={false}
+          className="invisible absolute left-1/2 top-[3.5%] -translate-x-1/2"
+          style={{
+            height: "clamp(1.25rem, 1.85vw, 2rem)",
+            aspectRatio: "3918 / 1194",
+          }}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Home"
+          className="absolute left-1/2 top-[3.5%] z-[80] -translate-x-1/2 select-none outline-none"
+        >
           <img
             src="/lego-logo.png"
             alt="LEGO"
             draggable={false}
             style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
           />
-        )}
-      </button>
+        </button>
+      )}
 
       {/* MOBILE + TABLET (< lg): centered column — computer with labels below. */}
       <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 lg:hidden">

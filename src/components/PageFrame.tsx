@@ -224,7 +224,7 @@ function ListRows({ items }: { items: string[] }) {
       {items.map((name) => (
         <div
           key={name}
-          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-2 pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4] lg:text-[70px]"
+          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4] lg:text-[70px]"
         >
           {name}
         </div>
