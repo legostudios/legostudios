@@ -268,7 +268,7 @@ function CaseStudyRows({
             }}
             className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-8 pl-7 text-left outline-none"
           >
-            <span className="whitespace-nowrap text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black lg:text-[70px]">
+            <span className="whitespace-nowrap text-[clamp(1.4rem,3.1vw,2.7rem)] leading-[0.9] tracking-[-0.035em] text-black lg:text-[70px]">
               {cs.name}
             </span>
             <span
@@ -276,7 +276,7 @@ function CaseStudyRows({
               style={{
                 maxHeight: show ? "4em" : 0,
                 opacity: show ? 1 : 0,
-                marginTop: show ? "0.2rem" : 0,
+                marginTop: show ? "-0.1rem" : 0,
                 overflow: "hidden",
                 transition: `max-height ${EXPAND}ms ${SMOOTH}, margin-top ${EXPAND}ms ${SMOOTH}, opacity 360ms ease`,
               }}
