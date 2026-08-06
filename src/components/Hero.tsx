@@ -39,7 +39,9 @@ export function Hero({
             draggable={false}
             className="opacity-100 transition-opacity duration-700 ease-out starting:opacity-0"
             style={{
-              height: "clamp(1.5rem, 2.3vw, 2.5rem)",
+              // Height chosen so the single-row letters render at the same size
+              // as the stacked mark's letters (~0.62x the home logo's width).
+              height: "clamp(1.25rem, 1.85vw, 2rem)",
               aspectRatio: "3918 / 1194",
             }}
           />
