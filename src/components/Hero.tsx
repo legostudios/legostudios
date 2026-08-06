@@ -44,10 +44,10 @@ export function Hero({
           className="absolute left-1/2 top-[3.5%] z-[80] -translate-x-1/2 select-none outline-none"
         >
           <img
-            src="/lego-logo.png"
-            alt="LEGO"
+            src="/logo-studios.png"
+            alt="LEGO Studios"
             draggable={false}
-            style={{ width: "clamp(2rem, 3vw, 3.25rem)", height: "auto" }}
+            style={{ width: "clamp(2rem, 3vw, 3.25rem)", aspectRatio: "253 / 434" }}
           />
         </button>
       )}

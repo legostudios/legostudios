@@ -86,14 +86,14 @@ function ColumnName({
     // Left-aligned, vertically centred in the band. The page heading parks at
     // the band centre too, so it lands exactly here when a page collapses.
     return (
-      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
         {label}
       </span>
     );
   }
 
   return (
-    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[clamp(2.5rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.02em] text-black">
+    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[103px] font-medium leading-[0.9] tracking-[-0.035em] text-black">
       {words.map((word, i) => (
         <span
           key={i}
@@ -217,14 +217,21 @@ function PagePanel({
 }
 
 // The rows below the Services heading: bottom-left aligned names in equal boxes
-// that grow on hover (like the case-study rows).
+// that grow on hover (state-driven, same smoothness as the case-study rows).
 function ListRows({ items }: { items: string[] }) {
+  const [hover, setHover] = useState<number | null>(null);
   return (
     <>
-      {items.map((name) => (
+      {items.map((name, i) => (
         <div
           key={name}
-          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:grow-[2.4] lg:text-[70px]"
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(null)}
+          style={{
+            flexGrow: hover === i ? 2.4 : 1,
+            transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
+          }}
+          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black lg:text-[70px]"
         >
           {name}
         </div>
