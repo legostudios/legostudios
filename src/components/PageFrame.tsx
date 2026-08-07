@@ -43,19 +43,16 @@ const PANELS: Record<string, { title: string; items: string[] }> = {
   },
 };
 
-// A random archival image (mobile only). It's placed in a flex container that
-// centres it in the empty space, so the whitespace around it stays balanced.
-function CenterImage() {
-  const [src] = useState(
-    () => SHOWCASE_IMAGES[Math.floor(Math.random() * SHOWCASE_IMAGES.length)],
-  );
+// A single fixed archival image, centred in the empty space (mobile only).
+const CENTER_IMAGE_SRC = SHOWCASE_IMAGES[0];
+function CenterImage({ className }: { className: string }) {
   return (
     <img
-      src={src}
+      src={CENTER_IMAGE_SRC}
       alt=""
       aria-hidden="true"
       draggable={false}
-      className="max-h-full w-auto max-w-[68%] object-contain"
+      className={className}
     />
   );
 }
@@ -213,9 +210,9 @@ function PagePanel({
 
   return (
     <div className="absolute inset-0">
-      {mobile && title !== "Magazine" && (
+      {mobile && title !== "Magazine" && title !== "Contact" && (
         <div className="pointer-events-none absolute inset-x-0 top-[14%] bottom-[52%] z-0 flex items-center justify-center p-8">
-          <CenterImage />
+          <CenterImage className="max-h-full w-auto max-w-[68%] object-contain" />
         </div>
       )}
       <h1
@@ -303,19 +300,9 @@ function CaseStudyRows({
             key={cs.name}
             type="button"
             onClick={() => onSelect(i)}
-            className="block border-t-2 border-black py-3 pl-10 pr-4 text-left outline-none"
+            className="block whitespace-nowrap border-t-2 border-black py-5 pl-10 pr-4 text-left text-[clamp(1.4rem,5.3vw,2rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black outline-none"
           >
-            <div className="whitespace-nowrap text-[clamp(1.4rem,5.3vw,2rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
-              {cs.name}
-            </div>
-            <div className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] tracking-[-0.01em] text-black/45">
-              {cs.stats.map((s) => (
-                <span key={s.label} className="truncate">
-                  <span className="font-medium text-black">{s.value}</span>{" "}
-                  {s.label}
-                </span>
-              ))}
-            </div>
+            {cs.name}
           </button>
         ))}
       </>
@@ -377,12 +364,18 @@ function MagazineBody() {
 
 // The contact page's body — email at the bottom-left (large), social icons at
 // the bottom-right on the same line.
-function ContactBody() {
+function ContactBody({ mobile }: { mobile: boolean }) {
   return (
-    <div className="flex flex-1 flex-col justify-end pb-12 pl-10 pr-8">
+    <div className={`flex flex-1 flex-col ${mobile ? "" : "justify-end"}`}>
+      {/* Mobile: a big image fills the (large) empty space with equal margins. */}
+      {mobile && (
+        <div className="relative flex-1 p-8">
+          <CenterImage className="h-full w-full object-cover" />
+        </div>
+      )}
       {/* items-baseline puts the email's baseline on the icons' base (their
           bottom edge) — aligned on both mobile and desktop. */}
-      <div className="flex items-baseline justify-between gap-6">
+      <div className="flex items-baseline justify-between gap-6 pb-12 pl-10 pr-8">
         <a
           href={`mailto:${EMAIL}`}
           className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[80px]"
@@ -632,7 +625,7 @@ export function PageFrame({
         bandHeight={selGeo ? selGeo.end - selGeo.start : 0}
         onHeadingClick={collapsePanel}
       >
-        <ContactBody />
+        <ContactBody mobile={isMobile} />
       </PagePanel>
     ) : selTarget === "magazine" ? (
       <PagePanel
@@ -686,8 +679,8 @@ export function PageFrame({
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {isMobile && (
-            <div className="flex flex-1 items-center justify-center p-8">
-              <CenterImage />
+            <div className="relative flex-1 p-8">
+              <CenterImage className="h-full w-full object-cover" />
             </div>
           )}
           {ITEMS.map((item, i) => (
