@@ -272,7 +272,7 @@ function CaseStudyRows({
               {cs.name}
             </span>
             <span
-              className="flex flex-wrap gap-x-8 gap-y-1 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
+              className="flex flex-wrap gap-x-8 gap-y-1 pl-[2px] pr-4 text-[17px] tracking-[-0.01em] text-black/50"
               style={{
                 maxHeight: show ? "4em" : 0,
                 opacity: show ? 1 : 0,
@@ -315,7 +315,7 @@ function ContactBody() {
       >
         {EMAIL}
       </a>
-      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.3rem]">
+      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.45rem]">
         <a
           href={INSTAGRAM}
           target="_blank"
