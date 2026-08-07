@@ -95,7 +95,7 @@ export default function App() {
             aria-hidden="true"
             draggable={false}
             className="w-auto -translate-y-[1px]"
-            style={{ height: "0.9em" }}
+            style={{ height: "0.6em" }}
           />
           Back
         </button>

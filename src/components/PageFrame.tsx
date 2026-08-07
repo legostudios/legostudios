@@ -324,7 +324,7 @@ function ContactBody() {
           className="block transition-opacity hover:opacity-60"
         >
           <img
-            src="/ig-logo.webp"
+            src="/ig-icon.webp"
             alt="Instagram"
             draggable={false}
             className="h-[clamp(24px,2vw,32px)] w-auto object-contain"
@@ -338,7 +338,7 @@ function ContactBody() {
           className="block transition-opacity hover:opacity-60"
         >
           <img
-            src="/li-logo.png"
+            src="/li-icon.png"
             alt="LinkedIn"
             draggable={false}
             className="h-[clamp(24px,2vw,32px)] w-auto object-contain"
