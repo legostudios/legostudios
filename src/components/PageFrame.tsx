@@ -44,11 +44,20 @@ const PANELS: Record<string, { title: string; items: string[] }> = {
 };
 
 // A single fixed archival image, centred in the empty space (mobile only).
+// Default is the Global Outdoor Apparel photo (menu / services / case studies);
+// Contact overrides it with a distinct image.
 const CENTER_IMAGE_SRC = SHOWCASE_IMAGES[0];
-function CenterImage({ className }: { className: string }) {
+const CONTACT_IMAGE_SRC = SHOWCASE_IMAGES[6];
+function CenterImage({
+  className,
+  src = CENTER_IMAGE_SRC,
+}: {
+  className: string;
+  src?: string;
+}) {
   return (
     <img
-      src={CENTER_IMAGE_SRC}
+      src={src}
       alt=""
       aria-hidden="true"
       draggable={false}
@@ -367,10 +376,14 @@ function MagazineBody() {
 function ContactBody({ mobile }: { mobile: boolean }) {
   return (
     <div className={`flex flex-1 flex-col ${mobile ? "" : "justify-end"}`}>
-      {/* Mobile: a big image fills the (large) empty space with equal margins. */}
+      {/* Mobile: a distinct image, sized to fit entirely in the space *below* the
+          heading (object-contain so it never rides up under "Contact"). */}
       {mobile && (
-        <div className="relative flex-1 p-8">
-          <CenterImage className="h-full w-full object-cover" />
+        <div className="flex flex-1 items-center justify-center px-8 pb-4 pt-2">
+          <CenterImage
+            src={CONTACT_IMAGE_SRC}
+            className="max-h-full w-auto max-w-full object-contain"
+          />
         </div>
       )}
       {/* items-baseline puts the email's baseline on the icons' base (their
