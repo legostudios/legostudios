@@ -112,7 +112,6 @@ export default function App() {
           left={frameGeo.vx}
           top={frameGeo.hy}
           onBack={closeCaseStudy}
-          onOpen={openCaseStudy}
         />
       )}
     </>

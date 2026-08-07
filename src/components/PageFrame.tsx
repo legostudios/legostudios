@@ -86,14 +86,14 @@ function ColumnName({
     // Left-aligned, vertically centred in the band. The page heading parks at
     // the band centre too, so it lands exactly here when a page collapses.
     return (
-      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-5 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
+      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-10 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
         {label}
       </span>
     );
   }
 
   return (
-    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-5 pr-2 text-[103px] font-medium leading-[0.9] tracking-[-0.035em] text-black">
+    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-10 pr-2 text-[103px] font-medium leading-[0.9] tracking-[-0.035em] text-black">
       {words.map((word, i) => (
         <span
           key={i}
@@ -272,7 +272,7 @@ function CaseStudyRows({
               {cs.name}
             </span>
             <span
-              className="flex flex-wrap gap-x-8 gap-y-1 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
+              className="flex flex-wrap gap-x-8 gap-y-1 pl-3 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
               style={{
                 maxHeight: show ? "4em" : 0,
                 opacity: show ? 1 : 0,
@@ -669,6 +669,8 @@ export function PageFrame({
               style={{
                 top: pos1,
                 height: Math.max(0, pos2 - pos1),
+                // Shift 1px so the top border sits exactly on the SVG frame line.
+                marginTop: "-1px",
                 transition: `top ${EXPAND}ms ${SMOOTH}, height ${EXPAND}ms ${SMOOTH}`,
               }}
             >
@@ -690,6 +692,9 @@ export function PageFrame({
               style={{
                 left: pos1,
                 width: Math.max(0, pos2 - pos1),
+                // Shift 1px so the left border sits exactly on the SVG frame
+                // line when merged (rather than doubling into a thick line).
+                marginLeft: "-1px",
                 transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
               }}
             >
