@@ -83,10 +83,11 @@ function ColumnName({
   }, [label]);
 
   if (mobile) {
-    // Left-aligned, vertically centred in the band. The page heading parks at
-    // the band centre too, so it lands exactly here when a page collapses.
+    // A compact left-aligned row; the bands stack at the bottom of the menu.
+    // The page heading parks at the band centre, so it lands on this name when
+    // a page collapses.
     return (
-      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-10 pr-2 text-[clamp(2.4rem,11vw,3.5rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
+      <span className="block whitespace-nowrap py-3 pl-10 pr-2 text-[clamp(2.4rem,11vw,3.5rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
         {label}
       </span>
     );
@@ -120,14 +121,14 @@ function PagePanel({
   title,
   collapsing,
   mobile,
-  bands,
+  bandHeight,
   onHeadingClick,
   children,
 }: {
   title: string;
   collapsing: boolean;
   mobile: boolean;
-  bands: number;
+  bandHeight: number;
   onHeadingClick: () => void;
   children: ReactNode;
 }) {
@@ -144,8 +145,9 @@ function PagePanel({
     const parent = h?.offsetParent as HTMLElement | null;
     if (!h || !parent) return 0;
     if (mobile) {
-      const bandH = parent.clientHeight / bands;
-      return Math.max(0, bandH / 2 - h.offsetHeight / 2 - 40);
+      // Centre the heading in the (compact) band — may be negative, pulling the
+      // heading up into a band shorter than its top offset.
+      return bandHeight / 2 - h.offsetHeight / 2 - 40;
     }
     return Math.max(0, parent.clientHeight - h.offsetHeight - 44);
   };
@@ -531,9 +533,15 @@ export function PageFrame({
   let pos2 = 0;
   if (selGeo) {
     if (collapsing) {
-      const seg = selGeo.size / ITEMS.length;
-      pos1 = selGeo.index * seg;
-      pos2 = (selGeo.index + 1) * seg;
+      if (isMobile) {
+        // Mobile bands sit at their own (compact) position — return to it.
+        pos1 = selGeo.start;
+        pos2 = selGeo.end;
+      } else {
+        const seg = selGeo.size / ITEMS.length;
+        pos1 = selGeo.index * seg;
+        pos2 = (selGeo.index + 1) * seg;
+      }
     } else if (revealed) {
       pos2 = selGeo.size + 60;
     } else {
@@ -548,7 +556,7 @@ export function PageFrame({
         title="Contact"
         collapsing={collapsing}
         mobile={isMobile}
-        bands={ITEMS.length}
+        bandHeight={selGeo ? selGeo.end - selGeo.start : 0}
         onHeadingClick={collapsePanel}
       >
         <ContactBody />
@@ -558,7 +566,7 @@ export function PageFrame({
         title="Magazine"
         collapsing={collapsing}
         mobile={isMobile}
-        bands={ITEMS.length}
+        bandHeight={selGeo ? selGeo.end - selGeo.start : 0}
         onHeadingClick={collapsePanel}
       >
         <MagazineBody />
@@ -568,7 +576,7 @@ export function PageFrame({
         title={selPanel.title}
         collapsing={collapsing}
         mobile={isMobile}
-        bands={ITEMS.length}
+        bandHeight={selGeo ? selGeo.end - selGeo.start : 0}
         onHeadingClick={collapsePanel}
       >
         {selTarget === "caseStudies" ? (
@@ -601,7 +609,7 @@ export function PageFrame({
             stay opaque and are simply overdrawn (and non-interactive) while a
             page is open. */}
         <div
-          className={`flex h-full w-full ${isMobile ? "flex-col" : ""}`}
+          className={`flex h-full w-full ${isMobile ? "flex-col justify-end" : ""}`}
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {ITEMS.map((item, i) => (
@@ -638,14 +646,14 @@ export function PageFrame({
                 );
               }}
               style={{
-                flexGrow: !isMobile && hovered === i ? 3 : 1,
+                flexGrow: isMobile ? 0 : hovered === i ? 3 : 1,
                 transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
                 cursor: item.target ? undefined : "default",
               }}
-              className={`relative flex-1 basis-0 overflow-hidden border-black text-left outline-none ${
+              className={`relative overflow-hidden border-black text-left outline-none ${
                 isMobile
-                  ? "border-b-2 last:border-b-0"
-                  : "border-r-2 last:border-r-0"
+                  ? "border-t"
+                  : "flex-1 basis-0 border-r-2 last:border-r-0"
               }`}
             >
               <ColumnName
