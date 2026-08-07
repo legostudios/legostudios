@@ -7,6 +7,7 @@ export interface Stat {
 
 export interface CaseStudy {
   name: string;
+  category: string;
   stats: Stat[];
   challenge: string;
   approach: string;
@@ -16,6 +17,7 @@ export interface CaseStudy {
 export const CASE_STUDIES: CaseStudy[] = [
   {
     name: "Global Outdoor Apparel Brand",
+    category: "Apparel — Outdoor",
     stats: [
       { value: "10.7M+", label: "Organic Views" },
       { value: "343K+", label: "Engagements" },
@@ -35,6 +37,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     name: "Female Health Tracking App",
+    category: "Health — Mobile App",
     stats: [
       { value: "123M+", label: "Organic Views" },
       { value: "200K+", label: "App Downloads" },
@@ -53,6 +56,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     name: "Global HR SaaS Platform",
+    category: "Software — HR SaaS",
     stats: [
       { value: "118.9M+", label: "Organic Views" },
       { value: "6.5M+", label: "Engagements" },
@@ -72,6 +76,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     name: "Premium Skincare Brand",
+    category: "Beauty — Skincare",
     stats: [
       { value: "7.9M+", label: "Organic Views" },
       { value: "600+", label: "Content Pieces Produced" },
