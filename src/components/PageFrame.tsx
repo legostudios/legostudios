@@ -679,8 +679,8 @@ export function PageFrame({
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {isMobile && (
-            <div className="relative flex-1 p-8">
-              <CenterImage className="h-full w-full object-cover" />
+            <div className="flex flex-1 items-center justify-center overflow-hidden p-8">
+              <CenterImage className="max-h-[30vh] w-auto max-w-[64%] object-contain" />
             </div>
           )}
           {ITEMS.map((item, i) => (
