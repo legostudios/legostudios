@@ -205,7 +205,7 @@ function PagePanel({
         {title}
       </h1>
       <div
-        className="absolute inset-x-0 bottom-0 flex flex-col"
+        className={`absolute inset-x-0 bottom-0 flex flex-col ${mobile ? "justify-end" : ""}`}
         style={{
           top: rowsTop,
           opacity: shown ? 1 : 0,
@@ -218,10 +218,26 @@ function PagePanel({
   );
 }
 
-// The rows below the Services heading: bottom-left aligned names in equal boxes
-// that grow on hover (state-driven, same smoothness as the case-study rows).
-function ListRows({ items }: { items: string[] }) {
+// The rows below the Services heading. Desktop: bottom-left names in equal boxes
+// that grow on hover. Mobile: a compact bottom-aligned list matching the menu.
+function ListRows({ items, mobile }: { items: string[]; mobile: boolean }) {
   const [hover, setHover] = useState<number | null>(null);
+
+  if (mobile) {
+    return (
+      <>
+        {items.map((name) => (
+          <div
+            key={name}
+            className="block whitespace-nowrap border-t border-black py-3 pl-10 pr-2 text-[clamp(1.35rem,5.2vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
+          >
+            {name}
+          </div>
+        ))}
+      </>
+    );
+  }
+
   return (
     <>
       {items.map((name, i) => (
@@ -582,7 +598,7 @@ export function PageFrame({
         {selTarget === "caseStudies" ? (
           <CaseStudyRows onSelect={onOpenCaseStudy} mobile={isMobile} />
         ) : (
-          <ListRows items={selPanel.items} />
+          <ListRows items={selPanel.items} mobile={isMobile} />
         )}
       </PagePanel>
     ) : null;
