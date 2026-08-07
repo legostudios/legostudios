@@ -266,9 +266,9 @@ function CaseStudyRows({
               flexGrow: !mobile && hover === i ? 2.4 : 1,
               transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
             }}
-            className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-8 pl-9 text-left outline-none"
+            className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-8 pl-10 text-left outline-none"
           >
-            <span className="whitespace-nowrap pl-1 text-[clamp(1.4rem,3.1vw,2.7rem)] leading-[0.9] tracking-[-0.035em] text-black lg:text-[70px]">
+            <span className="whitespace-nowrap text-[clamp(1.4rem,3.1vw,2.7rem)] leading-[0.9] tracking-[-0.035em] text-black lg:text-[70px]">
               {cs.name}
             </span>
             <span
@@ -315,7 +315,7 @@ function ContactBody() {
       >
         {EMAIL}
       </a>
-      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-1">
+      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.6rem]">
         <a
           href={INSTAGRAM}
           target="_blank"
