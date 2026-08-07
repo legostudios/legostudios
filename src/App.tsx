@@ -12,7 +12,16 @@ export default function App() {
   const [caseDetail, setCaseDetail] = useState<number | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [frameGeo, setFrameGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
+  const [isMobile, setIsMobile] = useState(false);
   const collapsePanel = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const on = () => setIsMobile(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
 
   // Warm the horizontal wordmark so it's ready to fade in the moment the menu
   // opens (no first-load pop).
@@ -83,9 +92,9 @@ export default function App() {
           onClick={onBack}
           className="chrome-fade-in fixed z-[86] flex items-center gap-1 text-[22px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
           style={{
-            left: Math.max(frameGeo.vx, 60) + 37,
+            left: isMobile ? "50%" : Math.max(frameGeo.vx, 60) + 37,
             top: frameGeo.logoMid + 5,
-            transform: "translateY(-50%)",
+            transform: isMobile ? "translate(-50%, -50%)" : "translateY(-50%)",
             fontFamily: HELV,
           }}
         >

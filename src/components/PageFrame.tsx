@@ -86,7 +86,7 @@ function ColumnName({
     // Left-aligned, vertically centred in the band. The page heading parks at
     // the band centre too, so it lands exactly here when a page collapses.
     return (
-      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-10 pr-2 text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
+      <span className="absolute inset-0 flex items-center whitespace-nowrap pl-10 pr-2 text-[clamp(2.4rem,11vw,3.5rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
         {label}
       </span>
     );
@@ -198,7 +198,7 @@ function PagePanel({
         onClick={onHeadingClick}
         role="button"
         aria-label={`Close ${title}`}
-        className="absolute left-10 top-10 z-10 cursor-pointer whitespace-nowrap text-[clamp(1.7rem,6vw,2.6rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black will-change-transform lg:text-[103px]"
+        className="absolute left-10 top-10 z-10 cursor-pointer whitespace-nowrap text-[clamp(2.4rem,11vw,3.5rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black will-change-transform lg:text-[103px]"
       >
         {title}
       </h1>
