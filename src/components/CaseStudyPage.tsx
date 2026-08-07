@@ -3,11 +3,14 @@ import { CASE_STUDIES } from "../data/caseStudies";
 import { SHOWCASE_IMAGES } from "../data/showcaseImages";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
-const RED = "#d01012";
 const LABEL = "text-[12px] uppercase tracking-[0.18em] text-black/55";
 
 const imageFor = (i: number) => SHOWCASE_IMAGES[i % SHOWCASE_IMAGES.length];
 const pad = (n: number) => String(n).padStart(2, "0");
+
+// First letter of every word uppercase, the rest lowercase.
+const titleCase = (s: string) =>
+  s.replace(/\S+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
 
 interface CaseStudyPageProps {
   index: number;
@@ -54,8 +57,8 @@ export function CaseStudyPage({ index, left, top, onBack }: CaseStudyPageProps) 
       <div className="mx-auto max-w-[1500px]">
         {/* Title. */}
         <header className="px-5 pt-10 sm:px-8 sm:pt-16">
-          <h1 className="max-w-[16ch] text-[clamp(2.3rem,7vw,6rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
-            {cs.name}
+          <h1 className="max-w-[16ch] text-[clamp(2.3rem,7vw,6rem)] font-bold leading-[0.95] tracking-[-0.02em]">
+            {titleCase(cs.name)}
           </h1>
         </header>
 
@@ -110,15 +113,6 @@ export function CaseStudyPage({ index, left, top, onBack }: CaseStudyPageProps) 
                 <div className="shrink-0 text-[12px] tracking-widest text-black/40">
                   {pad(i + 1)}
                 </div>
-              </div>
-              <div className="mt-5 h-[3px] w-full bg-black/10">
-                <div
-                  className="h-full"
-                  style={{
-                    width: `${Math.max(38, 100 - i * 15)}%`,
-                    background: RED,
-                  }}
-                />
               </div>
             </div>
           ))}
