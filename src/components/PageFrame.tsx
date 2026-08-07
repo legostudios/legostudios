@@ -43,24 +43,20 @@ const PANELS: Record<string, { title: string; items: string[] }> = {
   },
 };
 
-// A random archival image, centred in the empty space (mobile only). The
-// `className` positions the band it centres within so it sits above the content.
-function CenterImage({ className }: { className: string }) {
+// A random archival image (mobile only). It's placed in a flex container that
+// centres it in the empty space, so the whitespace around it stays balanced.
+function CenterImage() {
   const [src] = useState(
     () => SHOWCASE_IMAGES[Math.floor(Math.random() * SHOWCASE_IMAGES.length)],
   );
   return (
-    <div
+    <img
+      src={src}
+      alt=""
       aria-hidden="true"
-      className={`pointer-events-none absolute z-0 flex items-center justify-center p-8 ${className}`}
-    >
-      <img
-        src={src}
-        alt=""
-        draggable={false}
-        className="max-h-full w-auto max-w-[68%] object-contain"
-      />
-    </div>
+      draggable={false}
+      className="max-h-full w-auto max-w-[68%] object-contain"
+    />
   );
 }
 
@@ -218,7 +214,9 @@ function PagePanel({
   return (
     <div className="absolute inset-0">
       {mobile && title !== "Magazine" && (
-        <CenterImage className="inset-x-0 top-[14%] bottom-[52%]" />
+        <div className="pointer-events-none absolute inset-x-0 top-[14%] bottom-[52%] z-0 flex items-center justify-center p-8">
+          <CenterImage />
+        </div>
       )}
       <h1
         ref={headingRef}
@@ -254,7 +252,7 @@ function ListRows({ items, mobile }: { items: string[]; mobile: boolean }) {
         {items.map((name) => (
           <div
             key={name}
-            className="block border-t border-black py-4 pl-10 pr-5 text-[clamp(1.9rem,8vw,2.8rem)] font-medium leading-[0.95] tracking-[-0.035em] text-black"
+            className="block whitespace-nowrap border-t border-black py-3 pl-10 pr-4 text-[clamp(1.3rem,5vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
           >
             {name}
           </div>
@@ -305,15 +303,14 @@ function CaseStudyRows({
             key={cs.name}
             type="button"
             onClick={() => onSelect(i)}
-            className="block border-t border-black py-4 pl-10 pr-5 text-left outline-none"
+            className="block border-t border-black py-3 pl-10 pr-4 text-left outline-none"
           >
-            <div className="text-[clamp(1.6rem,6vw,2.3rem)] font-medium leading-[0.95] tracking-[-0.035em] text-black">
+            <div className="whitespace-nowrap text-[clamp(1.4rem,5.3vw,2rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
               {cs.name}
             </div>
-            <div className="mt-1.5 line-clamp-2 text-[13px] leading-snug tracking-[-0.01em] text-black/45">
-              {cs.stats.map((s, k) => (
-                <span key={s.label}>
-                  {k > 0 && <span className="mx-1.5 text-black/30">·</span>}
+            <div className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] tracking-[-0.01em] text-black/45">
+              {cs.stats.map((s) => (
+                <span key={s.label} className="truncate">
                   <span className="font-medium text-black">{s.value}</span>{" "}
                   {s.label}
                 </span>
@@ -684,13 +681,15 @@ export function PageFrame({
         {/* Menu columns. The expanding page covers them physically, so they
             stay opaque and are simply overdrawn (and non-interactive) while a
             page is open. */}
-        {isMobile && !anySel && (
-          <CenterImage className="inset-x-0 top-0 bottom-[46%]" />
-        )}
         <div
-          className={`relative z-[1] flex h-full w-full ${isMobile ? "flex-col justify-end" : ""}`}
+          className={`relative z-[1] flex h-full w-full ${isMobile ? "flex-col" : ""}`}
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
+          {isMobile && (
+            <div className="flex flex-1 items-center justify-center p-8">
+              <CenterImage />
+            </div>
+          )}
           {ITEMS.map((item, i) => (
             <button
               key={item.label}
@@ -752,7 +751,7 @@ export function PageFrame({
           selGeo &&
           (isMobile ? (
             <div
-              className="absolute inset-x-0 z-[2] overflow-hidden border-t-2 border-b-2 border-black bg-white"
+              className="absolute inset-x-0 z-[2] overflow-hidden border-t border-b border-black bg-white"
               style={{
                 top: pos1,
                 height: Math.max(0, pos2 - pos1),
