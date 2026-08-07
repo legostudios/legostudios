@@ -304,18 +304,18 @@ function MagazineBody() {
   );
 }
 
-// The contact page's body — email + social icons, filling the area below the
-// "Contact" heading.
+// The contact page's body — email at the bottom-left (large), social icons at
+// the bottom-right on the same line.
 function ContactBody() {
   return (
-    <div className="flex flex-1 flex-col items-start justify-center gap-[clamp(1.5rem,4vh,2.75rem)] pl-5">
+    <div className="flex flex-1 items-end justify-between gap-6 pb-6 pl-10 pr-8">
       <a
         href={`mailto:${EMAIL}`}
-        className="text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black transition-opacity hover:opacity-60"
+        className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[86px]"
       >
         {EMAIL}
       </a>
-      <div className="flex items-center gap-[clamp(0.8rem,1.3vw,1.25rem)]">
+      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-1">
         <a
           href={INSTAGRAM}
           target="_blank"
@@ -327,7 +327,7 @@ function ContactBody() {
             src="/ig-logo.webp"
             alt="Instagram"
             draggable={false}
-            className="h-[clamp(28px,2.4vw,38px)] w-[clamp(28px,2.4vw,38px)] object-contain"
+            className="h-[clamp(28px,2.4vw,40px)] w-[clamp(28px,2.4vw,40px)] object-contain"
           />
         </a>
         <a
@@ -341,7 +341,7 @@ function ContactBody() {
             src="/li-logo.png"
             alt="LinkedIn"
             draggable={false}
-            className="h-[clamp(28px,2.4vw,38px)] w-[clamp(28px,2.4vw,38px)] object-contain"
+            className="h-[clamp(28px,2.4vw,40px)] w-[clamp(28px,2.4vw,40px)] object-contain"
           />
         </a>
       </div>
