@@ -246,7 +246,14 @@ function PagePanel({
   return (
     <div className="absolute inset-0">
       {mobile && title !== "Magazine" && title !== "Contact" && (
-        <div className="pointer-events-none absolute inset-x-0 top-[14%] bottom-[50%] z-0 flex items-center justify-center px-8">
+        <div
+          className="pointer-events-none absolute inset-x-0 z-0 flex items-center justify-center px-8"
+          style={{
+            // Case Studies sits a little lower than Services.
+            top: title === "Case Studies" ? "18%" : "14%",
+            bottom: title === "Case Studies" ? "46%" : "50%",
+          }}
+        >
           <FramedImage className="h-full w-auto max-w-full" />
         </div>
       )}
@@ -402,13 +409,14 @@ function MagazineBody() {
 function ContactBody({ mobile }: { mobile: boolean }) {
   return (
     <div className={`flex flex-1 flex-col ${mobile ? "" : "justify-end"}`}>
-      {/* Mobile: a distinct image, sized to fit entirely in the space *below* the
-          heading (object-contain so it never rides up under "Contact"). */}
+      {/* Mobile: a distinct image filling the space below the heading. object-cover
+          crops it, and the container starts below "Contact", so the overlapping top
+          is simply cropped away rather than riding up under the heading. */}
       {mobile && (
-        <div className="flex flex-1 items-center justify-center px-8 pb-4 pt-2">
+        <div className="flex flex-1 px-8 pb-4">
           <CenterImage
             src={CONTACT_IMAGE_SRC}
-            className="max-h-full w-auto max-w-full object-contain"
+            className="h-full w-full object-cover"
           />
         </div>
       )}
