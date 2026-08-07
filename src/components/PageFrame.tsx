@@ -252,7 +252,7 @@ function ListRows({ items, mobile }: { items: string[]; mobile: boolean }) {
         {items.map((name) => (
           <div
             key={name}
-            className="block whitespace-nowrap border-t-2 border-black py-3 pl-10 pr-4 text-[clamp(1.3rem,5vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
+            className="block whitespace-nowrap border-t-2 border-black py-5 pl-10 pr-4 text-[clamp(1.3rem,5vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
           >
             {name}
           </div>
