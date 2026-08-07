@@ -315,7 +315,7 @@ function ContactBody() {
       >
         {EMAIL}
       </a>
-      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.45rem]">
+      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.75rem]">
         <a
           href={INSTAGRAM}
           target="_blank"

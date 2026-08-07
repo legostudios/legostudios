@@ -90,11 +90,11 @@ export default function App() {
           }}
         >
           <img
-            src="/arrow.png"
+            src="/back_arrow.png"
             alt=""
             aria-hidden="true"
             draggable={false}
-            className="w-auto -translate-y-[2px]"
+            className="w-auto -translate-y-[1px]"
             style={{ height: "0.62em" }}
           />
           Back
