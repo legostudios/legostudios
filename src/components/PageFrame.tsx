@@ -231,7 +231,7 @@ function ListRows({ items }: { items: string[] }) {
             flexGrow: hover === i ? 2.4 : 1,
             transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
           }}
-          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-7 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black lg:text-[70px]"
+          className="flex flex-1 basis-0 items-end whitespace-nowrap border-t-2 border-black pb-1 pl-10 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.035em] text-black lg:text-[70px]"
         >
           {name}
         </div>
@@ -266,13 +266,13 @@ function CaseStudyRows({
               flexGrow: !mobile && hover === i ? 2.4 : 1,
               transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
             }}
-            className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-8 pl-7 text-left outline-none"
+            className="flex flex-1 basis-0 flex-col justify-end overflow-hidden border-t-2 border-black pb-8 pl-9 text-left outline-none"
           >
-            <span className="whitespace-nowrap text-[clamp(1.4rem,3.1vw,2.7rem)] leading-[0.9] tracking-[-0.035em] text-black lg:text-[70px]">
+            <span className="whitespace-nowrap pl-1 text-[clamp(1.4rem,3.1vw,2.7rem)] leading-[0.9] tracking-[-0.035em] text-black lg:text-[70px]">
               {cs.name}
             </span>
             <span
-              className="flex flex-wrap gap-x-8 gap-y-1 pl-3 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
+              className="flex flex-wrap gap-x-8 gap-y-1 pr-4 text-[17px] tracking-[-0.01em] text-black/50"
               style={{
                 maxHeight: show ? "4em" : 0,
                 opacity: show ? 1 : 0,
@@ -308,10 +308,10 @@ function MagazineBody() {
 // the bottom-right on the same line.
 function ContactBody() {
   return (
-    <div className="flex flex-1 items-end justify-between gap-6 pb-6 pl-10 pr-8">
+    <div className="flex flex-1 items-end justify-between gap-6 pb-12 pl-10 pr-8">
       <a
         href={`mailto:${EMAIL}`}
-        className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[86px]"
+        className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[80px]"
       >
         {EMAIL}
       </a>
