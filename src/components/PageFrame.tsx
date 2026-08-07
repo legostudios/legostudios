@@ -229,7 +229,7 @@ function ListRows({ items, mobile }: { items: string[]; mobile: boolean }) {
         {items.map((name) => (
           <div
             key={name}
-            className="block whitespace-nowrap border-t border-black py-3 pl-10 pr-2 text-[clamp(1.35rem,5.2vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
+            className="block border-t border-black py-4 pl-10 pr-5 text-[clamp(1.9rem,8vw,2.8rem)] font-medium leading-[0.95] tracking-[-0.035em] text-black"
           >
             {name}
           </div>
@@ -269,6 +269,37 @@ function CaseStudyRows({
   mobile: boolean;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+
+  if (mobile) {
+    // Compact bottom list matching the menu; the highlights sit under each name,
+    // constrained to two lines.
+    return (
+      <>
+        {CASE_STUDIES.map((cs, i) => (
+          <button
+            key={cs.name}
+            type="button"
+            onClick={() => onSelect(i)}
+            className="block border-t border-black py-4 pl-10 pr-5 text-left outline-none"
+          >
+            <div className="text-[clamp(1.6rem,6vw,2.3rem)] font-medium leading-[0.95] tracking-[-0.035em] text-black">
+              {cs.name}
+            </div>
+            <div className="mt-1.5 line-clamp-2 text-[13px] leading-snug tracking-[-0.01em] text-black/45">
+              {cs.stats.map((s, k) => (
+                <span key={s.label}>
+                  {k > 0 && <span className="mx-1.5 text-black/30">·</span>}
+                  <span className="font-medium text-black">{s.value}</span>{" "}
+                  {s.label}
+                </span>
+              ))}
+            </div>
+          </button>
+        ))}
+      </>
+    );
+  }
+
   return (
     <>
       {CASE_STUDIES.map((cs, i) => {
@@ -326,14 +357,17 @@ function MagazineBody() {
 // the bottom-right on the same line.
 function ContactBody() {
   return (
-    <div className="flex flex-1 items-end justify-between gap-6 pb-12 pl-10 pr-8">
-      <a
-        href={`mailto:${EMAIL}`}
-        className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[80px]"
-      >
-        {EMAIL}
-      </a>
-      <div className="flex shrink-0 items-end gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.5rem]">
+    <div className="flex flex-1 flex-col justify-end pb-12 pl-10 pr-8">
+      {/* items-baseline puts the email's baseline on the icons' base (their
+          bottom edge) — aligned on both mobile and desktop. */}
+      <div className="flex items-baseline justify-between gap-6">
+        <a
+          href={`mailto:${EMAIL}`}
+          className="whitespace-nowrap text-[clamp(1.3rem,5vw,2.4rem)] leading-[0.9] tracking-[-0.02em] text-black transition-opacity hover:opacity-60 lg:text-[80px]"
+        >
+          {EMAIL}
+        </a>
+        <div className="flex shrink-0 items-end gap-[clamp(0.8rem,1.3vw,1.25rem)]">
         <a
           href={INSTAGRAM}
           target="_blank"
@@ -362,6 +396,7 @@ function ContactBody() {
             className="h-[clamp(24px,2vw,32px)] w-auto object-contain"
           />
         </a>
+        </div>
       </div>
     </div>
   );
