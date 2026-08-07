@@ -252,7 +252,7 @@ function ListRows({ items, mobile }: { items: string[]; mobile: boolean }) {
         {items.map((name) => (
           <div
             key={name}
-            className="block whitespace-nowrap border-t border-black py-3 pl-10 pr-4 text-[clamp(1.3rem,5vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
+            className="block whitespace-nowrap border-t-2 border-black py-3 pl-10 pr-4 text-[clamp(1.3rem,5vw,1.9rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black"
           >
             {name}
           </div>
@@ -303,7 +303,7 @@ function CaseStudyRows({
             key={cs.name}
             type="button"
             onClick={() => onSelect(i)}
-            className="block border-t border-black py-3 pl-10 pr-4 text-left outline-none"
+            className="block border-t-2 border-black py-3 pl-10 pr-4 text-left outline-none"
           >
             <div className="whitespace-nowrap text-[clamp(1.4rem,5.3vw,2rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
               {cs.name}
@@ -730,7 +730,7 @@ export function PageFrame({
               }}
               className={`relative overflow-hidden border-black text-left outline-none ${
                 isMobile
-                  ? "border-t"
+                  ? "border-t-2"
                   : "flex-1 basis-0 border-r-2 last:border-r-0"
               }`}
             >
@@ -751,7 +751,7 @@ export function PageFrame({
           selGeo &&
           (isMobile ? (
             <div
-              className="absolute inset-x-0 z-[2] overflow-hidden border-t border-b border-black bg-white"
+              className="absolute inset-x-0 z-[2] overflow-hidden border-t-2 border-b-2 border-black bg-white"
               style={{
                 top: pos1,
                 height: Math.max(0, pos2 - pos1),
