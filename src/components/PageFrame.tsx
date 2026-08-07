@@ -66,6 +66,32 @@ function CenterImage({
   );
 }
 
+// The image exactly as it appears on the case-study detail page: a 4:3 photo in
+// a 2px black frame, grayscale, object-cover. Used in the white space of the
+// menu / services / case-studies pages. `className` sizes the outer frame.
+function FramedImage({
+  src = CENTER_IMAGE_SRC,
+  className,
+}: {
+  src?: string;
+  className: string;
+}) {
+  return (
+    <div
+      className={`overflow-hidden border-2 border-black ${className}`}
+      style={{ aspectRatio: "4 / 3" }}
+    >
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        className="h-full w-full object-cover grayscale"
+      />
+    </div>
+  );
+}
+
 // A column heading. Collapsed, its words stack onto lines (clipped). Active, the
 // words glide onto one line. On mobile the menu is a horizontal band, so the
 // name is just shown on one line, vertically centered.
@@ -220,8 +246,8 @@ function PagePanel({
   return (
     <div className="absolute inset-0">
       {mobile && title !== "Magazine" && title !== "Contact" && (
-        <div className="pointer-events-none absolute inset-x-0 top-[14%] bottom-[52%] z-0 flex items-center justify-center p-8">
-          <CenterImage className="max-h-full w-auto max-w-[68%] object-contain" />
+        <div className="pointer-events-none absolute inset-x-0 top-[14%] bottom-[50%] z-0 flex items-center justify-center px-8">
+          <FramedImage className="h-full w-auto max-w-full" />
         </div>
       )}
       <h1
@@ -692,8 +718,8 @@ export function PageFrame({
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {isMobile && (
-            <div className="flex flex-1 items-center justify-center overflow-hidden p-8">
-              <CenterImage className="max-h-[30vh] w-auto max-w-[64%] object-contain" />
+            <div className="flex flex-1 items-center justify-center overflow-hidden p-6">
+              <FramedImage className="max-h-full w-full max-w-[340px]" />
             </div>
           )}
           {ITEMS.map((item, i) => (
