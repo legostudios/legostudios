@@ -90,10 +90,10 @@ export default function App() {
         <button
           type="button"
           onClick={onBack}
-          className="chrome-fade-in fixed z-[86] flex items-center gap-1 text-[20px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
+          className="chrome-fade-in fixed z-[86] flex items-center gap-1 text-[18px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
           style={{
             left: isMobile ? "50%" : Math.max(frameGeo.vx, 60) + 37,
-            top: frameGeo.logoMid + 5,
+            top: frameGeo.hy / 2,
             transform: isMobile ? "translate(-50%, -50%)" : "translateY(-50%)",
             fontFamily: HELV,
           }}
