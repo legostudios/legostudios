@@ -90,12 +90,12 @@ export default function App() {
           }}
         >
           <img
-            src="/back_arrow.png"
+            src="/back_icon.png"
             alt=""
             aria-hidden="true"
             draggable={false}
             className="w-auto -translate-y-[1px]"
-            style={{ height: "0.62em" }}
+            style={{ height: "0.9em" }}
           />
           Back
         </button>

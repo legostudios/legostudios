@@ -315,19 +315,19 @@ function ContactBody() {
       >
         {EMAIL}
       </a>
-      <div className="flex shrink-0 items-center gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.75rem]">
+      <div className="flex shrink-0 items-end gap-[clamp(0.8rem,1.3vw,1.25rem)] pb-[0.5rem]">
         <a
           href={INSTAGRAM}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Instagram"
-          className="transition-opacity hover:opacity-60"
+          className="block transition-opacity hover:opacity-60"
         >
           <img
             src="/ig-logo.webp"
             alt="Instagram"
             draggable={false}
-            className="h-[clamp(28px,2.4vw,40px)] w-[clamp(28px,2.4vw,40px)] object-contain"
+            className="h-[clamp(24px,2vw,32px)] w-auto object-contain"
           />
         </a>
         <a
@@ -335,13 +335,13 @@ function ContactBody() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="LinkedIn"
-          className="transition-opacity hover:opacity-60"
+          className="block transition-opacity hover:opacity-60"
         >
           <img
             src="/li-logo.png"
             alt="LinkedIn"
             draggable={false}
-            className="h-[clamp(28px,2.4vw,40px)] w-[clamp(28px,2.4vw,40px)] object-contain"
+            className="h-[clamp(24px,2vw,32px)] w-auto object-contain"
           />
         </a>
       </div>
