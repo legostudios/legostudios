@@ -8,6 +8,7 @@ import {
 } from "react";
 import { SERVICES } from "../data/services";
 import { CASE_STUDIES } from "../data/caseStudies";
+import { SHOWCASE_IMAGES } from "../data/showcaseImages";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
@@ -41,6 +42,27 @@ const PANELS: Record<string, { title: string; items: string[] }> = {
     items: CASE_STUDIES.map((c) => c.name),
   },
 };
+
+// A random archival image, centred in the empty space (mobile only). The
+// `className` positions the band it centres within so it sits above the content.
+function CenterImage({ className }: { className: string }) {
+  const [src] = useState(
+    () => SHOWCASE_IMAGES[Math.floor(Math.random() * SHOWCASE_IMAGES.length)],
+  );
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none absolute z-0 flex items-center justify-center p-8 ${className}`}
+    >
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        className="max-h-full w-auto max-w-[68%] object-contain"
+      />
+    </div>
+  );
+}
 
 // A column heading. Collapsed, its words stack onto lines (clipped). Active, the
 // words glide onto one line. On mobile the menu is a horizontal band, so the
@@ -195,6 +217,9 @@ function PagePanel({
 
   return (
     <div className="absolute inset-0">
+      {mobile && title !== "Magazine" && (
+        <CenterImage className="inset-x-0 top-[14%] bottom-[52%]" />
+      )}
       <h1
         ref={headingRef}
         onClick={onHeadingClick}
@@ -659,8 +684,11 @@ export function PageFrame({
         {/* Menu columns. The expanding page covers them physically, so they
             stay opaque and are simply overdrawn (and non-interactive) while a
             page is open. */}
+        {isMobile && !anySel && (
+          <CenterImage className="inset-x-0 top-0 bottom-[46%]" />
+        )}
         <div
-          className={`flex h-full w-full ${isMobile ? "flex-col justify-end" : ""}`}
+          className={`relative z-[1] flex h-full w-full ${isMobile ? "flex-col justify-end" : ""}`}
           style={{ pointerEvents: anySel ? "none" : undefined }}
         >
           {ITEMS.map((item, i) => (
@@ -724,12 +752,13 @@ export function PageFrame({
           selGeo &&
           (isMobile ? (
             <div
-              className="absolute inset-x-0 overflow-hidden border-t-2 border-b-2 border-black bg-white"
+              className="absolute inset-x-0 z-[2] overflow-hidden border-t-2 border-b-2 border-black bg-white"
               style={{
                 top: pos1,
                 height: Math.max(0, pos2 - pos1),
-                // Shift 1px so the top border sits exactly on the SVG frame line.
-                marginTop: "-1px",
+                // Shift 1px so the top border sits on the SVG frame line (only
+                // while opening/open — see the desktop note above).
+                marginTop: collapsing ? "0px" : "-1px",
                 transition: `top ${EXPAND}ms ${SMOOTH}, height ${EXPAND}ms ${SMOOTH}`,
               }}
             >
@@ -747,13 +776,15 @@ export function PageFrame({
             </div>
           ) : (
             <div
-              className="absolute inset-y-0 overflow-hidden border-l-2 border-r-2 border-black bg-white"
+              className="absolute inset-y-0 z-[2] overflow-hidden border-l-2 border-r-2 border-black bg-white"
               style={{
                 left: pos1,
                 width: Math.max(0, pos2 - pos1),
-                // Shift 1px so the left border sits exactly on the SVG frame
-                // line when merged (rather than doubling into a thick line).
-                marginLeft: "-1px",
+                // Shift 1px so the left border sits exactly on the SVG frame line
+                // when merged. Only while opening/open — on collapse the borders
+                // must land exactly on the column grid (else they flicker 1px as
+                // the overlay hands off to the columns underneath).
+                marginLeft: collapsing ? "0px" : "-1px",
                 transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
               }}
             >
