@@ -276,7 +276,7 @@ function CaseStudyRows({
               style={{
                 maxHeight: show ? "4em" : 0,
                 opacity: show ? 1 : 0,
-                marginTop: show ? "-0.1rem" : 0,
+                marginTop: show ? "0.15rem" : 0,
                 overflow: "hidden",
                 transition: `max-height ${EXPAND}ms ${SMOOTH}, margin-top ${EXPAND}ms ${SMOOTH}, opacity 360ms ease`,
               }}

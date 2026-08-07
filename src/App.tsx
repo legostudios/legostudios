@@ -81,9 +81,9 @@ export default function App() {
         <button
           type="button"
           onClick={onBack}
-          className="chrome-fade-in fixed z-[86] flex items-center gap-2 text-[15px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
+          className="chrome-fade-in fixed z-[86] flex items-center gap-2.5 text-[22px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
           style={{
-            left: Math.max(frameGeo.vx, 60) + 20,
+            left: Math.max(frameGeo.vx, 60) + 37,
             top: frameGeo.logoMid + 5,
             transform: "translateY(-50%)",
             fontFamily: HELV,
@@ -95,7 +95,7 @@ export default function App() {
             aria-hidden="true"
             draggable={false}
             className="w-auto"
-            style={{ height: "0.72em" }}
+            style={{ height: "0.62em" }}
           />
           Back
         </button>
