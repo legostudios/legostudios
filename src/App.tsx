@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
 import { PageFrame } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
-import { TimeLine } from "./components/TimeLine";
+import { MenuButton } from "./components/MenuButton";
 import { CaseStudyPage } from "./components/CaseStudyPage";
 
 const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -32,12 +32,6 @@ export default function App() {
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
-  // The LEGO logo returns to the bare home page from anywhere.
-  const goHome = useCallback(() => {
-    setMenuOpen(false);
-    setCaseDetail(null);
-  }, []);
-
   // Opening a case study leaves the menu mounted underneath, so closing the
   // detail (Back) drops the user straight back onto the Case Studies list.
   const openCaseStudy = useCallback((i: number) => setCaseDetail(i), []);
@@ -52,7 +46,7 @@ export default function App() {
     else if (menuOpen) setMenuOpen(false);
   }, [caseDetail, panelOpen, menuOpen]);
 
-  // The clock steps back one level, same as the Back button.
+  // The menu button steps back one level, same as the Back button.
   const onClock = useCallback(() => {
     if (caseDetail !== null) {
       setCaseDetail(null);
@@ -70,7 +64,7 @@ export default function App() {
     <>
       <CustomCursor />
 
-      {/* Framed expanding-column menu — opens when the clock is clicked. Every
+      {/* Framed expanding-column menu — opens when the menu button is clicked. Every
           destination (Services, Case Studies, Contact) opens inside the frame. */}
       <PageFrame
         open={menuOpen}
@@ -81,8 +75,8 @@ export default function App() {
         onGeoChange={setFrameGeo}
       />
 
-      {/* The time-line clock sits on every page; clicking it steps back a level. */}
-      <TimeLine onClick={onClock} light={isHome} />
+      {/* The square menu button sits on every page; clicking it steps back a level. */}
+      <MenuButton onClick={onClock} light={isHome} />
 
       {/* Back button — in the top band (right of the vertical line) on every page
           except home. Steps back one level. */}
@@ -110,10 +104,8 @@ export default function App() {
         </button>
       )}
 
-      {/* The LEGO logo doubles as a home button — clicking it dismisses the menu.
-          Off the home page (menu or a detail open) it swaps to the horizontal
-          wordmark. */}
-      <Hero onHome={goHome} pageLogo={!isHome} />
+      {/* Home page: background video, the computer and the bottom strip. */}
+      <Hero />
 
       {caseDetail !== null && (
         <CaseStudyPage

@@ -411,10 +411,6 @@
   pointer-events: none;
 }
 
-.home-logo img {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
-}
-
 /* The area between the top chrome (logo/clock) and the strip. */
 .home-computer-stage {
   position: absolute;
@@ -432,10 +428,10 @@
    bigger than the space and still look balanced. Limited by whichever of
    width or height runs out first. */
 .home-computer {
-  width: min(92vw, 100%, 1100px);
+  width: min(74vw, 100%, 880px);
   aspect-ratio: 1 / 1;
-  max-height: 100%;
-  max-width: calc((100dvh - var(--strip-h) - clamp(3.5rem, 12vh, 7rem)) * 1);
+  max-height: 80%;
+  max-width: calc((100dvh - var(--strip-h) - clamp(3.5rem, 12vh, 7rem)) * 0.8);
 }
 
 .home-computer .reference-computer {
@@ -511,4 +507,23 @@
   .home-strip-inner {
     animation: none;
   }
+}
+
+/* Menu button — square outline that fills on hover/focus. */
+.menu-square {
+  padding: 4px;
+}
+
+.menu-square-box {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border: 4px solid currentColor;
+  background: transparent;
+  transition: background-color 150ms ease-out;
+}
+
+.menu-square:hover .menu-square-box,
+.menu-square:focus-visible .menu-square-box {
+  background: currentColor;
 }

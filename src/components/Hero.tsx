@@ -20,13 +20,7 @@ function StripTrack({ hidden }: { hidden?: boolean }) {
   );
 }
 
-export function Hero({
-  onHome,
-  pageLogo,
-}: {
-  onHome: () => void;
-  pageLogo: boolean;
-}) {
+export function Hero() {
   const reducedMotion = usePrefersReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -59,42 +53,25 @@ export function Hero({
         <source src="/home-video.mp4" type="video/mp4" />
       </video>
 
-      {/* LEGO logo — top-center home button. On inner pages it is hidden; an
-          invisible placeholder (still alt="LEGO") keeps the footprint so the
-          frame geometry can keep measuring where the line and Back button sit. */}
-      {pageLogo ? (
-        <img
-          src="/Logo-Horizontal.png"
-          alt="LEGO"
-          aria-hidden="true"
-          draggable={false}
-          className="invisible absolute left-1/2 top-[3.5%] -translate-x-1/2"
-          style={{
-            height: "clamp(1.25rem, 1.85vw, 2rem)",
-            aspectRatio: "3918 / 1194",
-          }}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={onHome}
-          aria-label="Home"
-          className="home-logo absolute left-1/2 top-[4.5%] z-[80] -translate-x-1/2 select-none outline-none"
-        >
-          <img
-            src="/logo-studios.png"
-            alt="LEGO Studios"
-            draggable={false}
-            style={{ width: "clamp(2rem, 3vw, 3.25rem)", aspectRatio: "253 / 434" }}
-          />
-        </button>
-      )}
+      {/* Invisible LEGO wordmark placeholder (alt="LEGO"): not shown, but the
+          menu frame measures it to place its line and the Back button. */}
+      <img
+        src="/Logo-Horizontal.png"
+        alt="LEGO"
+        aria-hidden="true"
+        draggable={false}
+        className="invisible absolute left-1/2 top-[3.5%] -translate-x-1/2"
+        style={{
+          height: "clamp(1.25rem, 1.85vw, 2rem)",
+          aspectRatio: "3918 / 1194",
+        }}
+      />
 
       {/* The computer, centered in the space above the strip and sized to fit
           any width or aspect ratio. */}
       <div className="home-computer-stage">
         <div className="home-computer">
-          <ComputerShowcase playing={!reducedMotion} />
+          <ComputerShowcase />
         </div>
       </div>
 
