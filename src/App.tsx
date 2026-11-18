@@ -1,146 +1,88 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
-import { PageFrame, type Target } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { MenuButton } from "./components/MenuButton";
+import { Menu, type PageId } from "./components/Menu";
+import { ServicesPage } from "./components/pages/ServicesPage";
+import { CaseStudiesPage } from "./components/pages/CaseStudiesPage";
+import { ContactPage } from "./components/pages/ContactPage";
 import { CaseStudyPage } from "./components/CaseStudyPage";
 
-const HELV = '"Helvetica Neue", Helvetica, Arial, sans-serif';
-
+// Navigation is three stacked layers over the home page:
+//   menu (yellow)  →  page (Services / Case Studies / Contact)  →  case study.
+// Back steps down one layer; Close returns straight home. The home-page
+// Contact link opens the Contact page without the menu, so Back goes home.
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [page, setPage] = useState<PageId | null>(null);
   const [caseDetail, setCaseDetail] = useState<number | null>(null);
-  const [panelOpen, setPanelOpen] = useState(false);
-  // A page opened straight from the home page (Contact link): it should step
-  // back to home, not to the menu.
-  const [directPage, setDirectPage] = useState(false);
-  const [requestPage, setRequestPage] = useState<Target | null>(null);
-  const [frameGeo, setFrameGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
-  const [isMobile, setIsMobile] = useState(false);
-  const collapsePanel = useRef<() => void>(() => {});
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const on = () => setIsMobile(mq.matches);
-    on();
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
-  }, []);
+  const isHome = !menuOpen && page === null && caseDetail === null;
 
-  // Warm the horizontal wordmark so it's ready to fade in the moment the menu
-  // opens (no first-load pop).
-  useEffect(() => {
-    const img = new Image();
-    img.src = "/Logo-Horizontal.png";
-  }, []);
-
-  const closeMenu = useCallback(() => {
+  const closeAll = useCallback(() => {
+    setCaseDetail(null);
+    setPage(null);
     setMenuOpen(false);
-    setDirectPage(false);
   }, []);
 
-  const openContact = useCallback(() => {
-    setDirectPage(true);
-    setRequestPage("contact");
-    setMenuOpen(true);
-  }, []);
-  const requestHandled = useCallback(() => setRequestPage(null), []);
-
-  // Opening a case study leaves the menu mounted underneath, so closing the
-  // detail (Back) drops the user straight back onto the Case Studies list.
-  const openCaseStudy = useCallback((i: number) => setCaseDetail(i), []);
-  const closeCaseStudy = useCallback(() => setCaseDetail(null), []);
-
-  const isHome = !menuOpen && caseDetail === null;
-
-  // Step back one level: detail → list, page → menu, menu → home.
-  const onBack = useCallback(() => {
+  const back = useCallback(() => {
     if (caseDetail !== null) setCaseDetail(null);
-    else if (panelOpen && directPage) closeMenu();
-    else if (panelOpen) collapsePanel.current();
-    else if (menuOpen) closeMenu();
-  }, [caseDetail, panelOpen, menuOpen, directPage, closeMenu]);
+    else if (page !== null) setPage(null);
+    else setMenuOpen(false);
+  }, [caseDetail, page]);
 
-  // The menu button steps back one level, same as the Back button.
-  const onClock = useCallback(() => {
-    if (caseDetail !== null) {
-      setCaseDetail(null);
-      collapsePanel.current();
-    } else if (panelOpen && directPage) {
-      closeMenu();
-    } else if (panelOpen) {
-      collapsePanel.current();
-    } else if (menuOpen) {
-      closeMenu();
-    } else {
-      setMenuOpen(true);
-    }
-  }, [caseDetail, panelOpen, menuOpen, directPage, closeMenu]);
+  // The menu square opens the menu from home, and steps back everywhere else.
+  const onMenuButton = useCallback(() => {
+    if (isHome) setMenuOpen(true);
+    else back();
+  }, [isHome, back]);
+
+  const openContactFromHome = useCallback(() => setPage("contact"), []);
+
+  useEffect(() => {
+    if (isHome) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") back();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isHome, back]);
+
+  // The square is white-on-dark over the home video (difference blend) and on
+  // the black Contact page; black on every other page colour.
+  const lightButton = isHome || (page === "contact" && caseDetail === null);
 
   return (
     <>
       <CustomCursor />
 
-      {/* Framed expanding-column menu — opens when the menu button is clicked. Every
-          destination (Services, Case Studies, Contact) opens inside the frame. */}
-      <PageFrame
-        open={menuOpen}
-        onClose={closeMenu}
-        onOpenCaseStudy={openCaseStudy}
-        onPanelOpenChange={setPanelOpen}
-        collapseRef={collapsePanel}
-        onGeoChange={setFrameGeo}
-        requestPage={requestPage}
-        onRequestHandled={requestHandled}
-      />
+      <Hero />
 
-      {/* Contact — top-right on the home page; opens the Contact page directly. */}
       {isHome && (
-        <button type="button" onClick={openContact} className="home-contact">
+        <button type="button" onClick={openContactFromHome} className="home-contact">
           Contact
         </button>
       )}
 
-      {/* The square menu button sits on every page; clicking it steps back a level. */}
-      <MenuButton onClick={onClock} light={isHome} />
+      <Menu open={menuOpen} onOpenPage={setPage} onClose={closeAll} />
 
-      {/* Back button — in the top band (right of the vertical line) on inner
-          pages. The menu itself has its own Close. Steps back one level. */}
-      {(panelOpen || caseDetail !== null) && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="chrome-fade-in fixed z-[86] flex items-center gap-1 text-[18px] font-medium tracking-wide text-black transition-opacity hover:opacity-60"
-          style={{
-            left: isMobile ? "50%" : Math.max(frameGeo.vx, 60) + 37,
-            top: frameGeo.hy / 2,
-            transform: isMobile ? "translate(-50%, -50%)" : "translateY(-50%)",
-            fontFamily: HELV,
-          }}
-        >
-          <img
-            src="/back_icon.png"
-            alt=""
-            aria-hidden="true"
-            draggable={false}
-            className="w-auto -translate-y-[1px]"
-            style={{ height: "0.6em" }}
-          />
-          Back
-        </button>
-      )}
+      <ServicesPage open={page === "services"} onBack={back} onClose={closeAll} />
+      <CaseStudiesPage
+        open={page === "caseStudies"}
+        onBack={back}
+        onClose={closeAll}
+        onSelect={setCaseDetail}
+      />
+      <ContactPage open={page === "contact"} onBack={back} onClose={closeAll} />
 
-      {/* Home page: background video, the computer and the bottom strip. */}
-      <Hero />
+      <CaseStudyPage
+        index={caseDetail}
+        onBack={back}
+        onClose={closeAll}
+        onNavigate={setCaseDetail}
+      />
 
-      {caseDetail !== null && (
-        <CaseStudyPage
-          index={caseDetail}
-          left={frameGeo.vx}
-          top={frameGeo.hy}
-          onBack={closeCaseStudy}
-        />
-      )}
+      <MenuButton onClick={onMenuButton} light={lightButton} />
     </>
   );
 }

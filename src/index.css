@@ -534,7 +534,7 @@
 .big-menu {
   position: fixed;
   inset: 0;
-  z-index: 84;
+  z-index: 82;
   display: flex;
   align-items: center;
   padding: 5rem clamp(1.5rem, 9vw, 11rem) 3rem;
@@ -643,4 +643,412 @@
 
 .home-contact:hover {
   opacity: 0.7;
+}
+
+/* ───────────────────────── Pages ─────────────────────────
+   Full-screen pages in one brand colour each, sharing a sticky top bar, a big
+   condensed title and numbered rows. Layers: menu 82 → page 83 → case study 84
+   → menu square 85. */
+
+.page {
+  --bg: var(--color-brand-white);
+  --fg: var(--color-brand-black);
+  --gutter: clamp(1.5rem, 6vw, 7rem);
+  --bar-h: calc(1.5rem + 34px + 1.5rem);
+  position: fixed;
+  inset: 0;
+  z-index: 83;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+
+.page--detail {
+  z-index: 84;
+}
+
+.page.is-visible {
+  opacity: 1;
+}
+
+.page--yellow { --bg: var(--color-brand-yellow); }
+.page--sky { --bg: var(--color-brand-sky); }
+.page--pink { --bg: var(--color-brand-pink); }
+.page--white { --bg: var(--color-brand-white); }
+.page--black { --bg: var(--color-brand-black); --fg: var(--color-brand-white); }
+
+/* Top bar: Back beside the (global, fixed) menu square, Close on the right. */
+.page-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: var(--bar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 clamp(1.5rem, 4vw, 4.5rem) 0 calc(1.5rem + 34px + 1.25rem);
+  background: var(--bg);
+}
+
+.page-bar-link,
+.page-bar-meta {
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.page-bar-link {
+  transition: opacity 150ms ease;
+}
+
+.page-bar-link:hover {
+  opacity: 0.6;
+}
+
+.page-bar-meta {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.55;
+}
+
+.page-body {
+  padding: clamp(1rem, 4vh, 3rem) var(--gutter) clamp(4rem, 10vh, 8rem);
+}
+
+/* Big condensed title; rises in when the page opens. */
+.page-title {
+  margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: min(15vw, 22vh);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  transform: translateY(0.3em);
+  opacity: 0;
+  transition:
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1) 60ms,
+    opacity 500ms ease 60ms;
+}
+
+.page.is-visible .page-title {
+  transform: none;
+  opacity: 1;
+}
+
+/* Numbered rows (services, case studies, impact). */
+.page-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 2px solid var(--fg);
+}
+
+.page-row {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 3rem);
+  width: 100%;
+  padding: clamp(1rem, 2.4vh, 1.75rem) clamp(0.5rem, 1.5vw, 1.5rem);
+  border-top: 2px solid var(--fg);
+  text-align: left;
+  color: inherit;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.page-row-num {
+  flex-shrink: 0;
+  min-width: 2ch;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+.page-row-main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.page-row-name {
+  flex: 1;
+  min-width: 0;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.75rem, 5.2vw, 5.25rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.page-row-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  font-size: clamp(0.85rem, 1.1vw, 1.1rem);
+}
+
+.page-row-stats strong {
+  font-weight: 700;
+}
+
+.page-row-arrow {
+  align-self: center;
+  flex-shrink: 0;
+  font-size: clamp(1.5rem, 3vw, 3rem);
+  line-height: 1;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Rows invert on hover (mouse only, so taps on phones don't stick). */
+@media (hover: hover) {
+  .page-row:not(.page-row--static):hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .page-row--link:hover .page-row-arrow {
+    transform: translateX(0.3em);
+  }
+}
+
+/* ── Contact ── */
+.contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contact-label {
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  margin-bottom: 0.75rem;
+  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.contact-label:first-child {
+  margin-top: 0;
+}
+
+.contact-email {
+  max-width: 100%;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: min(9.5vw, 13vh);
+  line-height: 1;
+  color: var(--color-brand-yellow);
+  overflow-wrap: anywhere;
+  transition: opacity 150ms ease;
+}
+
+.contact-email:hover {
+  opacity: 0.75;
+}
+
+.contact-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem clamp(1.5rem, 4vw, 4rem);
+}
+
+.contact-social {
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  transition: opacity 150ms ease;
+}
+
+.contact-social:hover {
+  opacity: 0.7;
+}
+
+.contact-social--sky { color: var(--color-brand-sky); }
+.contact-social--pink { color: var(--color-brand-pink); }
+
+/* ── Case study ── */
+.cs-kicker {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.cs-title {
+  max-width: 14ch;
+  margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.75rem, 9vw, 9rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.cs-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+@media (min-width: 900px) {
+  .cs-hero {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: stretch;
+  }
+}
+
+.cs-image {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 2px solid var(--fg);
+}
+
+.cs-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cs-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1vw, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  min-height: clamp(7rem, 16vh, 12rem);
+  padding: clamp(0.9rem, 1.5vw, 1.5rem);
+  color: var(--color-brand-black);
+}
+
+/* A lone last tile (odd count) spans the full row. */
+.cs-stat:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.cs-stat--pink { background: var(--color-brand-pink); }
+.cs-stat--sky { background: var(--color-brand-sky); }
+.cs-stat--yellow { background: var(--color-brand-yellow); }
+.cs-stat--black { background: var(--color-brand-black); color: var(--color-brand-white); }
+
+.cs-stat-value {
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(2.25rem, 4.5vw, 4.75rem);
+  line-height: 1;
+}
+
+.cs-stat-label {
+  font-size: clamp(0.75rem, 0.9vw, 0.9rem);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cs-copy {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  margin-top: clamp(3rem, 8vh, 6rem);
+  padding-top: clamp(1.5rem, 3vh, 2.5rem);
+  border-top: 2px solid var(--fg);
+}
+
+@media (min-width: 900px) {
+  .cs-copy {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.cs-copy p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: clamp(1.05rem, 1.45vw, 1.45rem);
+  line-height: 1.5;
+}
+
+.cs-heading {
+  margin: 0 0 1rem;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cs-impact {
+  margin-top: clamp(3rem, 8vh, 6rem);
+}
+
+.cs-impact-line {
+  font-size: clamp(1.15rem, 2vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* "Next case study" — a full-width pink band. */
+.cs-next {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: clamp(3rem, 8vh, 6rem);
+  padding: clamp(1.5rem, 4vh, 3rem) clamp(1rem, 2vw, 2rem);
+  background: var(--color-brand-pink);
+  color: var(--color-brand-black);
+  text-align: left;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.cs-next-label {
+  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cs-next-name {
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(2rem, 6vw, 6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) {
+  .cs-next:hover {
+    background: var(--color-brand-black);
+    color: var(--color-brand-pink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page,
+  .page-title {
+    transition: none;
+  }
+
+  .page-title {
+    transform: none;
+  }
 }

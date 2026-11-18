@@ -64,20 +64,6 @@ export function Hero() {
         <source src="/home-video.mp4" type="video/mp4" />
       </video>
 
-      {/* Invisible LEGO wordmark placeholder (alt="LEGO"): not shown, but the
-          menu frame measures it to place its line and the Back button. */}
-      <img
-        src="/Logo-Horizontal.png"
-        alt="LEGO"
-        aria-hidden="true"
-        draggable={false}
-        className="invisible absolute left-1/2 top-[3.5%] -translate-x-1/2"
-        style={{
-          height: "clamp(1.25rem, 1.85vw, 2rem)",
-          aspectRatio: "3918 / 1194",
-        }}
-      />
-
       {/* The computer, centered in the space above the strip and sized to fit
           any width or aspect ratio. */}
       <div className="home-computer-stage">
