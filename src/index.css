@@ -394,6 +394,12 @@
 
 .home-hero {
   --strip-h: clamp(2.5rem, 2rem + 2.2vmin, 4rem);
+  /* Nothing on the home page is selectable or draggable (double-clicks and
+     drags would otherwise tint the computer with the selection highlight). */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   position: relative;
   height: 100vh;
   height: 100dvh;
@@ -1244,4 +1250,20 @@
   text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.home-hero img,
+.home-hero video {
+  -webkit-user-drag: none;
+}
+
+.home-hero ::selection {
+  background: transparent;
+}
+
+.home-contact,
+.menu-square {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
