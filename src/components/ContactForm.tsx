@@ -11,31 +11,64 @@ const SOURCES = [
   "Other",
 ];
 
-// The contact form. There's no server behind the site, so sending opens the
-// visitor's email app with a message to `to`, pre-filled with every answer.
-export function ContactForm({ to }: { to: string }) {
-  const [sent, setSent] = useState(false);
+type Status = "idle" | "sending" | "sent" | "error";
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+// The contact form. Submissions are delivered by email to `to` through
+// FormSubmit (formsubmit.co) — no backend of our own. FormSubmit asks the
+// inbox owner to confirm once, via an activation email sent on the first
+// submission; until then nothing is delivered.
+export function ContactForm({ to }: { to: string }) {
+  const [status, setStatus] = useState<Status>("idle");
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const f = new FormData(form);
     const get = (k: string) => String(f.get(k) ?? "").trim();
-    const name = get("name");
-    const subject = `New enquiry from ${name}${get("company") ? ` (${get("company")})` : ""}`;
-    const body = [
-      `Name: ${name}`,
-      `Email: ${get("email")}`,
-      `Company: ${get("company") || "-"}`,
-      `Heard about us: ${get("source") || "-"}`,
-      "",
-      get("message"),
-    ].join("\n");
-    window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
+
+    // Bots fill the hidden field; people never see it.
+    if (get("_honey")) return;
+
+    setStatus("sending");
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${to}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          Name: get("name"),
+          Email: get("email"),
+          Company: get("company") || "-",
+          "Heard about us": get("source") || "-",
+          Message: get("message"),
+          _subject: `New enquiry from ${get("name")}${get("company") ? ` (${get("company")})` : ""}`,
+          _replyto: get("email"),
+          _template: "table",
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { success?: string | boolean };
+      if (!res.ok || String(data.success) !== "true") throw new Error("send failed");
+      form.reset();
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   };
+
+  if (status === "sent") {
+    return (
+      <div className="cform-done" role="status">
+        <p className="cform-done-title">Thanks — message sent.</p>
+        <p className="cform-note">We'll get back to you soon.</p>
+        <button type="button" className="cform-again" onClick={() => setStatus("idle")}>
+          Send another
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form className="cform" onSubmit={onSubmit}>
+      <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="cform-honey" aria-hidden="true" />
       <div className="cform-grid">
         <label className="cform-field">
           <span className="cform-label">Name</span>
@@ -75,12 +108,12 @@ export function ContactForm({ to }: { to: string }) {
         </label>
       </div>
       <div className="cform-actions">
-        <button type="submit" className="cform-submit">
-          Send message
+        <button type="submit" className="cform-submit" disabled={status === "sending"}>
+          {status === "sending" ? "Sending…" : "Send message"}
         </button>
-        {sent && (
-          <p className="cform-note" role="status">
-            Your email app should open with the message ready to send. If it doesn't, write to us at{" "}
+        {status === "error" && (
+          <p className="cform-note cform-note--error" role="alert">
+            Something went wrong sending your message. Please try again, or write to us at{" "}
             <a href={`mailto:${to}`}>{to}</a>.
           </p>
         )}

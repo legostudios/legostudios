@@ -1209,3 +1209,39 @@
   color: var(--color-brand-yellow);
   text-decoration: underline;
 }
+
+.cform-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.cform-submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.cform-note--error {
+  color: var(--color-brand-pink);
+  opacity: 1;
+}
+
+.cform-done-title {
+  margin: 0 0 0.5rem;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-brand-yellow);
+}
+
+.cform-again {
+  margin-top: 1.5rem;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
