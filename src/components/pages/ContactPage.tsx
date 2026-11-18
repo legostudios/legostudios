@@ -2,6 +2,8 @@ import { PageShell, PageTitle } from "./PageShell";
 import { ContactForm } from "../ContactForm";
 
 const EMAIL = "hello@legostudios.co";
+// Form submissions go to EMAIL and are copied to these addresses.
+const FORM_CC = ["jashwanth@legostudios.co"];
 const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
 const INSTAGRAM = "https://www.instagram.com/legostudios.in";
 
@@ -35,7 +37,7 @@ export function ContactPage({ open, onBack }: Props) {
         <h2 id="contact-form-heading" className="contact-form-heading">
           Send a message
         </h2>
-        <ContactForm to={EMAIL} />
+        <ContactForm to={EMAIL} cc={FORM_CC} />
       </section>
     </PageShell>
   );

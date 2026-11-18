@@ -13,11 +13,12 @@ const SOURCES = [
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-// The contact form. Submissions are delivered by email to `to` through
+// The contact form. Submissions are delivered by email to `to` (and copied to
+// every address in `cc`) through
 // FormSubmit (formsubmit.co) — no backend of our own. FormSubmit asks the
 // inbox owner to confirm once, via an activation email sent on the first
 // submission; until then nothing is delivered.
-export function ContactForm({ to }: { to: string }) {
+export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
   const [status, setStatus] = useState<Status>("idle");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -42,6 +43,7 @@ export function ContactForm({ to }: { to: string }) {
           Message: get("message"),
           _subject: `New enquiry from ${get("name")}${get("company") ? ` (${get("company")})` : ""}`,
           _replyto: get("email"),
+          ...(cc.length ? { _cc: cc.join(",") } : {}),
           _template: "table",
         }),
       });
