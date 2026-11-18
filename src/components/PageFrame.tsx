@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -25,12 +26,11 @@ const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
 const INSTAGRAM =
   "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnlncw==";
 
-type Target = "services" | "caseStudies" | "magazine" | "contact";
+type Target = "services" | "caseStudies" | "contact";
 
-const ITEMS: { label: string; target: Target | null }[] = [
+const ITEMS: { label: string; target: Target }[] = [
   { label: "Services", target: "services" },
   { label: "Case Studies", target: "caseStudies" },
-  { label: "Magazine", target: "magazine" },
   { label: "Contact", target: "contact" },
 ];
 
@@ -89,78 +89,6 @@ function FramedImage({
         className="h-full w-full object-cover grayscale"
       />
     </div>
-  );
-}
-
-// A column heading. Collapsed, its words stack onto lines (clipped). Active, the
-// words glide onto one line. On mobile the menu is a horizontal band, so the
-// name is just shown on one line, vertically centered.
-function ColumnName({
-  label,
-  active,
-  mobile,
-}: {
-  label: string;
-  active: boolean;
-  mobile: boolean;
-}) {
-  const words = label.split(" ");
-  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const [stacked, setStacked] = useState<string[]>(() =>
-    words.map(() => "translate(0, 0)"),
-  );
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const els = wordRefs.current;
-      const first = els[0];
-      if (!first) return;
-      const n = words.length;
-      const lineHeight = first.offsetHeight;
-      const left0 = first.offsetLeft;
-      setStacked(
-        words.map((_, i) => {
-          const el = els[i];
-          const dx = el ? -(el.offsetLeft - left0) : 0;
-          const dy = -((n - 1 - i) * lineHeight);
-          return `translate(${dx}px, ${dy}px)`;
-        }),
-      );
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [label]);
-
-  if (mobile) {
-    // A compact left-aligned row; the bands stack at the bottom of the menu.
-    // The page heading parks at the band centre, so it lands on this name when
-    // a page collapses.
-    return (
-      <span className="block whitespace-nowrap py-3 pl-10 pr-2 text-[clamp(2.4rem,11vw,3.5rem)] font-medium leading-[0.9] tracking-[-0.035em] text-black">
-        {label}
-      </span>
-    );
-  }
-
-  return (
-    <span className="absolute bottom-6 left-0 w-full whitespace-nowrap pl-10 pr-2 text-[103px] font-medium leading-[0.9] tracking-[-0.035em] text-black">
-      {words.map((word, i) => (
-        <span
-          key={i}
-          ref={(el) => {
-            wordRefs.current[i] = el;
-          }}
-          className="inline-block"
-          style={{
-            transform: active ? "translate(0, 0)" : stacked[i],
-            transition: `transform ${EXPAND}ms ${SMOOTH}`,
-          }}
-        >
-          {i < words.length - 1 ? `${word} ` : word}
-        </span>
-      ))}
-    </span>
   );
 }
 
@@ -245,7 +173,7 @@ function PagePanel({
 
   return (
     <div className="absolute inset-0">
-      {mobile && title !== "Magazine" && title !== "Contact" && (
+      {mobile && title !== "Contact" && (
         <div
           className="pointer-events-none absolute inset-x-0 z-0 flex items-center justify-center px-8"
           style={{
@@ -395,15 +323,6 @@ function CaseStudyRows({
   );
 }
 
-// The magazine page's body — a placeholder until it launches.
-function MagazineBody() {
-  return (
-    <div className="flex flex-1 items-center pl-5 text-[clamp(1.4rem,3.1vw,2.7rem)] tracking-[-0.01em] text-black/45">
-      Coming Soon
-    </div>
-  );
-}
-
 // The contact page's body — email at the bottom-left (large), social icons at
 // the bottom-right on the same line.
 function ContactBody({ mobile }: { mobile: boolean }) {
@@ -496,7 +415,6 @@ export function PageFrame({
   const menuRef = useRef<HTMLDivElement>(null);
   const collapseTimer = useRef<number | null>(null);
   const [geo, setGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
-  const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   // start/end are the clicked band's edges along the menu axis (x on desktop,
   // y on mobile); size is the menu's extent along that axis.
@@ -592,7 +510,6 @@ export function PageFrame({
     h.style.strokeDashoffset = String(hLen);
     v.style.strokeDashoffset = String(vLen);
     if (collapseTimer.current) window.clearTimeout(collapseTimer.current);
-    setHovered(null);
     setSelected(null);
     setSelGeo(null);
     setRevealed(false);
@@ -605,7 +522,6 @@ export function PageFrame({
     if (collapsing) return;
     setCollapsing(true);
     setRevealed(false);
-    setHovered(null); // let the columns underneath ease back to equal widths
     collapseTimer.current = window.setTimeout(() => {
       setSelected(null);
       setSelGeo(null);
@@ -645,23 +561,26 @@ export function PageFrame({
   let pos1 = 0;
   let pos2 = 0;
   if (selGeo) {
-    if (collapsing) {
-      if (isMobile) {
-        // Mobile bands sit at their own (compact) position — return to it.
-        pos1 = selGeo.start;
-        pos2 = selGeo.end;
-      } else {
-        const seg = selGeo.size / ITEMS.length;
-        pos1 = selGeo.index * seg;
-        pos2 = (selGeo.index + 1) * seg;
-      }
-    } else if (revealed) {
+    if (revealed || collapsing) {
       pos2 = selGeo.size + 60;
     } else {
       pos1 = selGeo.start;
       pos2 = selGeo.end;
     }
   }
+
+  // Open a page straight from the menu: it covers the whole frame and its
+  // heading slides up into place.
+  const openPage = (i: number) => {
+    const menuEl = menuRef.current;
+    const size = isMobile
+      ? (menuEl?.clientHeight ?? window.innerHeight - geo.hy)
+      : (menuEl?.clientWidth ?? window.innerWidth - geo.vx);
+    setSelGeo({ start: 0, end: size, size, index: i });
+    setCollapsing(false);
+    setRevealed(true);
+    setSelected(i);
+  };
 
   const panelNode =
     selTarget === "contact" ? (
@@ -673,16 +592,6 @@ export function PageFrame({
         onHeadingClick={collapsePanel}
       >
         <ContactBody mobile={isMobile} />
-      </PagePanel>
-    ) : selTarget === "magazine" ? (
-      <PagePanel
-        title="Magazine"
-        collapsing={collapsing}
-        mobile={isMobile}
-        bandHeight={selGeo ? selGeo.end - selGeo.start : 0}
-        onHeadingClick={collapsePanel}
-      >
-        <MagazineBody />
       </PagePanel>
     ) : selPanel ? (
       <PagePanel
@@ -718,71 +627,6 @@ export function PageFrame({
           fontFamily: HELV,
         }}
       >
-        {/* Menu columns. The expanding page covers them physically, so they
-            stay opaque and are simply overdrawn (and non-interactive) while a
-            page is open. */}
-        <div
-          className={`relative z-[1] flex h-full w-full ${isMobile ? "flex-col" : ""}`}
-          style={{ pointerEvents: anySel ? "none" : undefined }}
-        >
-          {isMobile && (
-            <div className="flex flex-1 items-center justify-center overflow-hidden p-6">
-              <FramedImage className="max-h-full w-full max-w-[340px]" />
-            </div>
-          )}
-          {ITEMS.map((item, i) => (
-            <button
-              key={item.label}
-              type="button"
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={(e) => {
-                if (!item.target) return;
-                const menuEl = menuRef.current;
-                const rect = menuEl?.getBoundingClientRect();
-                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                let start: number;
-                let end: number;
-                let size: number;
-                if (isMobile) {
-                  const menuTop = rect?.top ?? geo.hy;
-                  size = menuEl?.clientHeight ?? window.innerHeight - geo.hy;
-                  start = r.top - menuTop;
-                  end = r.bottom - menuTop;
-                } else {
-                  const menuLeft = rect?.left ?? geo.vx;
-                  size = menuEl?.clientWidth ?? window.innerWidth - geo.vx;
-                  start = r.left - menuLeft;
-                  end = r.right - menuLeft;
-                }
-                setSelGeo({ start, end, size, index: i });
-                setCollapsing(false);
-                setRevealed(false);
-                setSelected(i);
-                requestAnimationFrame(() =>
-                  requestAnimationFrame(() => setRevealed(true)),
-                );
-              }}
-              style={{
-                flexGrow: isMobile ? 0 : hovered === i ? 3 : 1,
-                transition: `flex-grow ${EXPAND}ms ${SMOOTH}`,
-                cursor: item.target ? undefined : "default",
-              }}
-              className={`relative overflow-hidden border-black text-left outline-none ${
-                isMobile
-                  ? "border-t-2"
-                  : "flex-1 basis-0 border-r-2 last:border-r-0"
-              }`}
-            >
-              <ColumnName
-                label={item.label}
-                active={hovered === i}
-                mobile={isMobile}
-              />
-            </button>
-          ))}
-        </div>
-
         {/* Expanded page. Desktop: the left/right borders are two dividers and
             the page grows horizontally out of the clicked column (inner div
             counter-offset so the content stays pinned to the frame's left).
@@ -795,10 +639,9 @@ export function PageFrame({
               style={{
                 top: pos1,
                 height: Math.max(0, pos2 - pos1),
-                // Shift 1px so the top border sits on the SVG frame line (only
-                // while opening/open — see the desktop note above).
-                marginTop: collapsing ? "0px" : "-1px",
-                transition: `top ${EXPAND}ms ${SMOOTH}, height ${EXPAND}ms ${SMOOTH}`,
+                marginTop: "-1px",
+                opacity: collapsing ? 0 : 1,
+                transition: `opacity ${EXPAND}ms ${SMOOTH}`,
               }}
             >
               <div
@@ -819,20 +662,17 @@ export function PageFrame({
               style={{
                 left: pos1,
                 width: Math.max(0, pos2 - pos1),
-                // Shift 1px so the left border sits exactly on the SVG frame line
-                // when merged. Only while opening/open — on collapse the borders
-                // must land exactly on the column grid (else they flicker 1px as
-                // the overlay hands off to the columns underneath).
-                marginLeft: collapsing ? "0px" : "-1px",
-                transition: `left ${EXPAND}ms ${SMOOTH}, width ${EXPAND}ms ${SMOOTH}`,
+                // Shift 1px so the left border sits exactly on the frame line.
+                marginLeft: "-1px",
+                opacity: collapsing ? 0 : 1,
+                transition: `opacity ${EXPAND}ms ${SMOOTH}`,
               }}
             >
               <div
                 className="absolute inset-y-0"
                 style={{
-                  left: collapsing ? 0 : -pos1,
+                  left: -pos1,
                   width: selGeo.size,
-                  transition: `left ${EXPAND}ms ${SMOOTH}`,
                 }}
               >
                 {panelNode}
@@ -849,6 +689,33 @@ export function PageFrame({
         <line ref={hRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" style={{ opacity: 0 }} />
         <line ref={vRef} stroke="#000000" strokeWidth={2} shapeRendering="crispEdges" style={{ opacity: 0 }} />
       </svg>
+
+      {/* The menu: full-screen brand yellow with the destinations in huge
+          condensed type. It hides while a page is open and returns when the
+          page closes. */}
+      <nav
+        aria-label="Main menu"
+        aria-hidden={!open || anySel}
+        className={`big-menu ${open && !anySel ? "is-open" : ""}`}
+      >
+        <button type="button" onClick={onClose} className="big-menu-close">
+          Close
+        </button>
+        <ul className="big-menu-list">
+          {ITEMS.map((item, i) => (
+            <li key={item.label} style={{ "--i": i } as CSSProperties}>
+              <button
+                type="button"
+                tabIndex={open && !anySel ? 0 : -1}
+                onClick={() => openPage(i)}
+                className="big-menu-item"
+              >
+                {item.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </>
   );
 }

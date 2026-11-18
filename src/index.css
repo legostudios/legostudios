@@ -451,7 +451,8 @@
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: var(--color-brand-black);
+  background: var(--color-brand-white);
+  color: var(--color-brand-black);
   /* Keep clear of the iPhone home indicator. */
   padding-bottom: env(safe-area-inset-bottom);
   box-sizing: content-box;
@@ -489,7 +490,6 @@
   width: calc(var(--strip-h) * 0.26);
   height: calc(var(--strip-h) * 0.26);
   margin: 0 calc(var(--strip-h) * 0.7);
-  background: var(--color-brand-white);
 }
 
 @keyframes home-strip-scroll {
@@ -524,4 +524,99 @@
 .menu-square:hover .menu-square-box,
 .menu-square:focus-visible .menu-square-box {
   background: currentColor;
+}
+
+/* ───────────────────────── Menu ─────────────────────────
+   Full-screen brand yellow, destinations in huge condensed caps. Sized from
+   both viewport width and height so the longest word ("Case Studies") always
+   fits, on any device or aspect ratio. */
+
+.big-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 84;
+  display: flex;
+  align-items: center;
+  padding: 5rem clamp(1.5rem, 9vw, 11rem) 3rem;
+  background: var(--color-brand-yellow);
+  color: var(--color-brand-black);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease, visibility 0s linear 300ms;
+}
+
+.big-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 300ms ease, visibility 0s;
+}
+
+.big-menu-close {
+  position: absolute;
+  top: clamp(1.25rem, 3.5vh, 2.25rem);
+  right: clamp(1.5rem, 4vw, 4.5rem);
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  transition: opacity 150ms ease;
+}
+
+.big-menu-close:hover {
+  opacity: 0.6;
+}
+
+.big-menu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.big-menu-item {
+  display: block;
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: min(16.5vw, 24vh);
+  line-height: 1.02;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+  transition: opacity 200ms ease;
+}
+
+/* Hovering one destination dims the others. */
+.big-menu-list:hover .big-menu-item,
+.big-menu-list:focus-within .big-menu-item {
+  opacity: 0.25;
+}
+
+.big-menu-list .big-menu-item:hover,
+.big-menu-list .big-menu-item:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+/* Words rise in one after another when the menu opens. */
+.big-menu-list li {
+  overflow: hidden;
+}
+
+.big-menu-list li .big-menu-item {
+  transform: translateY(105%);
+}
+
+.big-menu.is-open .big-menu-list li .big-menu-item {
+  transform: translateY(0);
+  transition:
+    transform 650ms cubic-bezier(0.22, 1, 0.36, 1) calc(80ms + var(--i) * 70ms),
+    opacity 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .big-menu-list li .big-menu-item,
+  .big-menu.is-open .big-menu-list li .big-menu-item {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
 }

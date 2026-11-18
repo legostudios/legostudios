@@ -3,7 +3,7 @@ import { ComputerShowcase } from "./ComputerShowcase";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const STRIP_TEXT = "The Creative Archive of Today";
-// Each phrase takes the next brand colour: pink → sky blue → yellow.
+// Each separator square takes the next brand colour: pink → sky blue → yellow.
 const STRIP_COLORS = [
   "var(--color-brand-pink)",
   "var(--color-brand-sky)",
@@ -19,8 +19,12 @@ function StripTrack({ hidden }: { hidden?: boolean }) {
     <div className="home-strip-track" aria-hidden={hidden || undefined}>
       {Array.from({ length: STRIP_REPEAT }, (_, i) => (
         <span key={i} className="home-strip-item">
-          <span style={{ color: STRIP_COLORS[i % STRIP_COLORS.length] }}>{STRIP_TEXT}</span>
-          <span className="home-strip-sep" aria-hidden="true" />
+          <span>{STRIP_TEXT}</span>
+          <span
+            className="home-strip-sep"
+            aria-hidden="true"
+            style={{ background: STRIP_COLORS[i % STRIP_COLORS.length] }}
+          />
         </span>
       ))}
     </div>

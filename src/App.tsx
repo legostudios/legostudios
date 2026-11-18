@@ -78,9 +78,9 @@ export default function App() {
       {/* The square menu button sits on every page; clicking it steps back a level. */}
       <MenuButton onClick={onClock} light={isHome} />
 
-      {/* Back button — in the top band (right of the vertical line) on every page
-          except home. Steps back one level. */}
-      {!isHome && (
+      {/* Back button — in the top band (right of the vertical line) on inner
+          pages. The menu itself has its own Close. Steps back one level. */}
+      {(panelOpen || caseDetail !== null) && (
         <button
           type="button"
           onClick={onBack}
