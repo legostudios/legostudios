@@ -3,8 +3,15 @@ import { ComputerShowcase } from "./ComputerShowcase";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const STRIP_TEXT = "The Creative Archive of Today";
+// Each phrase takes the next brand colour: pink → sky blue → yellow.
+const STRIP_COLORS = [
+  "var(--color-brand-pink)",
+  "var(--color-brand-sky)",
+  "var(--color-brand-yellow)",
+];
 // Enough copies to overflow even an ultra-wide screen; the track is rendered
-// twice and slides by exactly one copy for a seamless loop.
+// twice and slides by exactly one copy for a seamless loop. Keep it a
+// multiple of the colour count so the colour sequence loops seamlessly too.
 const STRIP_REPEAT = 6;
 
 function StripTrack({ hidden }: { hidden?: boolean }) {
@@ -12,8 +19,8 @@ function StripTrack({ hidden }: { hidden?: boolean }) {
     <div className="home-strip-track" aria-hidden={hidden || undefined}>
       {Array.from({ length: STRIP_REPEAT }, (_, i) => (
         <span key={i} className="home-strip-item">
-          <span>{STRIP_TEXT}</span>
-          <span className="home-strip-dot" aria-hidden="true" />
+          <span style={{ color: STRIP_COLORS[i % STRIP_COLORS.length] }}>{STRIP_TEXT}</span>
+          <span className="home-strip-sep" aria-hidden="true" />
         </span>
       ))}
     </div>
