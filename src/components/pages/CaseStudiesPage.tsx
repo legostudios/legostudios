@@ -6,15 +6,14 @@ const pad = (n: number) => String(n).padStart(2, "0");
 interface Props {
   open: boolean;
   onBack: () => void;
-  onClose: () => void;
   onSelect: (index: number) => void;
 }
 
 // Case Studies — pink. Each row shows the name and its headline numbers; hover
 // inverts it, click opens the full study.
-export function CaseStudiesPage({ open, onBack, onClose, onSelect }: Props) {
+export function CaseStudiesPage({ open, onBack, onSelect }: Props) {
   return (
-    <PageShell open={open} theme="pink" label="Case Studies" onBack={onBack} onClose={onClose}>
+    <PageShell open={open} theme="pink" label="Case Studies" onBack={onBack}>
       <PageTitle>Case Studies</PageTitle>
       <ol className="page-rows">
         {CASE_STUDIES.map((cs, i) => (

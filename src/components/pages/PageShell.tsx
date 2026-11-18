@@ -9,7 +9,6 @@ interface PageShellProps {
   /** Accessible name for the page. */
   label: string;
   onBack: () => void;
-  onClose: () => void;
   /** Stacking layer: inner pages sit above the menu, details above pages. */
   layer?: "page" | "detail";
   /** Optional text shown in the middle of the top bar (e.g. "01 / 05"). */
@@ -19,15 +18,14 @@ interface PageShellProps {
   children: ReactNode;
 }
 
-// A full-screen page in one brand colour: a sticky top bar (Back on the left,
-// beside the menu square; Close on the right) and a scrolling body. Fades and
+// A full-screen page in one brand colour: a sticky top bar (menu square on the
+// left, Back on the right) and a scrolling body. Fades and
 // rises in on open, fades out on close.
 export function PageShell({
   open,
   theme,
   label,
   onBack,
-  onClose,
   layer = "page",
   meta,
   scrollKey,
@@ -52,12 +50,9 @@ export function PageShell({
       className={`page page--${theme} page--${layer} ${visible ? "is-visible" : ""}`}
     >
       <header className="page-bar">
-        <button type="button" onClick={onBack} className="page-bar-link page-bar-back">
-          <span aria-hidden="true">←</span> Back
-        </button>
         {meta && <span className="page-bar-meta">{meta}</span>}
-        <button type="button" onClick={onClose} className="page-bar-link page-bar-close">
-          Close
+        <button type="button" onClick={onBack} className="page-bar-link page-bar-back">
+          Back
         </button>
       </header>
       <div className="page-body">{children}</div>

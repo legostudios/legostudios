@@ -10,7 +10,7 @@ import { CaseStudyPage } from "./components/CaseStudyPage";
 
 // Navigation is three stacked layers over the home page:
 //   menu (yellow)  →  page (Services / Case Studies / Contact)  →  case study.
-// Back steps down one layer; Close returns straight home. The home-page
+// Back (top-right on every page) steps down one layer. The home-page
 // Contact link opens the Contact page without the menu, so Back goes home.
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,12 +18,6 @@ export default function App() {
   const [caseDetail, setCaseDetail] = useState<number | null>(null);
 
   const isHome = !menuOpen && page === null && caseDetail === null;
-
-  const closeAll = useCallback(() => {
-    setCaseDetail(null);
-    setPage(null);
-    setMenuOpen(false);
-  }, []);
 
   const back = useCallback(() => {
     if (caseDetail !== null) setCaseDetail(null);
@@ -64,21 +58,19 @@ export default function App() {
         </button>
       )}
 
-      <Menu open={menuOpen} onOpenPage={setPage} onClose={closeAll} />
+      <Menu open={menuOpen} onOpenPage={setPage} onBack={back} />
 
-      <ServicesPage open={page === "services"} onBack={back} onClose={closeAll} />
+      <ServicesPage open={page === "services"} onBack={back} />
       <CaseStudiesPage
         open={page === "caseStudies"}
         onBack={back}
-        onClose={closeAll}
         onSelect={setCaseDetail}
       />
-      <ContactPage open={page === "contact"} onBack={back} onClose={closeAll} />
+      <ContactPage open={page === "contact"} onBack={back} />
 
       <CaseStudyPage
         index={caseDetail}
         onBack={back}
-        onClose={closeAll}
         onNavigate={setCaseDetail}
       />
 

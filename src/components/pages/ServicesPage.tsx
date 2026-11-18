@@ -6,14 +6,13 @@ const pad = (n: number) => String(n).padStart(2, "0");
 interface Props {
   open: boolean;
   onBack: () => void;
-  onClose: () => void;
 }
 
 // Services — sky blue. Numbered rows in big condensed type that invert to
 // black on hover.
-export function ServicesPage({ open, onBack, onClose }: Props) {
+export function ServicesPage({ open, onBack }: Props) {
   return (
-    <PageShell open={open} theme="sky" label="Services" onBack={onBack} onClose={onClose}>
+    <PageShell open={open} theme="sky" label="Services" onBack={onBack}>
       <PageTitle>Services</PageTitle>
       <ol className="page-rows">
         {SERVICES.map((name, i) => (

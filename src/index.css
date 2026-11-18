@@ -551,7 +551,7 @@
   transition: opacity 300ms ease, visibility 0s;
 }
 
-.big-menu-close {
+.big-menu-back {
   position: absolute;
   top: clamp(1.25rem, 3.5vh, 2.25rem);
   right: clamp(1.5rem, 4vw, 4.5rem);
@@ -563,7 +563,7 @@
   transition: opacity 150ms ease;
 }
 
-.big-menu-close:hover {
+.big-menu-back:hover {
   opacity: 0.6;
 }
 
@@ -681,7 +681,7 @@
 .page--white { --bg: var(--color-brand-white); }
 .page--black { --bg: var(--color-brand-black); --fg: var(--color-brand-white); }
 
-/* Top bar: Back beside the (global, fixed) menu square, Close on the right. */
+/* Top bar: the (global, fixed) menu square on the left, Back on the right. */
 .page-bar {
   position: sticky;
   top: 0;
@@ -689,9 +689,9 @@
   height: var(--bar-h);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
-  padding: 0 clamp(1.5rem, 4vw, 4.5rem) 0 calc(1.5rem + 34px + 1.25rem);
+  padding: 0 clamp(1.5rem, 4vw, 4.5rem);
   background: var(--bg);
 }
 

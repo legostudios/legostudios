@@ -12,11 +12,11 @@ const ITEMS: { label: string; id: PageId }[] = [
 interface MenuProps {
   open: boolean;
   onOpenPage: (id: PageId) => void;
-  onClose: () => void;
+  onBack: () => void;
 }
 
 // Full-screen brand-yellow menu with the destinations in huge condensed caps.
-export function Menu({ open, onOpenPage, onClose }: MenuProps) {
+export function Menu({ open, onOpenPage, onBack }: MenuProps) {
   const { mounted, visible } = usePresence(open);
   if (!mounted) return null;
 
@@ -26,8 +26,8 @@ export function Menu({ open, onOpenPage, onClose }: MenuProps) {
       aria-hidden={!open}
       className={`big-menu ${visible ? "is-open" : ""}`}
     >
-      <button type="button" onClick={onClose} className="big-menu-close">
-        Close
+      <button type="button" onClick={onBack} className="big-menu-back">
+        Back
       </button>
       <ul className="big-menu-list">
         {ITEMS.map((item, i) => (

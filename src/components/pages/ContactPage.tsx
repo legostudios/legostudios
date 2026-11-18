@@ -7,14 +7,13 @@ const INSTAGRAM = "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnl
 interface Props {
   open: boolean;
   onBack: () => void;
-  onClose: () => void;
 }
 
 // Contact — black. The email is the hero of the page; socials sit below in
 // the brand colours.
-export function ContactPage({ open, onBack, onClose }: Props) {
+export function ContactPage({ open, onBack }: Props) {
   return (
-    <PageShell open={open} theme="black" label="Contact" onBack={onBack} onClose={onClose}>
+    <PageShell open={open} theme="black" label="Contact" onBack={onBack}>
       <PageTitle>Contact</PageTitle>
       <div className="contact">
         <span className="contact-label">Email</span>

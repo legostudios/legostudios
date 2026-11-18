@@ -11,14 +11,13 @@ interface CaseStudyPageProps {
   /** The study to show, or null when closed. */
   index: number | null;
   onBack: () => void;
-  onClose: () => void;
   onNavigate: (index: number) => void;
 }
 
 // A single case study — white, with brand-coloured stat tiles: title, photo
 // beside the headline numbers, challenge / approach, the impact list, and a
 // big link through to the next study.
-export function CaseStudyPage({ index, onBack, onClose, onNavigate }: CaseStudyPageProps) {
+export function CaseStudyPage({ index, onBack, onNavigate }: CaseStudyPageProps) {
   // Keep showing the last study while the page animates out.
   const last = useRef(0);
   if (index !== null) last.current = index;
@@ -33,7 +32,6 @@ export function CaseStudyPage({ index, onBack, onClose, onNavigate }: CaseStudyP
       layer="detail"
       label={cs.name}
       onBack={onBack}
-      onClose={onClose}
       meta={`${pad(i + 1)} / ${pad(CASE_STUDIES.length)}`}
       scrollKey={i}
     >
