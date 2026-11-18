@@ -25,11 +25,18 @@ export default function App() {
     else setMenuOpen(false);
   }, [caseDetail, page]);
 
-  // The menu square opens the menu from home, and steps back everywhere else.
+  // The menu square always opens the menu (from home or any page). On the
+  // menu itself it closes it, back to home.
+  const onMenuOnly = menuOpen && page === null && caseDetail === null;
   const onMenuButton = useCallback(() => {
-    if (isHome) setMenuOpen(true);
-    else back();
-  }, [isHome, back]);
+    if (onMenuOnly) {
+      setMenuOpen(false);
+      return;
+    }
+    setCaseDetail(null);
+    setPage(null);
+    setMenuOpen(true);
+  }, [onMenuOnly]);
 
   const openContactFromHome = useCallback(() => setPage("contact"), []);
 
