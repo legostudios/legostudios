@@ -68,6 +68,34 @@
   cursor: none !important;
 }
 
+/* …except text fields, which keep the native I-beam. */
+.cursor-none input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),
+.cursor-none textarea,
+.cursor-none [contenteditable="true"] {
+  cursor: text !important;
+}
+
+/* Arrow pointer that inverts against whatever is behind it. */
+.invert-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  will-change: transform;
+}
+
+.invert-cursor-arrow {
+  display: block;
+  /* Shift so the arrow tip (1,1) lands exactly on the mouse position. */
+  margin: -1px 0 0 -1px;
+  transform-origin: 1px 1px;
+  transition: transform 120ms ease-out;
+}
+
 /* The services stack is scroll-driven; hide the raw scrollbar so only the
    3D card motion reads on screen. */
 .services-scroll {
@@ -111,6 +139,13 @@
 }
 
 @theme {
+  /* LEGO Studios brand colours — use these for all new design work. */
+  --color-brand-pink: #f238a7;
+  --color-brand-sky: #79eede;
+  --color-brand-yellow: #e5fe02;
+  --color-brand-black: #000000;
+  --color-brand-white: #ffffff;
+
   --color-navy: #0b0e1a;
   --color-album-blue: #2a46ff;
   --color-crt-beige: #e6dcc3;
@@ -349,5 +384,131 @@
   .reference-hero-copy {
     bottom: 5.5rem;
     font-size: clamp(1.5rem, 7.5vw, 2.35rem);
+  }
+}
+
+/* ───────────────────────── Home page ─────────────────────────
+   Full-bleed video, the computer centered above a scrolling strip pinned to
+   the bottom of the screen. Everything is sized from the viewport so it fits
+   phones, tablets, laptops and ultra-wides in any orientation. */
+
+.home-hero {
+  --strip-h: clamp(2.5rem, 2rem + 2.2vmin, 4rem);
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 320px;
+  overflow: hidden;
+  background: var(--color-brand-black);
+}
+
+.home-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.home-logo img {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
+}
+
+/* The area between the top chrome (logo/clock) and the strip. */
+.home-computer-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: clamp(3.5rem, 12vh, 7rem);
+  bottom: var(--strip-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Square box: the machine fills ~74% of each frame, so the box can be a bit
+   bigger than the space and still look balanced. Limited by whichever of
+   width or height runs out first. */
+.home-computer {
+  width: min(92vw, 100%, 1100px);
+  aspect-ratio: 1 / 1;
+  max-height: 100%;
+  max-width: calc((100dvh - var(--strip-h) - clamp(3.5rem, 12vh, 7rem)) * 1);
+}
+
+.home-computer .reference-computer {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* ── Bottom strip ── */
+.home-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  height: var(--strip-h);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--color-brand-black);
+  color: var(--color-brand-yellow);
+  /* Keep clear of the iPhone home indicator. */
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+}
+
+.home-strip-inner {
+  display: flex;
+  width: max-content;
+  animation: home-strip-scroll 28s linear infinite;
+}
+
+.home-strip:hover .home-strip-inner {
+  animation-play-state: paused;
+}
+
+.home-strip-track {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.home-strip-item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: calc(var(--strip-h) * 0.48);
+  line-height: 1;
+}
+
+.home-strip-dot {
+  display: inline-block;
+  width: calc(var(--strip-h) * 0.32);
+  height: calc(var(--strip-h) * 0.32);
+  margin: 0 calc(var(--strip-h) * 0.7);
+  border-radius: 9999px;
+  background: var(--color-brand-pink);
+}
+
+@keyframes home-strip-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-strip-inner {
+    animation: none;
   }
 }

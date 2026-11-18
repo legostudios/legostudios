@@ -82,7 +82,7 @@ export default function App() {
       />
 
       {/* The time-line clock sits on every page; clicking it steps back a level. */}
-      <TimeLine onClick={onClock} />
+      <TimeLine onClick={onClock} light={isHome} />
 
       {/* Back button — in the top band (right of the vertical line) on every page
           except home. Steps back one level. */}

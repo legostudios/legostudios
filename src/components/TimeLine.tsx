@@ -17,9 +17,12 @@ function tip(len: number, deg: number) {
 
 interface TimeLineProps {
   onClick: () => void;
+  /** White hands with a difference blend, so they invert against the
+   *  home-page video and stay visible on both light and dark frames. */
+  light?: boolean;
 }
 
-export function TimeLine({ onClick }: TimeLineProps) {
+export function TimeLine({ onClick, light = false }: TimeLineProps) {
   const hourRef = useRef<SVGLineElement>(null);
   const minRef = useRef<SVGLineElement>(null);
 
@@ -59,6 +62,7 @@ export function TimeLine({ onClick }: TimeLineProps) {
       onClick={onClick}
       aria-label="Menu"
       className="fixed left-6 top-6 z-[85] block"
+      style={light ? { mixBlendMode: "difference" } : undefined}
     >
       <svg
         width="34"
@@ -73,7 +77,7 @@ export function TimeLine({ onClick }: TimeLineProps) {
           y1={C}
           x2={C}
           y2={C - HAND_LEN}
-          stroke="#000000"
+          stroke={light ? "#ffffff" : "#000000"}
           strokeWidth={4}
           strokeLinecap="butt"
         />
@@ -83,7 +87,7 @@ export function TimeLine({ onClick }: TimeLineProps) {
           y1={C}
           x2={C}
           y2={C - HAND_LEN}
-          stroke="#000000"
+          stroke={light ? "#ffffff" : "#000000"}
           strokeWidth={4}
           strokeLinecap="butt"
         />
