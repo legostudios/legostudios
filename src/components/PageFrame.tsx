@@ -26,7 +26,7 @@ const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
 const INSTAGRAM =
   "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnlncw==";
 
-type Target = "services" | "caseStudies" | "contact";
+export type Target = "services" | "caseStudies" | "contact";
 
 const ITEMS: { label: string; target: Target }[] = [
   { label: "Services", target: "services" },
@@ -395,6 +395,9 @@ interface PageFrameProps {
   // can open inside the same boundary. logoMid is the logo's vertical centre so
   // the Back button can align to it.
   onGeoChange: (g: { vx: number; hy: number; logoMid: number }) => void;
+  // Open a page directly (skipping the menu), e.g. the home-page Contact link.
+  requestPage?: Target | null;
+  onRequestHandled?: () => void;
 }
 
 // The clock opens this menu: a horizontal line under the logo meets a vertical
@@ -409,6 +412,8 @@ export function PageFrame({
   onPanelOpenChange,
   collapseRef,
   onGeoChange,
+  requestPage = null,
+  onRequestHandled,
 }: PageFrameProps) {
   const hRef = useRef<SVGLineElement>(null);
   const vRef = useRef<SVGLineElement>(null);
@@ -582,6 +587,25 @@ export function PageFrame({
     setSelected(i);
   };
 
+  // A page requested from outside the menu: wait two frames so the frame
+  // geometry has settled, then open it. The menu stays hidden meanwhile.
+  useEffect(() => {
+    if (!open || !requestPage) return;
+    const i = ITEMS.findIndex((it) => it.target === requestPage);
+    let r2 = 0;
+    const r1 = requestAnimationFrame(() => {
+      r2 = requestAnimationFrame(() => {
+        if (i >= 0) openPage(i);
+        onRequestHandled?.();
+      });
+    });
+    return () => {
+      cancelAnimationFrame(r1);
+      cancelAnimationFrame(r2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, requestPage]);
+
   const panelNode =
     selTarget === "contact" ? (
       <PagePanel
@@ -695,8 +719,8 @@ export function PageFrame({
           page closes. */}
       <nav
         aria-label="Main menu"
-        aria-hidden={!open || anySel}
-        className={`big-menu ${open && !anySel ? "is-open" : ""}`}
+        aria-hidden={!open || anySel || !!requestPage}
+        className={`big-menu ${open && !anySel && !requestPage ? "is-open" : ""}`}
       >
         <button type="button" onClick={onClose} className="big-menu-close">
           Close

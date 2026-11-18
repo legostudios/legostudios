@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
-import { PageFrame } from "./components/PageFrame";
+import { PageFrame, type Target } from "./components/PageFrame";
 import { Hero } from "./components/Hero";
 import { MenuButton } from "./components/MenuButton";
 import { CaseStudyPage } from "./components/CaseStudyPage";
@@ -11,6 +11,10 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [caseDetail, setCaseDetail] = useState<number | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  // A page opened straight from the home page (Contact link): it should step
+  // back to home, not to the menu.
+  const [directPage, setDirectPage] = useState(false);
+  const [requestPage, setRequestPage] = useState<Target | null>(null);
   const [frameGeo, setFrameGeo] = useState({ vx: 86, hy: 120, logoMid: 40 });
   const [isMobile, setIsMobile] = useState(false);
   const collapsePanel = useRef<() => void>(() => {});
@@ -30,7 +34,17 @@ export default function App() {
     img.src = "/Logo-Horizontal.png";
   }, []);
 
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    setDirectPage(false);
+  }, []);
+
+  const openContact = useCallback(() => {
+    setDirectPage(true);
+    setRequestPage("contact");
+    setMenuOpen(true);
+  }, []);
+  const requestHandled = useCallback(() => setRequestPage(null), []);
 
   // Opening a case study leaves the menu mounted underneath, so closing the
   // detail (Back) drops the user straight back onto the Case Studies list.
@@ -42,23 +56,26 @@ export default function App() {
   // Step back one level: detail → list, page → menu, menu → home.
   const onBack = useCallback(() => {
     if (caseDetail !== null) setCaseDetail(null);
+    else if (panelOpen && directPage) closeMenu();
     else if (panelOpen) collapsePanel.current();
-    else if (menuOpen) setMenuOpen(false);
-  }, [caseDetail, panelOpen, menuOpen]);
+    else if (menuOpen) closeMenu();
+  }, [caseDetail, panelOpen, menuOpen, directPage, closeMenu]);
 
   // The menu button steps back one level, same as the Back button.
   const onClock = useCallback(() => {
     if (caseDetail !== null) {
       setCaseDetail(null);
       collapsePanel.current();
+    } else if (panelOpen && directPage) {
+      closeMenu();
     } else if (panelOpen) {
       collapsePanel.current();
     } else if (menuOpen) {
-      setMenuOpen(false);
+      closeMenu();
     } else {
       setMenuOpen(true);
     }
-  }, [caseDetail, panelOpen, menuOpen]);
+  }, [caseDetail, panelOpen, menuOpen, directPage, closeMenu]);
 
   return (
     <>
@@ -73,7 +90,16 @@ export default function App() {
         onPanelOpenChange={setPanelOpen}
         collapseRef={collapsePanel}
         onGeoChange={setFrameGeo}
+        requestPage={requestPage}
+        onRequestHandled={requestHandled}
       />
+
+      {/* Contact — top-right on the home page; opens the Contact page directly. */}
+      {isHome && (
+        <button type="button" onClick={openContact} className="home-contact">
+          Contact
+        </button>
+      )}
 
       {/* The square menu button sits on every page; clicking it steps back a level. */}
       <MenuButton onClick={onClock} light={isHome} />
