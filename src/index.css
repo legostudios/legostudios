@@ -1052,3 +1052,160 @@
     transform: none;
   }
 }
+
+/* ── Contact form ── */
+.contact-form-section {
+  margin-top: clamp(3.5rem, 10vh, 7rem);
+  padding-top: clamp(1.5rem, 3vh, 2.5rem);
+  border-top: 2px solid var(--fg);
+}
+
+.contact-form-heading {
+  margin: 0 0 clamp(1.5rem, 4vh, 3rem);
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 5rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cform {
+  max-width: 1200px;
+}
+
+.cform-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 4vh, 2.75rem) clamp(2rem, 4vw, 4rem);
+}
+
+@media (min-width: 768px) {
+  .cform-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cform-field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.cform-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cform-label {
+  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.cform input,
+.cform select,
+.cform textarea {
+  width: 100%;
+  padding: 0.6rem 0;
+  border: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+  line-height: 1.3;
+  outline: none;
+  transition: border-color 150ms ease;
+  appearance: none;
+}
+
+.cform textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.cform ::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cform input:focus,
+.cform select:focus,
+.cform textarea:focus {
+  border-bottom-color: var(--color-brand-yellow);
+}
+
+/* Native select with our own chevron; the placeholder option looks muted. */
+.cform-select {
+  position: relative;
+  display: block;
+}
+
+.cform-select::after {
+  content: "";
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  width: 0.55em;
+  height: 0.55em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-75%) rotate(45deg);
+  pointer-events: none;
+  font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+}
+
+.cform select {
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.cform select:invalid,
+.cform select:has(option[value=""]:checked) {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cform option {
+  background: var(--color-brand-black);
+  color: var(--color-brand-white);
+}
+
+.cform-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-top: clamp(2rem, 5vh, 3rem);
+}
+
+.cform-submit {
+  padding: 1rem 2rem;
+  background: var(--color-brand-yellow);
+  color: var(--color-brand-black);
+  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+  line-height: 1;
+  text-transform: uppercase;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cform-submit:hover,
+.cform-submit:focus-visible {
+  background: var(--color-brand-pink);
+  outline: none;
+}
+
+.cform-note {
+  margin: 0;
+  max-width: 50ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.cform-note a {
+  color: var(--color-brand-yellow);
+  text-decoration: underline;
+}

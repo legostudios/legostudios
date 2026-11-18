@@ -1,4 +1,5 @@
 import { PageShell, PageTitle } from "./PageShell";
+import { ContactForm } from "../ContactForm";
 
 const EMAIL = "hello@legostudios.co";
 const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
@@ -10,7 +11,7 @@ interface Props {
 }
 
 // Contact — black. The email is the hero of the page; socials sit below in
-// the brand colours.
+// the brand colours, then the contact form.
 export function ContactPage({ open, onBack }: Props) {
   return (
     <PageShell open={open} theme="black" label="Contact" onBack={onBack}>
@@ -30,6 +31,12 @@ export function ContactPage({ open, onBack }: Props) {
           </a>
         </div>
       </div>
+      <section className="contact-form-section" aria-labelledby="contact-form-heading">
+        <h2 id="contact-form-heading" className="contact-form-heading">
+          Send a message
+        </h2>
+        <ContactForm to={EMAIL} />
+      </section>
     </PageShell>
   );
 }
