@@ -2,7 +2,7 @@ import { PageShell, PageTitle } from "./PageShell";
 
 const EMAIL = "hello@legostudios.co";
 const LINKEDIN = "https://www.linkedin.com/company/lego-studios/";
-const INSTAGRAM = "https://www.instagram.com/legostudios.co?igsh=MXI2NjBwN2d4dnlncw==";
+const INSTAGRAM = "https://www.instagram.com/legostudios.in";
 
 interface Props {
   open: boolean;
