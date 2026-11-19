@@ -168,7 +168,7 @@ export function Menu({ open, onOpenPage, onBack }: MenuProps) {
       className={`big-menu ${visible ? "is-open" : ""}`}
     >
       <button type="button" onClick={onBack} className="big-menu-back">
-        back
+        Back
       </button>
       <ul className="menu-folders">
         {FOLDERS.map((f, i) => {

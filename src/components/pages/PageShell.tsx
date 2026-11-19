@@ -55,7 +55,7 @@ export function PageShell({
       <header className="page-bar">
         {meta && <span className="page-bar-meta">{meta}</span>}
         <button type="button" onClick={onBack} className="page-bar-link page-bar-back">
-          back
+          Back
         </button>
       </header>
       <div className="page-body">{children}</div>

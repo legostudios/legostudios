@@ -698,7 +698,7 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  text-transform: lowercase;
+  text-transform: uppercase;
   text-align: center;
   pointer-events: none;
 }
@@ -1449,7 +1449,6 @@
 }
 
 /* Pages that use lower case for the title and row names. */
-.page--lower .page-title,
 .page--lower .page-row-name {
   text-transform: lowercase;
 }
@@ -1621,15 +1620,33 @@
    dragging. Fills the page below the top bar. */
 .stack-wrap {
   position: absolute;
-  inset: var(--bar-h) 0 0 0;
+  inset: 0;
   overflow: hidden;
+}
+
+/* In the 3D view the top bar is see-through so the stack runs to the top
+   edge of the screen (Back stays on top). */
+.page:has(.stack-wrap) .page-bar {
+  background: transparent;
+  pointer-events: none;
+}
+
+.page:has(.stack-wrap) .page-bar > * {
+  pointer-events: auto;
+}
+
+/* Back sits over the panels here: give it a chip in the page colour. */
+.page:has(.stack-wrap) .page-bar-back {
+  padding: 0.35rem 0.6rem;
+  margin-right: -0.6rem;
+  background: var(--bg);
 }
 
 .stack-head {
   position: absolute;
-  top: clamp(0.25rem, 2vh, 1.5rem);
-  left: var(--gutter);
   z-index: 3;
+  top: calc(var(--bar-h) + clamp(0.25rem, 2vh, 1.5rem));
+  left: var(--gutter);
   pointer-events: none;
 }
 
@@ -1641,8 +1658,14 @@
 .stack-stage {
   position: absolute;
   inset: 0;
-  perspective: 1600px;
-  perspective-origin: 55% 45%;
+  /* Own layer below the title (3D panels near the camera would otherwise be
+     drawn over it). */
+  z-index: 1;
+  isolation: isolate;
+  perspective: 1500px;
+  /* Viewed from low down: panel bottoms stay level, tops slope (as in the
+     reference). */
+  perspective-origin: 50% 100%;
   touch-action: none;
   cursor: grab;
   -webkit-user-select: none;
@@ -1667,24 +1690,34 @@
   left: 0;
   top: 0;
   width: var(--card-w, 300px);
-  aspect-ratio: 4 / 5;
+  height: var(--card-h, 400px);
   transform-style: preserve-3d;
   will-change: transform, opacity;
 }
 
-/* The panel: soft fade on its left edge so panels layer like translucent
-   sheets; slides down out of the stack on hover. */
+.stack-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* A glass sheet: slightly see-through, the image softly distorted under a
+   milky haze, with a thin bright edge. Slides out to the right on hover. */
 .stack-card-inner {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
   padding: 0;
   border: 0;
-  background: var(--bg);
+  overflow: hidden;
+  background: transparent;
   cursor: pointer;
-  -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.25), #000 32%);
-  mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.25), #000 32%);
-  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.9;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.18);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease;
 }
 
 .stack-card-inner img {
@@ -1694,88 +1727,63 @@
   object-fit: cover;
   pointer-events: none;
   -webkit-user-drag: none;
+  filter: url(#stack-glass-distort) saturate(0.9);
+  transform: scale(1.06);
+}
+
+.stack-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.22) 100%);
 }
 
 .stack-card.is-hovered .stack-card-inner {
-  transform: translate3d(0, 24%, 40px);
+  opacity: 1;
+  transform: translate3d(42%, 3%, 110px);
 }
 
-/* Title beside the hovered panel. */
-.stack-label {
+/* Name beside the mouse pointer while hovering a panel. */
+.stack-cursor-label {
   position: absolute;
-  left: 100%;
-  top: 68%;
+  left: 0;
+  top: 0;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  margin-left: 1rem;
-  padding: 0.5rem 0.7rem;
-  white-space: nowrap;
+  max-width: 40vw;
   color: var(--fg);
-  /* Solid chip in the page colour so the label reads over other panels. */
-  background: var(--bg);
-  font-weight: 700;
-  font-size: clamp(0.9rem, 1.2vw, 1.25rem);
-  line-height: 1.1;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 250ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-}
-
-.stack-card.is-hovered .stack-label {
-  opacity: 1;
-  transform: none;
-}
-
-.stack-label-num,
-.stack-label-meta {
-  font-size: 0.75em;
+  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
   font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px var(--bg), 0 0 2px var(--bg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  will-change: transform;
+}
+
+.stack-cursor-label.is-visible {
+  opacity: 1;
+}
+
+.stack-cursor-meta {
+  font-size: 0.85em;
   opacity: 0.75;
 }
 
-.page--lower .stack-label-title {
+.page--lower .stack-cursor-label {
   text-transform: lowercase;
-}
-
-/* Overview / index switch (bottom-right). */
-.view-toggle {
-  position: fixed;
-  right: var(--chrome-right);
-  bottom: clamp(1rem, 3vh, 2rem);
-  z-index: 4;
-  display: flex;
-  gap: 0.2rem;
-  padding: 0.2rem;
-  border: 2px solid var(--fg);
-  background: var(--bg);
-}
-
-.view-toggle button {
-  padding: 0.45rem 0.8rem;
-  color: var(--fg);
-  font-weight: 700;
-  font-size: clamp(0.8rem, 0.95vw, 0.95rem);
-  line-height: 1;
-  text-transform: lowercase;
-  opacity: 0.55;
-  transition: opacity 150ms ease, background-color 150ms ease, color 150ms ease;
-}
-
-.view-toggle button:hover {
-  opacity: 1;
-}
-
-.view-toggle button.is-active {
-  opacity: 1;
-  background: var(--fg);
-  color: var(--bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .stack-card-inner,
-  .stack-label {
+  .stack-cursor-label {
     transition: none;
   }
 }

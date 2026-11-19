@@ -25,7 +25,8 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 // A 3D stack of image panels on a diagonal — the nearest at the bottom-left,
 // receding to the top-right. Scroll, drag, swipe or use the arrow keys to
 // travel along it (it loops endlessly); panels in front fly past the camera.
-// Hovering a panel slides it out of the stack and shows its title.
+// Panels look like glass sheets (see-through, softly distorted, bright edge).
+// Hovering one slides it out to the right; its name follows the pointer.
 export function StackView({ items, onOpen }: StackViewProps) {
   const reduced = usePrefersReducedMotion();
   const stage = useRef<HTMLDivElement>(null);
@@ -37,6 +38,8 @@ export function StackView({ items, onOpen }: StackViewProps) {
   const lastInput = useRef(0);
   const [base, setBase] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
+  // Name of the hovered panel, shown beside the mouse pointer.
+  const cursorLabel = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; y: number; t: number; startTarget: number; moved: boolean; id: number } | null>(null);
   // When the last drag ended; a click right after a drag is not a click.
   const dragEndedAt = useRef(0);
@@ -50,22 +53,26 @@ export function StackView({ items, onOpen }: StackViewProps) {
     const W = el.clientWidth;
     const H = el.clientHeight;
     const tall = H > W * 1.1;
-    const cardW = tall ? W * 0.58 : Math.min(W * 0.25, H * 0.42);
-    // Step between panels along the diagonal, and where panel 0 sits.
-    const sx = tall ? W * 0.085 : W * 0.06;
-    const sy = tall ? H * 0.06 : H * 0.075;
-    const sz = 70;
-    const x0 = tall ? W * 0.36 : W * 0.22;
-    const y0 = tall ? H * 0.72 : H * 0.7;
+    // Panels are about half the screen tall; the line runs from off the
+    // bottom-left corner to off the top-right one (as in the reference).
+    const cardH = tall ? H * 0.42 : H * 0.56;
+    const cardW = cardH * 0.78;
+    const sx = tall ? W * 0.15 : W * 0.085;
+    const sy = tall ? H * 0.085 : H * 0.1;
+    const sz = 40;
+    const x0 = tall ? W * 0.3 : W * 0.2;
+    const y0 = tall ? H * 0.82 : H * 0.8;
     el.style.setProperty("--card-w", `${cardW}px`);
+    el.style.setProperty("--card-h", `${cardH}px`);
     cards.current.forEach((card, k) => {
       const p = k - pos.current;
       const x = x0 + p * sx;
       const y = y0 - p * sy;
       const z = -p * sz;
       // Fade panels flying past the camera, and the far end of the line.
-      const op = p < 0 ? clamp(1 + (p + 0.35) * 1.6, 0, 1) : clamp((BEHIND - 1.5 - p) / 2.5, 0, 1);
-      card.style.transform = `translate3d(${x}px, ${y}px, ${z}px) translate(-50%, -50%) rotateY(32deg)`;
+      // Panels leave off the screen edges; fade only the very last ones.
+      const op = p < 0 ? clamp(1 + (p + 2.2) * 1.2, 0, 1) : clamp((BEHIND - 0.5 - p) / 2, 0, 1);
+      card.style.transform = `translate3d(${x}px, ${y}px, ${z}px) translate(-50%, -50%) rotateY(48deg)`;
       card.style.opacity = String(op);
       card.style.pointerEvents = op > 0.5 ? "auto" : "none";
     });
@@ -139,6 +146,12 @@ export function StackView({ items, onOpen }: StackViewProps) {
     velocity.current = 0;
   };
   const onPointerMove = (e: RPointerEvent<HTMLDivElement>) => {
+    const lab = cursorLabel.current;
+    const st = stage.current;
+    if (lab && st) {
+      const r = st.getBoundingClientRect();
+      lab.style.transform = `translate3d(${e.clientX - r.left + 18}px, ${e.clientY - r.top + 14}px, 0)`;
+    }
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
@@ -178,6 +191,13 @@ export function StackView({ items, onOpen }: StackViewProps) {
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
+      {/* Glass distortion: a soft wavy displacement of each image. */}
+      <svg className="stack-defs" aria-hidden="true" focusable="false">
+        <filter id="stack-glass-distort" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="2" seed="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       <div className="stack-world">
         {slots.map((k) => {
           const i = itemAt(k);
@@ -206,15 +226,23 @@ export function StackView({ items, onOpen }: StackViewProps) {
                 tabIndex={-1}
               >
                 <img src={item.image} alt="" draggable={false} />
+                <span className="stack-glass" aria-hidden="true" />
               </button>
-              <div className="stack-label" aria-hidden="true">
-                <span className="stack-label-num">{String(i + 1).padStart(2, "0")}</span>
-                <span className="stack-label-title">{item.title}</span>
-                {item.meta && <span className="stack-label-meta">{item.meta}</span>}
-              </div>
             </div>
           );
         })}
+      </div>
+      <div
+        ref={cursorLabel}
+        className={`stack-cursor-label ${hovered !== null ? "is-visible" : ""}`}
+        aria-hidden="true"
+      >
+        {hovered !== null && (
+          <>
+            <span className="stack-cursor-title">{items[itemAt(hovered)].title}</span>
+            {items[itemAt(hovered)].meta && <span className="stack-cursor-meta">{items[itemAt(hovered)].meta}</span>}
+          </>
+        )}
       </div>
     </div>
   );
