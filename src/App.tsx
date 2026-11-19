@@ -49,9 +49,8 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isHome, back]);
 
-  // The square is white-on-dark over the home video (difference blend) and on
-  // the black Contact page; black on every other page colour.
-  const lightButton = isHome || (page === "contact" && caseDetail === null);
+  // The square is black everywhere except on the black Contact page.
+  const squareOnDark = page === "contact" && caseDetail === null;
 
   return (
     <>
@@ -81,7 +80,7 @@ export default function App() {
         onNavigate={setCaseDetail}
       />
 
-      <MenuButton onClick={onMenuButton} light={lightButton} />
+      <MenuButton onClick={onMenuButton} onDark={squareOnDark} />
     </>
   );
 }

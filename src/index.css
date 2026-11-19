@@ -531,22 +531,43 @@
 }
 
 /* Menu button — square outline that fills on hover/focus. */
-.menu-square {
-  padding: 4px;
+:root {
+  /* Position of the top-left menu square; the Back / Contact links on the
+     right line up with it. The square's button is 34px tall. */
+  --chrome-top: clamp(1.75rem, 3vw, 2.25rem);
+  --chrome-left: clamp(1.75rem, 3vw, 2.5rem);
+  /* Right-hand links mirror the square: same gap to the right edge as the
+     visible square has to the left (its button adds 4px of padding). */
+  --chrome-right: calc(var(--chrome-left) + 4px);
 }
 
+.menu-square {
+  position: fixed;
+  top: var(--chrome-top);
+  left: var(--chrome-left);
+  z-index: 85;
+  display: block;
+  padding: 4px;
+  color: var(--color-brand-black);
+}
+
+.menu-square--on-dark {
+  color: var(--color-brand-white);
+}
+
+/* A solid square. */
 .menu-square-box {
   display: block;
   width: 26px;
   height: 26px;
-  border: 4px solid currentColor;
-  background: transparent;
-  transition: background-color 150ms ease-out;
+  background: currentColor;
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
 }
 
 .menu-square:hover .menu-square-box,
 .menu-square:focus-visible .menu-square-box {
-  background: currentColor;
+  opacity: 0.7;
+  transform: scale(0.9);
 }
 
 /* ───────────────────────── Menu ─────────────────────────
@@ -576,8 +597,11 @@
 
 .big-menu-back {
   position: absolute;
-  top: clamp(1.25rem, 3.5vh, 2.25rem);
-  right: clamp(1.5rem, 4vw, 4.5rem);
+  top: var(--chrome-top);
+  right: var(--chrome-right);
+  height: 34px;
+  display: flex;
+  align-items: center;
   font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
   font-size: clamp(1.1rem, 1.6vw, 1.6rem);
   line-height: 1;
@@ -648,8 +672,8 @@
    inverts against the video, matching the menu square. */
 .home-contact {
   position: fixed;
-  top: 1.5rem;
-  right: clamp(1.5rem, 3vw, 3rem);
+  top: var(--chrome-top);
+  right: var(--chrome-right);
   z-index: 85;
   height: 34px;
   display: flex;
@@ -677,7 +701,7 @@
   --bg: var(--color-brand-white);
   --fg: var(--color-brand-black);
   --gutter: clamp(1.5rem, 6vw, 7rem);
-  --bar-h: calc(1.5rem + 34px + 1.5rem);
+  --bar-h: calc(var(--chrome-top) * 2 + 34px);
   position: fixed;
   inset: 0;
   z-index: 83;
@@ -714,7 +738,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 1rem;
-  padding: 0 clamp(1.5rem, 4vw, 4.5rem);
+  padding: 0 var(--chrome-right);
   background: var(--bg);
 }
 

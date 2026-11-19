@@ -1,23 +1,18 @@
 interface MenuButtonProps {
   onClick: () => void;
-  /** White with a difference blend, so it inverts against the home-page
-   *  video and stays visible on both light and dark frames. */
-  light?: boolean;
+  /** White instead of black, for the black Contact page. */
+  onDark?: boolean;
 }
 
-// The menu button: a plain square outline that fills in on hover. It sits on
-// every page; clicking it opens the menu or steps back a level.
-export function MenuButton({ onClick, light = false }: MenuButtonProps) {
+// The menu button: a solid black square, top-left on every page. Clicking it
+// opens the menu (or closes it when the menu is showing).
+export function MenuButton({ onClick, onDark = false }: MenuButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label="Menu"
-      className="menu-square fixed left-6 top-6 z-[85] block"
-      style={{
-        color: light ? "#ffffff" : "#000000",
-        mixBlendMode: light ? "difference" : undefined,
-      }}
+      className={`menu-square ${onDark ? "menu-square--on-dark" : ""}`}
     >
       <span className="menu-square-box" aria-hidden="true" />
     </button>
