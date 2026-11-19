@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
+import { SourceSelect } from "./SourceSelect";
 
 const SOURCES = [
   "Google / Search engine",
@@ -20,6 +21,7 @@ type Status = "idle" | "sending" | "sent" | "error";
 // submission; until then nothing is delivered.
 export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
   const [status, setStatus] = useState<Status>("idle");
+  const sourceLabelId = `src-${useId().replace(/:/g, "")}`;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,21 +86,12 @@ export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
           <span className="cform-label">Company</span>
           <input name="company" type="text" autoComplete="organization" placeholder="Company name" />
         </label>
-        <label className="cform-field">
-          <span className="cform-label">Where did you hear about us?</span>
-          <span className="cform-select">
-            <select name="source" defaultValue="">
-              <option value="" disabled>
-                Select an option
-              </option>
-              {SOURCES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+        <div className="cform-field">
+          <span className="cform-label" id={sourceLabelId}>
+            Where did you hear about us?
           </span>
-        </label>
+          <SourceSelect name="source" labelId={sourceLabelId} options={SOURCES} placeholder="Select an option" />
+        </div>
         <label className="cform-field cform-field--wide">
           <span className="cform-label">Message</span>
           <textarea
