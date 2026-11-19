@@ -40,6 +40,9 @@ export function StackView({ items, onOpen }: StackViewProps) {
   const [hovered, setHovered] = useState<number | null>(null);
   // Name of the hovered panel, shown beside the mouse pointer.
   const cursorLabel = useRef<HTMLDivElement>(null);
+  // The label trails the pointer: it eases toward `labelTarget` each frame.
+  const labelTarget = useRef<{ x: number; y: number } | null>(null);
+  const labelPos = useRef({ x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; t: number; startTarget: number; moved: boolean; id: number } | null>(null);
   // When the last drag ended; a click right after a drag is not a click.
   const dragEndedAt = useRef(0);
@@ -53,26 +56,23 @@ export function StackView({ items, onOpen }: StackViewProps) {
     const W = el.clientWidth;
     const H = el.clientHeight;
     const tall = H > W * 1.1;
-    // Panels are about half the screen tall; the line runs from off the
-    // bottom-left corner to off the top-right one (as in the reference).
-    const cardH = tall ? H * 0.42 : H * 0.56;
-    const cardW = cardH * 0.78;
-    const sx = tall ? W * 0.15 : W * 0.085;
-    const sy = tall ? H * 0.085 : H * 0.1;
-    const sz = 40;
-    const x0 = tall ? W * 0.3 : W * 0.2;
-    const y0 = tall ? H * 0.82 : H * 0.8;
+    // Parallel glass sheets, one behind another, seen by a camera turned and
+    // tilted (see .stack-world): the row climbs from the bottom-left to the
+    // top-right and each sheet's long edges slope down to the right — solved
+    // from measurements of the reference.
+    const cardW = tall ? W * 0.6 : Math.min(W * 0.28, H * 0.58);
+    const cardH = cardW / 1.5;
+    // Depth between sheets, and which sheet sits at the centre of the screen.
+    const gap = cardW * 0.72;
+    const mid = 3;
     el.style.setProperty("--card-w", `${cardW}px`);
     el.style.setProperty("--card-h", `${cardH}px`);
     cards.current.forEach((card, k) => {
       const p = k - pos.current;
-      const x = x0 + p * sx;
-      const y = y0 - p * sy;
-      const z = -p * sz;
-      // Fade panels flying past the camera, and the far end of the line.
-      // Panels leave off the screen edges; fade only the very last ones.
-      const op = p < 0 ? clamp(1 + (p + 2.2) * 1.2, 0, 1) : clamp((BEHIND - 0.5 - p) / 2, 0, 1);
-      card.style.transform = `translate3d(${x}px, ${y}px, ${z}px) translate(-50%, -50%) rotateY(48deg)`;
+      const z = -(p - mid) * gap;
+      // Sheets fly past the camera at the front and fade out at the far end.
+      const op = p < 0 ? clamp(1 + (p + 1.4) * 1.4, 0, 1) : clamp((BEHIND - 0.5 - p) / 2, 0, 1);
+      card.style.transform = `translate(-50%, -50%) translate3d(0, 0, ${z}px)`;
       card.style.opacity = String(op);
       card.style.pointerEvents = op > 0.5 ? "auto" : "none";
     });
@@ -97,6 +97,15 @@ export function StackView({ items, onOpen }: StackViewProps) {
       const b = Math.floor(pos.current);
       setBase((prev) => (prev === b ? prev : b));
       layout();
+      const lab = cursorLabel.current;
+      const lt = labelTarget.current;
+      if (lab && lt) {
+        const lp = labelPos.current;
+        const k = reduced ? 1 : 0.14;
+        lp.x += (lt.x - lp.x) * k;
+        lp.y += (lt.y - lp.y) * k;
+        lab.style.transform = `translate3d(${lp.x}px, ${lp.y}px, 0)`;
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -146,11 +155,14 @@ export function StackView({ items, onOpen }: StackViewProps) {
     velocity.current = 0;
   };
   const onPointerMove = (e: RPointerEvent<HTMLDivElement>) => {
-    const lab = cursorLabel.current;
     const st = stage.current;
-    if (lab && st) {
+    if (st) {
       const r = st.getBoundingClientRect();
-      lab.style.transform = `translate3d(${e.clientX - r.left + 18}px, ${e.clientY - r.top + 14}px, 0)`;
+      const t = { x: e.clientX - r.left + 18, y: e.clientY - r.top + 14 };
+      // First move: start the label at the pointer rather than gliding in
+      // from the corner.
+      if (!labelTarget.current) labelPos.current = { ...t };
+      labelTarget.current = t;
     }
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
@@ -183,6 +195,7 @@ export function StackView({ items, onOpen }: StackViewProps) {
   for (let k = base - IN_FRONT; k <= base + BEHIND; k++) slots.push(k);
 
   return (
+    <>
     <div
       ref={stage}
       className="stack-stage"
@@ -195,7 +208,7 @@ export function StackView({ items, onOpen }: StackViewProps) {
       <svg className="stack-defs" aria-hidden="true" focusable="false">
         <filter id="stack-glass-distort" x="-5%" y="-5%" width="110%" height="110%">
           <feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="2" seed="3" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
       <div className="stack-world">
@@ -232,18 +245,21 @@ export function StackView({ items, onOpen }: StackViewProps) {
           );
         })}
       </div>
-      <div
-        ref={cursorLabel}
-        className={`stack-cursor-label ${hovered !== null ? "is-visible" : ""}`}
-        aria-hidden="true"
-      >
-        {hovered !== null && (
-          <>
-            <span className="stack-cursor-title">{items[itemAt(hovered)].title}</span>
-            {items[itemAt(hovered)].meta && <span className="stack-cursor-meta">{items[itemAt(hovered)].meta}</span>}
-          </>
-        )}
-      </div>
     </div>
+    {/* Outside the stage's layer so its difference blend inverts against the
+        page colour as well as the panels. */}
+    <div
+      ref={cursorLabel}
+      className={`stack-cursor-label ${hovered !== null ? "is-visible" : ""}`}
+      aria-hidden="true"
+    >
+      {hovered !== null && (
+        <>
+          <span className="stack-cursor-title">{items[itemAt(hovered)].title}</span>
+          {items[itemAt(hovered)].meta && <span className="stack-cursor-meta">{items[itemAt(hovered)].meta}</span>}
+        </>
+      )}
+    </div>
+    </>
   );
 }
