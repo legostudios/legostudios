@@ -1,18 +1,17 @@
 import { useId } from "react";
 
-export type FolderTheme = "sky" | "yellow";
+export type FolderTheme = "blue" | "orange" | "green";
 
-const BRAND = {
-  pink: "#f238a7",
-  sky: "#79eede",
-  yellow: "#e5fe02",
-};
-
-// Each folder: its body colour, a slightly deeper back panel, and the two
-// other brand colours for the abstract art on the front.
-const THEMES: Record<FolderTheme, { body: string; back: string; orb: [string, string]; star: string; glow: string }> = {
-  sky: { body: BRAND.sky, back: "#5fd9c8", orb: [BRAND.yellow, BRAND.pink], star: BRAND.pink, glow: BRAND.yellow },
-  yellow: { body: BRAND.yellow, back: "#cfe600", orb: [BRAND.sky, BRAND.pink], star: BRAND.pink, glow: BRAND.sky },
+// Each folder: its body colour, a slightly deeper back panel, and the colours
+// for the abstract art on the front (orb gradient, star outline, star glow,
+// and the thin inner line of the star).
+const THEMES: Record<
+  FolderTheme,
+  { body: string; back: string; orb: [string, string]; star: string; glow: string; line: string }
+> = {
+  blue: { body: "#3a4cff", back: "#2a39d4", orb: ["#ffc531", "#ff5a1f"], star: "#ff8a1f", glow: "#ffe45c", line: "#ffffff" },
+  orange: { body: "#ff7a1f", back: "#e2600b", orb: ["#ffe14d", "#ff2e63"], star: "#6b2bff", glow: "#ffd400", line: "#2a1a8f" },
+  green: { body: "#17c27a", back: "#0f9f62", orb: ["#d4ff4d", "#2f6bff"], star: "#2f6bff", glow: "#e7ff5c", line: "#0b2a7a" },
 };
 
 // A wavy six-point "star" blob, drawn around (cx, cy).
@@ -53,7 +52,7 @@ const SQUIGGLE = squiggle(70, 96, 120, 9, 6);
 
 // A folder icon in the spirit of a desktop folder: tabbed back panel, a front
 // flap with a light top edge, grainy paper texture and abstract art (a soft
-// orb, a glowing wavy star, a squiggle) in the other brand colours.
+// orb, a glowing wavy star, a squiggle).
 export function Folder({ theme }: { theme: FolderTheme }) {
   const t = THEMES[theme];
   const id = useId().replace(/:/g, "");
@@ -102,7 +101,7 @@ export function Folder({ theme }: { theme: FolderTheme }) {
           {/* Glowing wavy star: blurred glow under a crisp core. */}
           <path d={STAR} fill={t.glow} filter={`url(#blur-${id})`} opacity="0.95" />
           <path d={STAR} fill="none" stroke={t.star} strokeWidth="16" filter={`url(#soft-${id})`} />
-          <path d={STAR} fill="none" stroke="#3b2fd0" strokeWidth="3" opacity="0.55" filter={`url(#soft-${id})`} />
+          <path d={STAR} fill="none" stroke={t.line} strokeWidth="3" opacity="0.55" filter={`url(#soft-${id})`} />
           <path d={STAR_HOLE} fill={t.body} filter={`url(#soft-${id})`} />
           {/* Soft orb. */}
           <circle cx="96" cy="176" r="62" fill={`url(#orb-${id})`} opacity="0.95" />

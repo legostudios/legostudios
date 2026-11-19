@@ -625,33 +625,43 @@
   opacity: 0.6;
 }
 
-/* Two desktop-style folders, centred, names beneath; Contact link below. */
-.menu-desk {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(1.5rem, 5vh, 3.5rem);
-  width: 100%;
+/* Desktop-style folders, laid out in a row (stacked on tall screens) and
+   draggable anywhere on the screen. */
+.big-menu {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .menu-folders {
   display: flex;
   justify-content: center;
-  gap: clamp(1.25rem, 6vw, 7rem);
+  align-items: flex-start;
+  gap: clamp(1rem, 5vw, 5.5rem);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.menu-folders li {
+  position: relative;
 }
 
 .menu-folder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.6rem, 1.6vh, 1.1rem);
+  gap: clamp(0.5rem, 1.4vh, 1rem);
   /* Width from whichever runs out first: screen width or height. */
-  width: min(40vw, 46vh, 400px);
+  width: min(26vw, 40vh, 340px);
   color: inherit;
   outline: none;
+  touch-action: none;
+  cursor: grab;
+  -webkit-user-drag: none;
+}
+
+.menu-folder.is-dragging {
+  cursor: grabbing;
 }
 
 .folder-svg {
@@ -659,6 +669,7 @@
   width: 100%;
   height: auto;
   overflow: visible;
+  pointer-events: none;
   filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.18));
   transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), filter 350ms ease;
 }
@@ -670,29 +681,30 @@
 }
 
 .menu-folder-label {
-  font-size: clamp(0.95rem, 1.5vw, 1.5rem);
+  font-size: clamp(0.9rem, 1.4vw, 1.4rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   text-align: center;
+  pointer-events: none;
 }
 
-/* Tall, narrow screens (phones held upright): stack the folders so each
-   can be much bigger. */
+/* Tall, narrow screens (phones held upright): stack the folders. */
 @media (max-aspect-ratio: 4/5) {
   .menu-folders {
     flex-direction: column;
     align-items: center;
-    gap: clamp(1.25rem, 4vh, 2.5rem);
+    gap: clamp(0.75rem, 2.5vh, 1.75rem);
   }
 
   .menu-folder {
-    width: min(72vw, 30vh, 400px);
+    width: min(60vw, 21vh, 340px);
   }
 }
 
-/* Hover / keyboard focus: the folder lifts and its front flap tips open. */
+/* Hover / keyboard focus: the folder lifts and its front flap tips open.
+   While dragging it lifts higher with a deeper shadow. */
 @media (hover: hover) {
   .menu-folder:hover .folder-svg {
     transform: translateY(-8px);
@@ -704,6 +716,11 @@
   }
 }
 
+.menu-folder.is-dragging .folder-svg {
+  transform: translateY(-12px) rotate(-2deg);
+  filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.28));
+}
+
 .menu-folder:focus-visible .folder-svg {
   transform: translateY(-8px);
 }
@@ -713,48 +730,35 @@
   text-underline-offset: 0.2em;
 }
 
-.menu-contact {
-  font-size: clamp(1.1rem, 2vw, 2rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.25em;
-  transition: opacity 150ms ease;
-}
-
-.menu-contact:hover,
-.menu-contact:focus-visible {
-  opacity: 0.7;
-  outline: none;
-}
-
-/* Folders and Contact rise in one after another when the menu opens. */
-.menu-folders li,
-.menu-contact {
+/* Folders rise in one after another when the menu opens. */
+.menu-folders li {
   opacity: 0;
-  transform: translateY(24px);
+  translate: 0 24px;
   transition:
-    transform 650ms cubic-bezier(0.22, 1, 0.36, 1) calc(80ms + var(--i) * 80ms),
+    translate 650ms cubic-bezier(0.22, 1, 0.36, 1) calc(80ms + var(--i) * 80ms),
     opacity 450ms ease calc(80ms + var(--i) * 80ms);
 }
 
-.big-menu.is-open .menu-folders li,
-.big-menu.is-open .menu-contact {
+.big-menu.is-open .menu-folders li {
   opacity: 1;
-  transform: none;
+  translate: 0 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .menu-folders li,
-  .menu-contact,
   .folder-svg,
   .folder-front {
     transition: opacity 200ms ease;
-    transform: none !important;
+  }
+
+  .menu-folders li {
+    translate: none;
+  }
+
+  .menu-folder:hover .folder-svg,
+  .menu-folder:hover .folder-front,
+  .menu-folder.is-dragging .folder-svg {
+    transform: none;
   }
 }
 
