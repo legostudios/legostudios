@@ -776,7 +776,7 @@
 
 .page--yellow { --bg: var(--color-brand-yellow); }
 .page--sky { --bg: var(--color-brand-sky); }
-.page--pink { --bg: var(--color-brand-pink); }
+.page--pink { --bg: var(--color-brand-pink); --fg: var(--color-brand-white); }
 .page--white { --bg: var(--color-brand-white); }
 .page--black { --bg: var(--color-brand-black); --fg: var(--color-brand-white); }
 
