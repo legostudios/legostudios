@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
 import { Hero } from "./components/Hero";
-import { MenuButton } from "./components/MenuButton";
+import { MenuButton, type SquareSkip } from "./components/MenuButton";
 import { Menu, type PageId } from "./components/Menu";
 import { ServicesPage } from "./components/pages/ServicesPage";
 import { CaseStudiesPage } from "./components/pages/CaseStudiesPage";
@@ -49,8 +49,18 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isHome, back]);
 
-  // The square is black everywhere except on the black Contact page.
-  const squareOnDark = page === "contact" && caseDetail === null;
+  // The square flashes through the brand colours; on a page whose background
+  // is one of them, that colour is skipped so the square never disappears.
+  const squareSkip: SquareSkip =
+    caseDetail !== null
+      ? null
+      : page === "services"
+        ? "sky"
+        : page === "caseStudies"
+          ? "pink"
+          : page === null && menuOpen
+            ? "yellow"
+            : null;
 
   return (
     <>
@@ -80,7 +90,7 @@ export default function App() {
         onNavigate={setCaseDetail}
       />
 
-      <MenuButton onClick={onMenuButton} onDark={squareOnDark} />
+      <MenuButton onClick={onMenuButton} skip={squareSkip} />
     </>
   );
 }

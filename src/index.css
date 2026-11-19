@@ -548,20 +548,57 @@
   z-index: 85;
   display: block;
   padding: 4px;
-  color: var(--color-brand-black);
 }
 
-.menu-square--on-dark {
-  color: var(--color-brand-white);
-}
-
-/* A solid square. */
+/* A solid square that snaps through the brand colours (~0.3s each). On a
+   page whose background matches one colour, that colour is skipped. */
 .menu-square-box {
   display: block;
   width: 26px;
   height: 26px;
-  background: currentColor;
+  background: var(--color-brand-pink);
+  animation: square-3 0.9s step-end infinite;
   transition: opacity 150ms ease-out, transform 150ms ease-out;
+}
+
+.menu-square--skip-yellow .menu-square-box { animation: square-pink-sky 0.6s step-end infinite; }
+.menu-square--skip-sky .menu-square-box { animation: square-pink-yellow 0.6s step-end infinite; }
+.menu-square--skip-pink .menu-square-box { animation: square-sky-yellow 0.6s step-end infinite; }
+
+@keyframes square-3 {
+  0% { background: var(--color-brand-pink); }
+  33.333% { background: var(--color-brand-sky); }
+  66.667% { background: var(--color-brand-yellow); }
+}
+
+@keyframes square-pink-sky {
+  0% { background: var(--color-brand-pink); }
+  50% { background: var(--color-brand-sky); }
+}
+
+@keyframes square-pink-yellow {
+  0% { background: var(--color-brand-pink); }
+  50% { background: var(--color-brand-yellow); }
+}
+
+@keyframes square-sky-yellow {
+  0% { background: var(--color-brand-sky); }
+  50% { background: var(--color-brand-yellow); }
+}
+
+/* Reduced motion: no flashing — hold one colour that suits the page. */
+@media (prefers-reduced-motion: reduce) {
+  .menu-square-box,
+  .menu-square--skip-yellow .menu-square-box,
+  .menu-square--skip-sky .menu-square-box {
+    animation: none;
+    background: var(--color-brand-pink);
+  }
+
+  .menu-square--skip-pink .menu-square-box {
+    animation: none;
+    background: var(--color-brand-black);
+  }
 }
 
 .menu-square:hover .menu-square-box,
