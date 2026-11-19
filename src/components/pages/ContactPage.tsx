@@ -1,4 +1,4 @@
-import { PageShell, PageTitle } from "./PageShell";
+import { PageShell } from "./PageShell";
 import { ContactForm } from "../ContactForm";
 import { PixelIcon } from "../PixelIcon";
 import { toRects } from "../../lib/pixels";
@@ -95,35 +95,63 @@ const LINKS = [
   { label: "LinkedIn", href: LINKEDIN, grid: LINKED, tone: "pink", external: true },
 ];
 
-// Contact — white. Lower-case heading with the email / Instagram / LinkedIn
-// icons at the right end of its line, then the contact form.
+// The word "contact" in square pixels, after the design reference: each
+// letter on a 5×6 grid, one empty column between letters.
+const GLYPHS: Record<string, string[]> = {
+  c: [".###.", "#...#", "#....", "#....", "#...#", ".###."],
+  o: [".....", ".###.", "#...#", "#...#", "#...#", ".###."],
+  n: [".....", "#.##.", "##..#", "#...#", "#...#", "#...#"],
+  t: [".#...", "#####", ".#...", ".#...", ".#...", "..###"],
+  a: [".....", ".###.", "....#", ".####", "#...#", ".##.#"],
+  c2: [".....", ".####", "#....", "#....", "#...#", ".###."],
+};
+const WORD = ["c", "o", "n", "t", "a", "c2", "t"];
+const COLS = WORD.length * 6 - 1;
+const CELLS: [number, number][] = WORD.flatMap((g, li) =>
+  GLYPHS[g].flatMap((row, y) => [...row].flatMap((ch, x) => (ch === "#" ? [[li * 6 + x, y] as [number, number]] : []))),
+);
+
+function PixelWord() {
+  return (
+    <svg className="contact-word" viewBox={`0 0 ${COLS} 6`} aria-hidden="true" focusable="false">
+      {CELLS.map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x + 0.13} y={y + 0.13} width={0.74} height={0.74} />
+      ))}
+    </svg>
+  );
+}
+
+// Contact — white. The word "contact" in big square pixels across the top;
+// bottom-left the email / Instagram / LinkedIn pixel icons stacked; bottom-
+// right the enquiry form in small type.
 export function ContactPage({ open, onBack }: Props) {
   return (
-    <PageShell open={open} theme="white" label="Contact" onBack={onBack} lowercase>
-      <div className="contact-head">
-        <PageTitle>Contact</PageTitle>
-        <ul className="contact-icons">
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <a
-                href={l.href}
-                aria-label={l.label}
-                title={l.label}
-                className={`contact-icon contact-icon--${l.tone}`}
-                {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              >
-                <PixelIcon rects={toRects(outlined(l.grid))} grid={13} size={26} />
-              </a>
-            </li>
-          ))}
-        </ul>
+    <PageShell open={open} theme="white" label="Contact" onBack={onBack}>
+      <div className="contact2">
+        <h1 className="sr-only">Contact</h1>
+        <PixelWord />
+        <div className="contact2-bottom">
+          <ul className="contact2-socials">
+            {LINKS.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  aria-label={l.label}
+                  title={l.label}
+                  className={`contact-icon contact-icon--${l.tone}`}
+                  {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
+                  <PixelIcon rects={toRects(outlined(l.grid))} grid={13} size={39} />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <section className="contact2-form" aria-label="Send a message">
+            <h2 className="contact2-form-heading">Send a message</h2>
+            <ContactForm to={EMAIL} cc={FORM_CC} />
+          </section>
+        </div>
       </div>
-      <section className="contact-form-section" aria-labelledby="contact-form-heading">
-        <h2 id="contact-form-heading" className="contact-form-heading">
-          Send a message
-        </h2>
-        <ContactForm to={EMAIL} cc={FORM_CC} />
-      </section>
     </PageShell>
   );
 }

@@ -1904,3 +1904,125 @@
 .gravity-stage.is-grabbing .gravity-word {
   cursor: grabbing;
 }
+
+/* ── Contact (pixel word layout) ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page:has(.contact2) .page-body {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--bar-h));
+  padding-top: clamp(0.5rem, 2vh, 1.5rem);
+  padding-bottom: clamp(1.25rem, 4vh, 3rem);
+}
+
+.contact2 {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vh, 3rem);
+}
+
+.contact-word {
+  display: block;
+  width: 100%;
+  max-height: 34vh;
+  fill: var(--fg);
+}
+
+.contact2-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.contact2-socials {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The form, small and compact, bottom-right. */
+.contact2-form {
+  width: min(560px, 46%);
+}
+
+.contact2-form-heading {
+  margin: 0 0 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.contact2-form .cform-grid {
+  gap: 0.8rem 1.5rem;
+}
+
+.contact2-form .cform-field {
+  gap: 0.15rem;
+}
+
+.contact2-form .cform-label {
+  font-size: 0.72rem;
+}
+
+.contact2-form .cform input,
+.contact2-form .cform textarea,
+.contact2-form .cselect-trigger {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  font-size: 0.9rem;
+  border-bottom-width: 1px;
+}
+
+.contact2-form .cform textarea {
+  min-height: 0;
+  height: 3.6rem;
+  resize: none;
+}
+
+.contact2-form .cselect::after {
+  font-size: 0.9rem;
+  top: 1.05em;
+}
+
+.contact2-form .cselect-option {
+  font-size: 0.9rem;
+  padding: 0.45rem 0.75rem;
+}
+
+.contact2-form .cform-actions {
+  margin-top: 1rem;
+}
+
+.contact2-form .cform-submit {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+}
+
+/* Phones: socials and form stack under the word. */
+@media (max-width: 767px) {
+  .contact2-bottom {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .contact2-form {
+    width: 100%;
+  }
+
+  .contact2-socials {
+    flex-direction: row;
+  }
+}
