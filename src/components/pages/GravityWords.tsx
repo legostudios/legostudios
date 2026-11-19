@@ -28,7 +28,7 @@ export function GravityWords({ words }: Props) {
     const root = stage.current;
     if (!root) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const engine = Engine.create({ gravity: { x: 0, y: 1, scale: 0.0012 } });
+    const engine = Engine.create({ gravity: { x: 0, y: 1, scale: 0.0022 } });
     const world = engine.world;
 
     let W = root.clientWidth;
@@ -53,7 +53,7 @@ export function GravityWords({ words }: Props) {
       const w = el.offsetWidth;
       const h = el.offsetHeight * 0.78;
       const x = rand(w / 2 + 10, Math.max(w / 2 + 11, W - w / 2 - 10));
-      const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * (H * 0.09) - rand(0, H * 0.2);
+      const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * (H * 0.045) - rand(0, H * 0.1);
       const b = Bodies.rectangle(x, y, w, h, {
         angle: rand(-0.9, 0.9),
         restitution: 0.25,
