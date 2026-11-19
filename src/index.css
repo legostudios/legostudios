@@ -618,6 +618,7 @@
   text-transform: none;
   letter-spacing: 0.01em;
   transition: opacity 150ms ease;
+  z-index: 10;
 }
 
 .big-menu-back:hover {
@@ -640,18 +641,22 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* The layer covers the screen; only the folders themselves catch clicks,
+     so "back" and the menu square stay clickable. */
+  pointer-events: none;
 }
 
 .menu-folder-slot {
+  pointer-events: auto;
   position: absolute;
   left: var(--x);
   top: var(--y);
   transform: translate(-50%, -50%);
 }
 
-.menu-folder-slot--services { --x: 65.6%; --y: 27.4%; }
-.menu-folder-slot--contact { --x: 31.7%; --y: 37.7%; }
-.menu-folder-slot--caseStudies { --x: 55.1%; --y: 74.9%; }
+.menu-folder-slot--services { --x: 31.7%; --y: 37.7%; }
+.menu-folder-slot--caseStudies { --x: 65.6%; --y: 27.4%; }
+.menu-folder-slot--contact { --x: 55.1%; --y: 74.9%; }
 
 .menu-folder {
   display: flex;
@@ -704,9 +709,9 @@
     width: min(52vw, 21vh, 340px);
   }
 
-  .menu-folder-slot--services { --x: 66%; --y: 25%; }
-  .menu-folder-slot--contact { --x: 34%; --y: 50%; }
-  .menu-folder-slot--caseStudies { --x: 64%; --y: 75%; }
+  .menu-folder-slot--caseStudies { --x: 66%; --y: 25%; }
+  .menu-folder-slot--services { --x: 34%; --y: 50%; }
+  .menu-folder-slot--contact { --x: 64%; --y: 75%; }
 }
 
 /* Hover / keyboard focus: the folder lifts and its front flap tips open.

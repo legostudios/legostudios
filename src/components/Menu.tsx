@@ -12,29 +12,22 @@ const FOLDERS: { label: string; id: PageId; theme: FolderTheme }[] = [
 
 // Moving less than this (px) counts as a click, not a drag.
 const DRAG_THRESHOLD = 6;
-// v2: positions are now relative to the scattered default layout.
-const STORAGE_KEY = "lego-menu-folders-v2";
 // Folders stop this far (px) from the screen edges.
 const EDGE = 12;
 
 type Offset = { x: number; y: number };
 type Offsets = Partial<Record<PageId, Offset>>;
 
-// Where the visitor last left the folders (per browser; optional).
-function loadOffsets(): Offsets {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Offsets) : {};
-  } catch {
-    return {};
-  }
-}
-function saveOffsets(o: Offsets) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(o));
-  } catch {
-    /* storage unavailable — positions just won't be remembered */
-  }
+// Dragged positions last while the visitor moves around the site, and reset
+// to the default layout on refresh (kept in memory only, never saved).
+let sessionOffsets: Offsets = {};
+
+// Clear positions that older versions saved in the browser.
+try {
+  window.localStorage.removeItem("lego-menu-folders");
+  window.localStorage.removeItem("lego-menu-folders-v2");
+} catch {
+  /* storage unavailable — nothing to clear */
 }
 
 interface MenuProps {
@@ -48,7 +41,7 @@ interface MenuProps {
 // folder; a drag just moves it.
 export function Menu({ open, onOpenPage, onBack }: MenuProps) {
   const { mounted, visible } = usePresence(open);
-  const [offsets, setOffsets] = useState<Offsets>(loadOffsets);
+  const [offsets, setOffsets] = useState<Offsets>(() => sessionOffsets);
   // Stacking order: the last-touched folder sits on top.
   const [order, setOrder] = useState<PageId[]>(FOLDERS.map((f) => f.id));
   const [dragging, setDragging] = useState<PageId | null>(null);
@@ -93,6 +86,7 @@ export function Menu({ open, onOpenPage, onBack }: MenuProps) {
             changed = true;
           }
         }
+        if (changed) sessionOffsets = next;
         return changed ? next : prev;
       });
     };
@@ -151,7 +145,7 @@ export function Menu({ open, onOpenPage, onBack }: MenuProps) {
       suppressClick.current = d.id;
       setDragging(null);
       setOffsets((o) => {
-        saveOffsets(o);
+        sessionOffsets = o;
         return o;
       });
     }
