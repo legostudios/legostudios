@@ -7,18 +7,11 @@ interface Props {
   onBack: () => void;
 }
 
-// Every word of every service, each knowing which service it belongs to.
-// The "&"s get the brand pink as a small accent.
-const WORDS: GravityWord[] = SERVICES.flatMap((name) =>
-  name.split(" ").map((text) => ({
-    text,
-    group: name,
-    color: text === "&" ? "var(--color-brand-pink)" : undefined,
-  })),
-);
+// Each service falls as one piece.
+const WORDS: GravityWord[] = SERVICES.map((name) => ({ text: name, group: name }));
 
-// Services — sky blue: the service names as words that fall, pile up and can
-// be grabbed, thrown and bumped around.
+// Services — sky blue: the service names fall, pile up and can be grabbed,
+// thrown and bumped around.
 export function ServicesPage({ open, onBack }: Props) {
   return (
     <PageShell open={open} theme="sky" label="Services" onBack={onBack}>

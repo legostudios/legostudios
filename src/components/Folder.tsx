@@ -4,10 +4,10 @@ export type FolderTheme = "blue" | "orange" | "green";
 
 // Folder body and its slightly deeper back panel. The art on the front (orb,
 // heat-map star, wavy ring) uses the same warm palette on every folder.
-const THEMES: Record<FolderTheme, { body: string; back: string; edge: string }> = {
-  blue: { body: "#3f52f0", back: "#3446db", edge: "#8d99ff" },
-  orange: { body: "#e8483f", back: "#dd3f39", edge: "#ff9a8e" },
-  green: { body: "#15a86a", back: "#11955d", edge: "#7fe0b5" },
+const THEMES: Record<FolderTheme, { body: string; back: string }> = {
+  blue: { body: "#3f52f0", back: "#3446db" },
+  orange: { body: "#e8483f", back: "#dd3f39" },
+  green: { body: "#15a86a", back: "#11955d" },
 };
 
 // A star as a polygon: alternating outer/inner radius, with a per-point
@@ -137,8 +137,6 @@ export function Folder({ theme }: { theme: FolderTheme }) {
           {/* Wavy ring, on top. */}
           <path d={RING} fill="none" stroke="#2a2a52" strokeWidth="1.5" opacity="0.75" />
         </g>
-        {/* Light top edge of the front panel. */}
-        <rect x="16" y="51" width="288" height="2.5" rx="1.25" fill={t.edge} opacity="0.9" />
       </g>
 
       {/* Grain over everything. */}

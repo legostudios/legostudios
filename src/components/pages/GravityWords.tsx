@@ -55,13 +55,15 @@ export function GravityWords({ words }: Props) {
       const x = rand(w / 2 + 10, Math.max(w / 2 + 11, W - w / 2 - 10));
       const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * (H * 0.045) - rand(0, H * 0.1);
       const b = Bodies.rectangle(x, y, w, h, {
-        angle: rand(-0.9, 0.9),
+        angle: rand(-0.6, 0.6),
         restitution: 0.25,
         friction: 0.5,
         frictionAir: 0.012,
         density: 0.0016,
         chamfer: { radius: Math.min(8, h / 4) },
       });
+      // Heavier to spin, so words tumble and tilt but rarely land upside down.
+      Body.setInertia(b, b.inertia * 14);
       (b as Matter.Body & { wordIndex: number }).wordIndex = i;
       bodies.push(b);
     });

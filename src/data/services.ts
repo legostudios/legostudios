@@ -1,9 +1,12 @@
-// The services shown on the services page. Just names — the page renders each
-// as a full-width row.
+// The services shown on the services page (each falls as one piece).
 export const SERVICES: string[] = [
-  "Content Production & Marketing",
-  "Brand Strategy & Campaigns",
-  "Organic Content Distribution",
+  "Clipping",
+  "Marketing",
+  "Brand Strategy",
+  "Campaigns",
+  "Content Distribution",
   "Personal Branding",
-  "Creative IP's",
+  "IP’s",
+  "Creative Production",
+  "Non boring stuff",
 ];

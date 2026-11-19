@@ -1884,7 +1884,7 @@
   padding: 0 0.04em;
   color: var(--fg);
   font-weight: 700;
-  font-size: min(7.5vw, 11vh);
+  font-size: min(5vw, 8.5vh);
   line-height: 1;
   letter-spacing: -0.03em;
   text-transform: uppercase;
@@ -1897,7 +1897,7 @@
 /* Tall screens (phones held upright): bigger words. */
 @media (max-aspect-ratio: 4/5) {
   .gravity-word {
-    font-size: min(11vw, 8vh);
+    font-size: min(7vw, 5.5vh);
   }
 }
 
