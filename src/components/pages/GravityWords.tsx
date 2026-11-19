@@ -17,8 +17,8 @@ const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matt
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
-// Words that drop in under gravity, tumble and pile up at the bottom at
-// random angles. Grab and throw them; the pointer itself also bumps words
+// Words that drop in under gravity, falling straight down and stacking flat
+// at the bottom. Grab and throw them; the pointer itself also bumps words
 // it passes through.
 export function GravityWords({ words }: Props) {
   const stage = useRef<HTMLDivElement>(null);
@@ -53,17 +53,18 @@ export function GravityWords({ words }: Props) {
       const w = el.offsetWidth;
       const h = el.offsetHeight * 0.78;
       const x = rand(w / 2 + 10, Math.max(w / 2 + 11, W - w / 2 - 10));
-      const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * (H * 0.045) - rand(0, H * 0.1);
+      const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * h * 1.35;
       const b = Bodies.rectangle(x, y, w, h, {
-        angle: rand(-0.6, 0.6),
+        angle: 0,
         restitution: 0.25,
         friction: 0.5,
         frictionAir: 0.012,
         density: 0.0016,
         chamfer: { radius: Math.min(8, h / 4) },
       });
-      // Heavier to spin, so words tumble and tilt but rarely land upside down.
-      Body.setInertia(b, b.inertia * 14);
+      // Words stay level: they fall straight down and stack flat, and keep
+      // level when dragged or thrown.
+      Body.setInertia(b, Infinity);
       (b as Matter.Body & { wordIndex: number }).wordIndex = i;
       bodies.push(b);
     });
