@@ -1164,7 +1164,6 @@
   gap: clamp(2rem, 4vw, 4rem);
   margin-top: clamp(3rem, 8vh, 6rem);
   padding-top: clamp(1.5rem, 3vh, 2.5rem);
-  border-top: 2px solid var(--fg);
 }
 
 @media (min-width: 900px) {

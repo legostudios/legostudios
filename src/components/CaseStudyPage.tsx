@@ -65,7 +65,7 @@ export function CaseStudyPage({ index, onBack, onNavigate }: CaseStudyPageProps)
 
       <section className="cs-impact">
         <h2 className="cs-heading">Business Impact</h2>
-        <ol className="page-rows">
+        <ol className="page-rows page-rows--plain">
           {cs.impact.map((line, k) => (
             <li key={line} className="page-row page-row--static">
               <span className="page-row-num">{pad(k + 1)}</span>
