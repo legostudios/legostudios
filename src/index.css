@@ -1865,3 +1865,42 @@
 .page:has(.contact-head) .cform-submit {
   padding: clamp(0.65rem, 1.6vh, 1rem) 1.6rem;
 }
+
+/* ── Services: words under gravity ── */
+.gravity-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.gravity-word {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0 0.04em;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: min(7.5vw, 11vh);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+  /* Hidden above the screen until the first frame places it. */
+  transform: translate(-200px, -400px);
+}
+
+/* Tall screens (phones held upright): bigger words. */
+@media (max-aspect-ratio: 4/5) {
+  .gravity-word {
+    font-size: min(11vw, 8vh);
+  }
+}
+
+.gravity-stage.is-grabbing .gravity-word {
+  cursor: grabbing;
+}
