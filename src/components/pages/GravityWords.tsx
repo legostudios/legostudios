@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Matter from "matter-js";
-import { sentenceCase } from "../../lib/text";
 
 export interface GravityWord {
   text: string;
-  /** Shown beside the pointer while hovering this word (e.g. the full name). */
+  /** Which phrase the word belongs to (e.g. the full service name). */
   group: string;
   /** Optional accent colour for the word. */
   color?: string;
@@ -20,13 +19,10 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 // Words that drop in under gravity, tumble and pile up at the bottom at
 // random angles. Grab and throw them; the pointer itself also bumps words
-// it passes through. Hovering a word shows its group (the full service name)
-// beside the pointer.
+// it passes through.
 export function GravityWords({ words }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLSpanElement | null)[]>([]);
-  const label = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<string | null>(null);
 
   useEffect(() => {
     const root = stage.current;
@@ -91,7 +87,6 @@ export function GravityWords({ words }: Props) {
     const onLeave = () => {
       pointerIn = false;
       Body.setPosition(bumper, { x: -1000, y: -1000 });
-      setHover(null);
     };
     root.addEventListener("pointerenter", onEnter);
     // The pointer may already be over the page when it opens (no enter event).
@@ -104,7 +99,6 @@ export function GravityWords({ words }: Props) {
     // Simulation + DOM update loop.
     let raf = 0;
     let last = performance.now();
-    let hovered: string | null = null;
     const loop = (now: number) => {
       const dt = Math.min(32, now - last);
       last = now;
@@ -120,18 +114,6 @@ export function GravityWords({ words }: Props) {
       for (const b of bodies) {
         const el = els.current[(b as Matter.Body & { wordIndex: number }).wordIndex];
         if (el) el.style.transform = `translate(${b.position.x}px, ${b.position.y}px) translate(-50%, -50%) rotate(${b.angle}rad)`;
-      }
-      // Which word is under the pointer?
-      let found: string | null = null;
-      if (pointerIn) {
-        const hit = Matter.Query.point(bodies, mouse.position)[0] as (Matter.Body & { wordIndex: number }) | undefined;
-        if (hit) found = words[hit.wordIndex].group;
-        const lab = label.current;
-        if (lab) lab.style.transform = `translate3d(${mouse.position.x + 18}px, ${mouse.position.y + 14}px, 0)`;
-      }
-      if (found !== hovered) {
-        hovered = found;
-        setHover(found);
       }
       raf = requestAnimationFrame(loop);
     };
@@ -177,15 +159,11 @@ export function GravityWords({ words }: Props) {
               els.current[i] = el;
             }}
             className="gravity-word"
-            data-cursor="hand"
             style={w.color ? { color: w.color } : undefined}
           >
             {w.text}
           </span>
         ))}
-      </div>
-      <div ref={label} className={`stack-cursor-label ${hover ? "is-visible" : ""}`} aria-hidden="true">
-        {hover && <span className="stack-cursor-title">{sentenceCase(hover)}</span>}
       </div>
     </>
   );
