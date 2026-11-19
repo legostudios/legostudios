@@ -154,16 +154,23 @@ export function StackView({ items, onOpen }: StackViewProps) {
     drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), startTarget: target.current, moved: false, id: e.pointerId };
     velocity.current = 0;
   };
-  const onPointerMove = (e: RPointerEvent<HTMLDivElement>) => {
+  // Aim the label just below-right of the pointer. The first time, jump
+  // straight there rather than gliding in from the corner.
+  const aimLabel = (clientX: number, clientY: number) => {
     const st = stage.current;
-    if (st) {
-      const r = st.getBoundingClientRect();
-      const t = { x: e.clientX - r.left + 18, y: e.clientY - r.top + 14 };
-      // First move: start the label at the pointer rather than gliding in
-      // from the corner.
-      if (!labelTarget.current) labelPos.current = { ...t };
-      labelTarget.current = t;
+    if (!st) return;
+    const r = st.getBoundingClientRect();
+    const t = { x: clientX - r.left + 18, y: clientY - r.top + 14 };
+    if (!labelTarget.current) {
+      labelPos.current = { ...t };
+      const lab = cursorLabel.current;
+      if (lab) lab.style.transform = `translate3d(${t.x}px, ${t.y}px, 0)`;
     }
+    labelTarget.current = t;
+  };
+
+  const onPointerMove = (e: RPointerEvent<HTMLDivElement>) => {
+    aimLabel(e.clientX, e.clientY);
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
@@ -225,7 +232,11 @@ export function StackView({ items, onOpen }: StackViewProps) {
               className={`stack-card ${hovered === k ? "is-hovered" : ""}`}
               // Clickable panels show the pointing-hand cursor.
               data-cursor={onOpen ? "hand" : undefined}
-              onPointerEnter={() => !drag.current?.moved && setHovered(k)}
+              onPointerEnter={(e) => {
+                if (drag.current?.moved) return;
+                aimLabel(e.clientX, e.clientY);
+                setHovered(k);
+              }}
               onPointerLeave={() => setHovered((h) => (h === k ? null : h))}
               // The click target is the panel's whole (static) area, so a
               // panel that has slid out on hover is clickable everywhere.
@@ -252,7 +263,7 @@ export function StackView({ items, onOpen }: StackViewProps) {
         page colour as well as the panels. */}
     <div
       ref={cursorLabel}
-      className={`stack-cursor-label ${hovered !== null ? "is-visible" : ""}`}
+      className={`stack-cursor-label ${hovered !== null && labelTarget.current ? "is-visible" : ""}`}
       aria-hidden="true"
     >
       {hovered !== null && (
