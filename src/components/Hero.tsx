@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { ComputerShowcase } from "./ComputerShowcase";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
-const STRIP_TEXT = "The Creative Archive of Today";
+const STRIP_TEXT = "The creative archive of today";
 // Each separator square takes the next brand colour: pink → sky blue → yellow.
 const STRIP_COLORS = [
   "var(--color-brand-pink)",

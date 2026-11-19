@@ -5,14 +5,15 @@ import { Folder, type FolderTheme } from "./Folder";
 export type PageId = "services" | "caseStudies" | "contact";
 
 const FOLDERS: { label: string; id: PageId; theme: FolderTheme }[] = [
-  { label: "Services", id: "services", theme: "blue" },
-  { label: "Case Studies", id: "caseStudies", theme: "orange" },
-  { label: "Contact", id: "contact", theme: "green" },
+  { label: "services", id: "services", theme: "blue" },
+  { label: "case studies", id: "caseStudies", theme: "orange" },
+  { label: "contact", id: "contact", theme: "green" },
 ];
 
 // Moving less than this (px) counts as a click, not a drag.
 const DRAG_THRESHOLD = 6;
-const STORAGE_KEY = "lego-menu-folders";
+// v2: positions are now relative to the scattered default layout.
+const STORAGE_KEY = "lego-menu-folders-v2";
 // Folders stop this far (px) from the screen edges.
 const EDGE = 12;
 
@@ -173,13 +174,17 @@ export function Menu({ open, onOpenPage, onBack }: MenuProps) {
       className={`big-menu ${visible ? "is-open" : ""}`}
     >
       <button type="button" onClick={onBack} className="big-menu-back">
-        Back
+        back
       </button>
       <ul className="menu-folders">
         {FOLDERS.map((f, i) => {
           const o = offsetOf(f.id);
           return (
-            <li key={f.id} style={{ "--i": i, zIndex: order.indexOf(f.id) + 1 } as CSSProperties}>
+            <li
+              key={f.id}
+              className={`menu-folder-slot menu-folder-slot--${f.id}`}
+              style={{ "--i": i, zIndex: order.indexOf(f.id) + 1 } as CSSProperties}
+            >
               <button
                 ref={(el) => {
                   els.current[f.id] = el;

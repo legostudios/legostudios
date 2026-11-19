@@ -460,9 +460,8 @@
   white-space: nowrap;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: -0.01em;
-  font-size: calc(var(--strip-h) * 0.48);
+  font-size: calc(var(--strip-h) * 0.4);
   line-height: 1;
 }
 
@@ -616,7 +615,7 @@
   font-weight: 700;
   font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.01em;
   transition: opacity 150ms ease;
 }
@@ -632,19 +631,27 @@
   user-select: none;
 }
 
+/* Default scattered layout (from the design reference): each folder is
+   centred on a point given as a share of the screen. Dragging moves it from
+   there. */
 .menu-folders {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: clamp(1rem, 5vw, 5.5rem);
+  position: absolute;
+  inset: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.menu-folders li {
-  position: relative;
+.menu-folder-slot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
 }
+
+.menu-folder-slot--services { --x: 65.6%; --y: 27.4%; }
+.menu-folder-slot--contact { --x: 31.7%; --y: 37.7%; }
+.menu-folder-slot--caseStudies { --x: 55.1%; --y: 74.9%; }
 
 .menu-folder {
   display: flex;
@@ -685,22 +692,21 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
+  text-transform: lowercase;
   text-align: center;
   pointer-events: none;
 }
 
-/* Tall, narrow screens (phones held upright): stack the folders. */
+/* Tall, narrow screens (phones held upright): the same idea as a zig-zag,
+   so the folders don't overlap. */
 @media (max-aspect-ratio: 4/5) {
-  .menu-folders {
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(0.75rem, 2.5vh, 1.75rem);
+  .menu-folder {
+    width: min(52vw, 21vh, 340px);
   }
 
-  .menu-folder {
-    width: min(60vw, 21vh, 340px);
-  }
+  .menu-folder-slot--services { --x: 66%; --y: 25%; }
+  .menu-folder-slot--contact { --x: 34%; --y: 50%; }
+  .menu-folder-slot--caseStudies { --x: 64%; --y: 75%; }
 }
 
 /* Hover / keyboard focus: the folder lifts and its front flap tips open.
@@ -857,7 +863,7 @@
   font-weight: 700;
   font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.01em;
 }
 
@@ -1433,4 +1439,86 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Pages that use lower case for the title and row names. */
+.page--lower .page-title,
+.page--lower .page-row-name {
+  text-transform: lowercase;
+}
+
+/* Contact: heading on the left, pixel icons at the right end of its line. */
+.contact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 5vh, 3.5rem);
+}
+
+.contact-head .page-title {
+  margin-bottom: 0;
+}
+
+.contact-icons {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 2vw, 1.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-icon {
+  display: block;
+  color: var(--color-brand-white);
+  transition: color 120ms ease;
+}
+
+.contact-icon svg {
+  display: block;
+}
+
+.contact-icon--yellow:hover,
+.contact-icon--yellow:focus-visible { color: var(--color-brand-yellow); }
+.contact-icon--sky:hover,
+.contact-icon--sky:focus-visible { color: var(--color-brand-sky); }
+.contact-icon--pink:hover,
+.contact-icon--pink:focus-visible { color: var(--color-brand-pink); }
+
+.contact-icon:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* Rows without divider lines (Services). */
+.page-rows--plain,
+.page-rows--plain .page-row {
+  border: 0;
+}
+
+/* Without lines, line the rows up with the page title. */
+.page-rows--plain .page-row {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Lower-case pages: the rest of the Contact page's text too (headings,
+   labels, placeholders, button, messages). What visitors type is left as is. */
+.page--lower .contact-form-heading,
+.page--lower .cform-label,
+.page--lower .cform-submit,
+.page--lower .cform-done-title,
+.page--lower .cform-again,
+.page--lower .cform-note,
+.page--lower .cform select,
+.page--lower .cform option,
+.page--lower .cform ::placeholder {
+  text-transform: lowercase;
+}
+
+/* Wide tracking suits capitals, not lower case. */
+.page--lower .cform-label {
+  letter-spacing: 0.02em;
 }

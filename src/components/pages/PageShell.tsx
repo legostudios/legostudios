@@ -15,6 +15,8 @@ interface PageShellProps {
   meta?: ReactNode;
   /** Changing this scrolls the page back to the top (e.g. next case study). */
   scrollKey?: unknown;
+  /** Show the title and row names in lower case. */
+  lowercase?: boolean;
   children: ReactNode;
 }
 
@@ -29,6 +31,7 @@ export function PageShell({
   layer = "page",
   meta,
   scrollKey,
+  lowercase = false,
   children,
 }: PageShellProps) {
   const { mounted, visible } = usePresence(open);
@@ -47,12 +50,12 @@ export function PageShell({
       aria-modal="true"
       aria-label={label}
       aria-hidden={!open}
-      className={`page page--${theme} page--${layer} ${visible ? "is-visible" : ""}`}
+      className={`page page--${theme} page--${layer} ${lowercase ? "page--lower" : ""} ${visible ? "is-visible" : ""}`}
     >
       <header className="page-bar">
         {meta && <span className="page-bar-meta">{meta}</span>}
         <button type="button" onClick={onBack} className="page-bar-link page-bar-back">
-          Back
+          back
         </button>
       </header>
       <div className="page-body">{children}</div>
