@@ -18,8 +18,8 @@ const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matt
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 // Words that drop in under gravity, falling straight down and stacking flat
-// at the bottom. Grab and throw them; the pointer itself also bumps words
-// it passes through.
+// (with clear space between them) at the bottom. Grab and throw them; the
+// pointer also gently pushes words it passes.
 export function GravityWords({ words }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLSpanElement | null)[]>([]);
@@ -28,7 +28,12 @@ export function GravityWords({ words }: Props) {
     const root = stage.current;
     if (!root) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const engine = Engine.create({ gravity: { x: 0, y: 1, scale: 0.0022 } });
+    const engine = Engine.create({
+      gravity: { x: 0, y: 1, scale: 0.0022 },
+      // Stricter contact solving so stacked words never sink into each other.
+      positionIterations: 24,
+      velocityIterations: 16,
+    });
     const world = engine.world;
 
     let W = root.clientWidth;
@@ -50,8 +55,11 @@ export function GravityWords({ words }: Props) {
     words.forEach((_, i) => {
       const el = els.current[i];
       if (!el) return;
-      const w = el.offsetWidth;
-      const h = el.offsetHeight * 0.78;
+      // Collision box a little larger than the letters, so words keep clear
+      // space between rows and side by side (the text stays centred in it).
+      const fs = parseFloat(getComputedStyle(el).fontSize);
+      const w = el.offsetWidth + fs * 0.35;
+      const h = el.offsetHeight + fs * 0.22;
       const x = rand(w / 2 + 10, Math.max(w / 2 + 11, W - w / 2 - 10));
       const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * h * 1.35;
       const b = Bodies.rectangle(x, y, w, h, {
@@ -60,7 +68,8 @@ export function GravityWords({ words }: Props) {
         friction: 0.5,
         frictionAir: 0.012,
         density: 0.0016,
-        chamfer: { radius: Math.min(8, h / 4) },
+        chamfer: { radius: Math.min(4, h / 8) },
+        slop: 0.01,
       });
       // Words stay level: they fall straight down and stack flat, and keep
       // level when dragged or thrown.
@@ -70,7 +79,7 @@ export function GravityWords({ words }: Props) {
     });
     Composite.add(world, bodies);
 
-    // Pointer: drag to grab/throw; an invisible round "bumper" follows the
+    // Pointer: drag to grab and throw (a soft push is applied in the loop).
     // pointer so passing over words nudges them.
     const mouse = Mouse.create(root);
     // Matter adds wheel listeners that block scrolling; we don't need them.
@@ -83,13 +92,10 @@ export function GravityWords({ words }: Props) {
       constraint: { stiffness: 0.2, damping: 0.1, render: { visible: false } },
     });
     Composite.add(world, grab);
-    const bumper = Bodies.circle(-1000, -1000, 26, { isStatic: true, render: { visible: false } });
-    Composite.add(world, bumper);
     let pointerIn = false;
     const onEnter = () => (pointerIn = true);
     const onLeave = () => {
       pointerIn = false;
-      Body.setPosition(bumper, { x: -1000, y: -1000 });
     };
     root.addEventListener("pointerenter", onEnter);
     // The pointer may already be over the page when it opens (no enter event).
@@ -102,17 +108,31 @@ export function GravityWords({ words }: Props) {
     // Simulation + DOM update loop.
     let raf = 0;
     let last = performance.now();
+    let lastPointer = { x: -1000, y: -1000 };
     const loop = (now: number) => {
       const dt = Math.min(32, now - last);
       last = now;
+      // The pointer gently pushes nearby words away (and a little up). A
+      // force, not a collision body, so words are never forced into each
+      // other.
       if (pointerIn && !grab.body) {
-        const prev = { ...bumper.position };
         const p = mouse.position;
-        Body.setPosition(bumper, p);
-        Body.setVelocity(bumper, { x: p.x - prev.x, y: p.y - prev.y });
-      } else if (grab.body) {
-        Body.setPosition(bumper, { x: -1000, y: -1000 });
+        const v = { x: p.x - lastPointer.x, y: p.y - lastPointer.y };
+        const speed = Math.min(40, Math.hypot(v.x, v.y));
+        for (const b of bodies) {
+          const bb = b.bounds;
+          // Distance from the pointer to the word's box.
+          const dx = Math.max(bb.min.x - p.x, 0, p.x - bb.max.x);
+          const dy = Math.max(bb.min.y - p.y, 0, p.y - bb.max.y);
+          const d = Math.hypot(dx, dy);
+          if (d < 40 && speed > 0.5) {
+            const k = (1 - d / 40) * speed * 0.00004 * b.mass;
+            const sx = Math.sign(b.position.x - p.x) || Math.sign(v.x) || 1;
+            Body.applyForce(b, b.position, { x: sx * k * 2.2 + v.x * k * 0.06, y: -k * 1.6 });
+          }
+        }
       }
+      lastPointer = { ...mouse.position };
       Engine.update(engine, dt);
       for (const b of bodies) {
         const el = els.current[(b as Matter.Body & { wordIndex: number }).wordIndex];
