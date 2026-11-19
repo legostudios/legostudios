@@ -18,8 +18,8 @@ const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matt
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 // Words that drop in under gravity, falling straight down and stacking flat
-// (with clear space between them) at the bottom. Grab and throw them; the
-// pointer also gently pushes words it passes.
+// at the bottom. Grab and throw them; the pointer playfully knocks words it
+// passes (once pushed, a word is free to tumble).
 export function GravityWords({ words }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLSpanElement | null)[]>([]);
@@ -55,24 +55,26 @@ export function GravityWords({ words }: Props) {
     words.forEach((_, i) => {
       const el = els.current[i];
       if (!el) return;
-      // Collision box a little larger than the letters, so words keep clear
-      // space between rows and side by side (the text stays centred in it).
+      // Collision box hugs the capitals (plus a hair of space), so words rest
+      // right on top of each other without their letters touching.
       const fs = parseFloat(getComputedStyle(el).fontSize);
-      const w = el.offsetWidth + fs * 0.35;
-      const h = el.offsetHeight + fs * 0.22;
+      const w = el.offsetWidth + fs * 0.12;
+      const h = fs * 0.84;
       const x = rand(w / 2 + 10, Math.max(w / 2 + 11, W - w / 2 - 10));
       const y = reduced ? rand(H * 0.45, H * 0.85) : -h - i * h * 1.35;
       const b = Bodies.rectangle(x, y, w, h, {
         angle: 0,
-        restitution: 0.25,
-        friction: 0.5,
+        restitution: 0,
+        friction: 0.8,
+        frictionStatic: 1,
         frictionAir: 0.012,
         density: 0.0016,
         chamfer: { radius: Math.min(4, h / 8) },
         slop: 0.01,
       });
-      // Words stay level: they fall straight down and stack flat, and keep
-      // level when dragged or thrown.
+      // Words fall straight down and stack flat (no rotation) until the
+      // pointer first pushes them; then they're free to tumble.
+      (b as Matter.Body & { freeInertia: number }).freeInertia = b.inertia * 3;
       Body.setInertia(b, Infinity);
       (b as Matter.Body & { wordIndex: number }).wordIndex = i;
       bodies.push(b);
@@ -125,10 +127,22 @@ export function GravityWords({ words }: Props) {
           const dx = Math.max(bb.min.x - p.x, 0, p.x - bb.max.x);
           const dy = Math.max(bb.min.y - p.y, 0, p.y - bb.max.y);
           const d = Math.hypot(dx, dy);
-          if (d < 40 && speed > 0.5) {
-            const k = (1 - d / 40) * speed * 0.00004 * b.mass;
+          if (d < 50 && speed > 0.5) {
+            // Release the word so it can tumble, with a little random spin.
+            const fb = b as Matter.Body & { freeInertia: number };
+            if (b.inertia === Infinity) {
+              Body.setInertia(b, fb.freeInertia);
+              Body.setAngularVelocity(b, rand(-0.06, 0.06));
+            }
+            const k = (1 - d / 50) * speed * 0.00009 * b.mass;
             const sx = Math.sign(b.position.x - p.x) || Math.sign(v.x) || 1;
-            Body.applyForce(b, b.position, { x: sx * k * 2.2 + v.x * k * 0.06, y: -k * 1.6 });
+            // Away from the pointer, along its motion, upward, plus a random
+            // kick, applied off-centre so the word spins.
+            Body.applyForce(
+              b,
+              { x: b.position.x + rand(-0.3, 0.3) * (bb.max.x - bb.min.x), y: b.position.y },
+              { x: sx * k * 1.8 + v.x * k * 0.08 + rand(-1, 1) * k, y: -k * (1.6 + Math.random()) },
+            );
           }
         }
       }
