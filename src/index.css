@@ -705,8 +705,9 @@
   }
 }
 
-/* Home-page Contact link (top-right). White with a difference blend so it
-   inverts against the video, matching the menu square. */
+/* Home-page Contact button (top-right): a pixel person icon whose fill
+   flashes through the brand colours, one step behind the menu square so the
+   two always show different colours. */
 .home-contact {
   position: fixed;
   top: var(--chrome-top);
@@ -715,18 +716,32 @@
   height: 34px;
   display: flex;
   align-items: center;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.25rem, 1.2rem + 0.6vw, 1.9rem);
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  color: #ffffff;
-  mix-blend-mode: difference;
-  transition: opacity 150ms ease;
+  color: var(--color-brand-pink);
+  animation: icon-3 0.9s step-end -0.3s infinite;
+  transition: transform 150ms ease-out;
 }
 
-.home-contact:hover {
-  opacity: 0.7;
+.home-contact svg {
+  display: block;
+}
+
+.home-contact:hover,
+.home-contact:focus-visible {
+  transform: scale(1.12);
+  outline: none;
+}
+
+@keyframes icon-3 {
+  0% { color: var(--color-brand-pink); }
+  33.333% { color: var(--color-brand-sky); }
+  66.667% { color: var(--color-brand-yellow); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-contact {
+    animation: none;
+    color: var(--color-brand-sky);
+  }
 }
 
 /* ───────────────────────── Pages ─────────────────────────

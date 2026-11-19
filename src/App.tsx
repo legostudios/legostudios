@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
 import { Hero } from "./components/Hero";
 import { MenuButton, type SquareSkip } from "./components/MenuButton";
+import { ContactIcon } from "./components/ContactIcon";
 import { Menu, type PageId } from "./components/Menu";
 import { ServicesPage } from "./components/pages/ServicesPage";
 import { CaseStudiesPage } from "./components/pages/CaseStudiesPage";
@@ -69,8 +70,13 @@ export default function App() {
       <Hero />
 
       {isHome && (
-        <button type="button" onClick={openContactFromHome} className="home-contact">
-          Contact
+        <button
+          type="button"
+          onClick={openContactFromHome}
+          className="home-contact"
+          aria-label="Contact"
+        >
+          <ContactIcon />
         </button>
       )}
 
