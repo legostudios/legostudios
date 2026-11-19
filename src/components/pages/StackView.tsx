@@ -22,6 +22,18 @@ const DRAG_THRESHOLD = 6;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
+// Sentence case: only the first letter capitalised. Words with capitals
+// after their first letter or digits (HR, SaaS, 10.7M+) are left as they are.
+function sentenceCase(text: string) {
+  let first = true;
+  return text.replace(/\S+/g, (w) => {
+    const keep = /\d/.test(w) || /[A-Z]/.test(w.slice(1));
+    const out = keep ? w : first ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase();
+    if (/[A-Za-z]/.test(w)) first = false;
+    return out;
+  });
+}
+
 // A 3D stack of image panels on a diagonal — the nearest at the bottom-left,
 // receding to the top-right. Scroll, drag, swipe or use the arrow keys to
 // travel along it (it loops endlessly); panels in front fly past the camera.
@@ -268,8 +280,10 @@ export function StackView({ items, onOpen }: StackViewProps) {
     >
       {hovered !== null && (
         <>
-          <span className="stack-cursor-title">{items[itemAt(hovered)].title}</span>
-          {items[itemAt(hovered)].meta && <span className="stack-cursor-meta">{items[itemAt(hovered)].meta}</span>}
+          <span className="stack-cursor-title">{sentenceCase(items[itemAt(hovered)].title)}</span>
+          {items[itemAt(hovered)].meta && (
+            <span className="stack-cursor-meta">{sentenceCase(items[itemAt(hovered)].meta!)}</span>
+          )}
         </>
       )}
     </div>
