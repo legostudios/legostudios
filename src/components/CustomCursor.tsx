@@ -18,23 +18,20 @@ const ARROW = [
 const ARROW_COLS = ARROW[0].length;
 const ARROW_RECTS = toRects(ARROW);
 
-// Pixel-art pointing hand (12×13 at 2×), shown over things marked
-// data-cursor="hand" (e.g. case study panels) to say "this opens". The tip of
-// the index finger (column 3–4, top row) is the hotspot.
+// Pixel-art pointing hand (9×10 at 2× = 18×20px, about the arrow's size),
+// shown over things marked data-cursor="hand" (e.g. case study panels). The
+// tip of the index finger is the hotspot.
 const HAND = [
-  "...##.......",
-  "..#wf#......",
-  "..#wf#......",
-  "..#ff#......",
-  "..#ff###....",
-  "..#ff#ff###.",
-  "###ff#ff#ff#",
-  "#f#ffffffff#",
-  "#ffffffffff#",
-  ".#fffffffff#",
-  ".#ffffffff#.",
-  "..#fffffff#.",
-  "..#########.",
+  "..##.....",
+  ".#wf#....",
+  ".#ff#....",
+  ".#ff####.",
+  "##ff#f#f#",
+  "#fffffff#",
+  "#fffffff#",
+  ".#ffffff#",
+  ".#fffff#.",
+  "..#####..",
 ];
 const HAND_COLS = HAND[0].length;
 const HAND_RECTS = toRects(HAND);

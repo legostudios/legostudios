@@ -94,7 +94,7 @@
    (3.5 pixels in, at 2×) sits on the mouse position. */
 .invert-cursor-hand {
   display: none;
-  margin-left: -7px;
+  margin-left: -5px;
 }
 
 .invert-cursor.is-hand .invert-cursor-hand {
@@ -1665,9 +1665,15 @@
   pointer-events: none;
 }
 
+/* One heading size for Services, Case Studies and Contact, small enough to
+   stay clear of the 3D panels. */
+:root {
+  --section-title: max(1.6rem, min(4.6vw, 7.5vh));
+}
+
 .stack-head .page-title {
   margin: 0;
-  font-size: min(7vw, 11vh);
+  font-size: var(--section-title);
 }
 
 .stack-stage {
@@ -1811,7 +1817,7 @@
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
+  text-transform: lowercase;
   pointer-events: none;
   opacity: 0;
   transition: opacity 200ms ease;
@@ -1827,13 +1833,67 @@
   opacity: 0.75;
 }
 
-.page--lower .stack-cursor-label {
-  text-transform: lowercase;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stack-card-inner,
   .stack-cursor-label {
     transition: none;
   }
+}
+
+/* ── Contact fits on one screen (no scrolling): sizes follow the screen
+   height. Very short screens (phones held sideways) can still scroll. ── */
+.page:has(.contact-head) .page-body {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--bar-h));
+  padding-top: clamp(0rem, 1.5vh, 1.25rem);
+  padding-bottom: clamp(1rem, 3vh, 2.25rem);
+}
+
+.contact-head {
+  margin-bottom: clamp(0.75rem, 3vh, 2rem);
+}
+
+.contact-head .page-title {
+  font-size: var(--section-title);
+}
+
+.contact-form-section {
+  margin-top: 0;
+  padding-top: clamp(0.75rem, 2.2vh, 1.5rem);
+}
+
+.contact-form-heading {
+  margin-bottom: clamp(0.75rem, 2.8vh, 2rem);
+  font-size: min(3.4vw, 5vh);
+}
+
+.page:has(.contact-head) .cform-grid {
+  gap: clamp(0.8rem, 2.4vh, 1.75rem) clamp(2rem, 4vw, 4rem);
+}
+
+.page:has(.contact-head) .cform-field {
+  gap: 0.3rem;
+}
+
+.page:has(.contact-head) .cform input,
+.page:has(.contact-head) .cform textarea,
+.page:has(.contact-head) .cselect-trigger {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  font-size: clamp(1rem, 2.3vh, 1.4rem);
+}
+
+.page:has(.contact-head) .cform textarea {
+  min-height: 0;
+  height: clamp(2.6rem, 9vh, 6.5rem);
+  resize: none;
+}
+
+.page:has(.contact-head) .cform-actions {
+  margin-top: clamp(0.9rem, 3vh, 2rem);
+}
+
+.page:has(.contact-head) .cform-submit {
+  padding: clamp(0.65rem, 1.6vh, 1rem) 1.6rem;
 }
