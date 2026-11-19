@@ -18,7 +18,29 @@ const ARROW = [
 const ARROW_COLS = ARROW[0].length;
 const ARROW_RECTS = toRects(ARROW);
 
-// A small pixel-art arrow pointer that flashes through the brand colours (with
+// Pixel-art pointing hand (12×13 at 2×), shown over things marked
+// data-cursor="hand" (e.g. case study panels) to say "this opens". The tip of
+// the index finger (column 3–4, top row) is the hotspot.
+const HAND = [
+  "...##.......",
+  "..#wf#......",
+  "..#wf#......",
+  "..#ff#......",
+  "..#ff###....",
+  "..#ff#ff###.",
+  "###ff#ff#ff#",
+  "#f#ffffffff#",
+  "#ffffffffff#",
+  ".#fffffffff#",
+  ".#ffffffff#.",
+  "..#fffffff#.",
+  "..#########.",
+];
+const HAND_COLS = HAND[0].length;
+const HAND_RECTS = toRects(HAND);
+const HAND_SELECTOR = '[data-cursor="hand"]';
+
+// A small pixel-art arrow pointer (a pointing hand over clickable panels) that flashes through the brand colours (with
 // a black pixel outline so it shows on any background). It tracks the mouse exactly — no
 // easing — so it feels like the system cursor, and stays the same size
 // everywhere, including over links and buttons.
@@ -43,6 +65,7 @@ export function CustomCursor() {
       const t = e.target as Element | null;
       const overText = !!t?.closest?.(TEXT);
       el.style.opacity = overText ? "0" : "1";
+      el.classList.toggle("is-hand", !overText && !!t?.closest?.(HAND_SELECTOR));
     };
     const onLeave = () => (el.style.opacity = "0");
 
@@ -79,6 +102,17 @@ export function CustomCursor() {
         shapeRendering="crispEdges"
       >
         {ARROW_RECTS.map((r, i) => (
+          <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.c} />
+        ))}
+      </svg>
+      <svg
+        className="invert-cursor-hand"
+        width={HAND_COLS * 2}
+        height={HAND.length * 2}
+        viewBox={`0 0 ${HAND_COLS} ${HAND.length}`}
+        shapeRendering="crispEdges"
+      >
+        {HAND_RECTS.map((r, i) => (
           <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.c} />
         ))}
       </svg>

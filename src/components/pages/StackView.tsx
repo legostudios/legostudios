@@ -223,6 +223,8 @@ export function StackView({ items, onOpen }: StackViewProps) {
                 else cards.current.delete(k);
               }}
               className={`stack-card ${hovered === k ? "is-hovered" : ""}`}
+              // Clickable panels show the pointing-hand cursor.
+              data-cursor={onOpen ? "hand" : undefined}
               onPointerEnter={() => !drag.current?.moved && setHovered(k)}
               onPointerLeave={() => setHovered((h) => (h === k ? null : h))}
               // The click target is the panel's whole (static) area, so a

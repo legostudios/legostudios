@@ -90,6 +90,21 @@
   will-change: transform;
 }
 
+/* Arrow normally; pointing hand over clickable panels. The hand's fingertip
+   (3.5 pixels in, at 2×) sits on the mouse position. */
+.invert-cursor-hand {
+  display: none;
+  margin-left: -7px;
+}
+
+.invert-cursor.is-hand .invert-cursor-hand {
+  display: block;
+}
+
+.invert-cursor.is-hand .invert-cursor-arrow {
+  display: none;
+}
+
 .invert-cursor-arrow {
   display: block;
   /* The top-left pixel is the tip, already at the mouse position. The
