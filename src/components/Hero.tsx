@@ -19,7 +19,7 @@ function StripTrack({ hidden }: { hidden?: boolean }) {
     <div className="home-strip-track" aria-hidden={hidden || undefined}>
       {Array.from({ length: STRIP_REPEAT }, (_, i) => (
         <span key={i} className="home-strip-item">
-          <span>{STRIP_TEXT}</span>
+          <span className="home-strip-text">{STRIP_TEXT}</span>
           <span
             className="home-strip-sep"
             aria-hidden="true"

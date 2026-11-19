@@ -491,7 +491,24 @@
   line-height: 1;
 }
 
+/* Centre on the capital letters, not the font's line box: Helvetica Neue
+   reserves more room above caps than below, which made the text sit high
+   against the squares. text-box trims the line box to cap height; browsers
+   without it (Firefox) get an equivalent fixed nudge. */
+.home-strip-text {
+  display: block;
+  text-box: trim-both cap alphabetic;
+}
+
+@supports not (text-box: trim-both cap alphabetic) {
+  .home-strip-text {
+    position: relative;
+    top: 0.1em;
+  }
+}
+
 .home-strip-sep {
+  flex-shrink: 0;
   display: inline-block;
   width: calc(var(--strip-h) * 0.26);
   height: calc(var(--strip-h) * 0.26);
