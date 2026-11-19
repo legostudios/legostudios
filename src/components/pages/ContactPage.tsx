@@ -122,8 +122,8 @@ function PixelWord() {
 }
 
 // Contact — white. The word "contact" in big square pixels across the top;
-// bottom-left the email / Instagram / LinkedIn pixel icons stacked; bottom-
-// right the enquiry form in small type.
+// bottom-left the enquiry form in small type; bottom-right the email /
+// Instagram / LinkedIn pixel icons stacked.
 export function ContactPage({ open, onBack }: Props) {
   return (
     <PageShell open={open} theme="white" label="Contact" onBack={onBack}>
@@ -131,6 +131,10 @@ export function ContactPage({ open, onBack }: Props) {
         <h1 className="sr-only">Contact</h1>
         <PixelWord />
         <div className="contact2-bottom">
+          <section className="contact2-form" aria-label="Send a message">
+            <h2 className="contact2-form-heading">Send a message</h2>
+            <ContactForm to={EMAIL} cc={FORM_CC} />
+          </section>
           <ul className="contact2-socials">
             {LINKS.map((l) => (
               <li key={l.href}>
@@ -146,10 +150,6 @@ export function ContactPage({ open, onBack }: Props) {
               </li>
             ))}
           </ul>
-          <section className="contact2-form" aria-label="Send a message">
-            <h2 className="contact2-form-heading">Send a message</h2>
-            <ContactForm to={EMAIL} cc={FORM_CC} />
-          </section>
         </div>
       </div>
     </PageShell>

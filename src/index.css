@@ -2014,7 +2014,7 @@
 /* Phones: socials and form stack under the word. */
 @media (max-width: 767px) {
   .contact2-bottom {
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: stretch;
   }
 
