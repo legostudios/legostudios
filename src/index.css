@@ -1261,7 +1261,6 @@
   font-weight: 700;
   font-size: clamp(1.6rem, 3.4vw, 3.4rem);
   line-height: 1;
-  text-transform: uppercase;
   letter-spacing: -0.03em;
 }
 
@@ -1295,8 +1294,7 @@
 .cform-label {
   font-size: clamp(0.8rem, 0.95vw, 0.95rem);
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   opacity: 0.6;
 }
 
@@ -1384,7 +1382,6 @@
   font-weight: 700;
   font-size: clamp(0.95rem, 1.2vw, 1.15rem);
   line-height: 1;
-  text-transform: uppercase;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
@@ -1432,7 +1429,6 @@
   font-weight: 700;
   font-size: clamp(1.4rem, 2.7vw, 2.4rem);
   line-height: 1;
-  text-transform: uppercase;
   color: var(--fg);
   letter-spacing: -0.03em;
 }
@@ -1442,7 +1438,6 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(0.9rem, 1.1vw, 1.1rem);
-  text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -1527,24 +1522,6 @@
   padding-right: 0;
 }
 
-/* Lower-case pages: the rest of the Contact page's text too (headings,
-   labels, placeholders, button, messages). What visitors type is left as is. */
-.page--lower .contact-form-heading,
-.page--lower .cform-label,
-.page--lower .cform-submit,
-.page--lower .cform-done-title,
-.page--lower .cform-again,
-.page--lower .cform-note,
-.page--lower .cform select,
-.page--lower .cform option,
-.page--lower .cform ::placeholder {
-  text-transform: lowercase;
-}
-
-/* Wide tracking suits capitals, not lower case. */
-.page--lower .cform-label {
-  letter-spacing: 0.02em;
-}
 
 /* Custom dropdown ("where did you hear about us?") in the site's style. */
 .cselect {
@@ -1623,11 +1600,6 @@
 .cselect-option.is-active {
   background: var(--color-brand-yellow);
   color: var(--color-brand-black);
-}
-
-.page--lower .cselect-trigger,
-.page--lower .cselect-option {
-  text-transform: lowercase;
 }
 
 /* ───────────────────────── 3D stack (Services / Case Studies) ─────────────
