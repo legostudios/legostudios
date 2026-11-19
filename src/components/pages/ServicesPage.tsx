@@ -7,8 +7,26 @@ interface Props {
   onBack: () => void;
 }
 
-// Each service falls as one piece.
-const WORDS: GravityWord[] = SERVICES.map((name) => ({ text: name, group: name }));
+// One colour per service, all strong against the sky-blue page (no yellow,
+// which barely shows on it).
+const COLORS = [
+  "var(--color-brand-pink)",
+  "#000000",
+  "#3a4cff",
+  "#ff6a13",
+  "#7b2bff",
+  "#ffffff",
+  "#e8221c",
+  "#0f8a55",
+  "#8a1c4a",
+];
+
+// Each service falls as one piece, in its own colour.
+const WORDS: GravityWord[] = SERVICES.map((name, i) => ({
+  text: name,
+  group: name,
+  color: COLORS[i % COLORS.length],
+}));
 
 // Services — sky blue: the service names fall, pile up and can be grabbed,
 // thrown and bumped around.
