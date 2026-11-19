@@ -1469,7 +1469,7 @@
 .contact-icons {
   display: flex;
   align-items: center;
-  gap: clamp(0.9rem, 2vw, 1.75rem);
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1477,7 +1477,6 @@
 
 .contact-icon {
   display: block;
-  color: var(--color-brand-white);
   transition: color 120ms ease;
 }
 
@@ -1485,12 +1484,15 @@
   display: block;
 }
 
-.contact-icon--yellow:hover,
-.contact-icon--yellow:focus-visible { color: var(--color-brand-yellow); }
-.contact-icon--sky:hover,
-.contact-icon--sky:focus-visible { color: var(--color-brand-sky); }
-.contact-icon--pink:hover,
-.contact-icon--pink:focus-visible { color: var(--color-brand-pink); }
+/* One brand colour each; white on hover. */
+.contact-icon--yellow { color: var(--color-brand-yellow); }
+.contact-icon--sky { color: var(--color-brand-sky); }
+.contact-icon--pink { color: var(--color-brand-pink); }
+
+.contact-icon:hover,
+.contact-icon:focus-visible {
+  color: var(--color-brand-white);
+}
 
 .contact-icon:focus-visible {
   outline: 2px solid currentColor;

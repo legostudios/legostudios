@@ -14,36 +14,38 @@ interface Props {
   onBack: () => void;
 }
 
-// Pixel-art icons (13×13, shown at 3×), drawn in the current text colour.
-// "f" = drawn pixel, "." = transparent.
+// Pixel-art icons on a 13×13 grid, shown at 2× (26px) like the menu square
+// and contact icon. All three share one shape — a filled rounded square with
+// the symbol cut out — so they read as a set. "f" = filled (current colour),
+// "." = cut out.
 const MAIL = [
-  ".............",
-  ".............",
+  "..fffffffff..",
+  ".fffffffffff.",
   "fffffffffffff",
   "ff.........ff",
-  "f.f.......f.f",
-  "f..f.....f..f",
-  "f...f...f...f",
-  "f....f.f....f",
-  "f.....f.....f",
-  "f...........f",
+  "ff..fffff..ff",
+  "ff.f.fff.f.ff",
+  "ff.ff.f.ff.ff",
+  "ff.fff.fff.ff",
+  "ff.fffffff.ff",
+  "ff.........ff",
   "fffffffffffff",
-  ".............",
-  ".............",
+  ".fffffffffff.",
+  "..fffffffff..",
 ];
 const INSTA = [
   "..fffffffff..",
-  ".f.........f.",
-  "f........ff.f",
-  "f....fff....f",
-  "f...f...f...f",
-  "f..f.....f..f",
-  "f..f.....f..f",
-  "f..f.....f..f",
-  "f...f...f...f",
-  "f....fff....f",
-  "f...........f",
-  ".f.........f.",
+  ".fffffffffff.",
+  "fff.......fff",
+  "ff.fffff.f.ff",
+  "ff.ff...ff.ff",
+  "ff.f.fff.f.ff",
+  "ff.f.fff.f.ff",
+  "ff.f.fff.f.ff",
+  "ff.ff...ff.ff",
+  "ff.fffffff.ff",
+  "fff.......fff",
+  ".fffffffffff.",
   "..fffffffff..",
 ];
 const LINKED = [
@@ -85,7 +87,7 @@ export function ContactPage({ open, onBack }: Props) {
                 className={`contact-icon contact-icon--${l.tone}`}
                 {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
-                <PixelIcon rects={toRects(l.grid)} grid={13} size={39} />
+                <PixelIcon rects={toRects(l.grid)} grid={13} size={26} />
               </a>
             </li>
           ))}
