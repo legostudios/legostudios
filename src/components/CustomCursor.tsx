@@ -20,13 +20,12 @@ const ARROW_RECTS = toRects(ARROW);
 
 // A small pixel-art arrow pointer that flashes through the brand colours (with
 // a black pixel outline so it shows on any background). It tracks the mouse exactly — no
-// easing — so it feels like the system cursor, and grows slightly over
-// anything clickable.
+// easing — so it feels like the system cursor, and stays the same size
+// everywhere, including over links and buttons.
 //
 // Only runs on large, fine-pointer (mouse) screens; phones and tablets keep
 // their native behaviour. Text fields keep the native I-beam.
 
-const HOVER = 'a, button, [role="button"], label, select, summary, [data-cursor-hover]';
 const TEXT = 'input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea, [contenteditable="true"]';
 
 export function CustomCursor() {
@@ -35,7 +34,6 @@ export function CustomCursor() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const arrow = el.firstElementChild as HTMLElement;
     const mq = window.matchMedia("(min-width: 1024px) and (pointer: fine)");
     const root = document.documentElement;
 
@@ -45,7 +43,6 @@ export function CustomCursor() {
       const t = e.target as Element | null;
       const overText = !!t?.closest?.(TEXT);
       el.style.opacity = overText ? "0" : "1";
-      arrow.style.transform = !overText && t?.closest?.(HOVER) ? "scale(1.5)" : "scale(1)";
     };
     const onLeave = () => (el.style.opacity = "0");
 

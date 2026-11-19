@@ -92,9 +92,8 @@
 
 .invert-cursor-arrow {
   display: block;
-  /* The top-left pixel is the tip, already at the mouse position. */
-  transform-origin: 0 0;
-  transition: transform 120ms ease-out;
+  /* The top-left pixel is the tip, already at the mouse position. The
+     cursor stays the same size everywhere, including over links. */
 }
 
 /* The services stack is scroll-driven; hide the raw scrollbar so only the
