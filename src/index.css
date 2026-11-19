@@ -1901,6 +1901,11 @@
   }
 }
 
+.gravity-word[data-outline] {
+  -webkit-text-stroke: 0.025em var(--color-brand-black);
+  paint-order: stroke fill;
+}
+
 .gravity-stage.is-grabbing .gravity-word {
   cursor: grabbing;
 }

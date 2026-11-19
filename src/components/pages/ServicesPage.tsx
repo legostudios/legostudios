@@ -7,18 +7,13 @@ interface Props {
   onBack: () => void;
 }
 
-// One colour per service, all strong against the sky-blue page (no yellow,
-// which barely shows on it).
+// Brand colours only. Sky blue is the page itself, so the names cycle pink,
+// black, yellow (with a thin black outline so it reads on sky) and white.
 const COLORS = [
   "var(--color-brand-pink)",
-  "#000000",
-  "#3a4cff",
-  "#ff6a13",
-  "#7b2bff",
-  "#ffffff",
-  "#e8221c",
-  "#0f8a55",
-  "#8a1c4a",
+  "var(--color-brand-black)",
+  "var(--color-brand-yellow)",
+  "var(--color-brand-white)",
 ];
 
 // Each service falls as one piece, in its own colour.
