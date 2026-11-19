@@ -1290,7 +1290,7 @@
   width: 100%;
   padding: 0.6rem 0;
   border: 0;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 2px solid color-mix(in srgb, var(--fg) 35%, transparent);
   border-radius: 0;
   background: transparent;
   color: var(--fg);
@@ -1308,13 +1308,13 @@
 }
 
 .cform ::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: color-mix(in srgb, var(--fg) 40%, transparent);
 }
 
 .cform input:focus,
 .cform select:focus,
 .cform textarea:focus {
-  border-bottom-color: var(--color-brand-yellow);
+  border-bottom-color: var(--fg);
 }
 
 /* Native select with our own chevron; the placeholder option looks muted. */
@@ -1348,8 +1348,8 @@
 }
 
 .cform option {
-  background: var(--color-brand-black);
-  color: var(--color-brand-white);
+  background: var(--bg);
+  color: var(--fg);
 }
 
 .cform-actions {
@@ -1362,8 +1362,8 @@
 
 .cform-submit {
   padding: 1rem 2rem;
-  background: var(--color-brand-yellow);
-  color: var(--color-brand-black);
+  background: var(--fg);
+  color: var(--bg);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 1.2vw, 1.15rem);
@@ -1375,6 +1375,7 @@
 .cform-submit:hover,
 .cform-submit:focus-visible {
   background: var(--color-brand-pink);
+  color: var(--color-brand-black);
   outline: none;
 }
 
@@ -1387,7 +1388,7 @@
 }
 
 .cform-note a {
-  color: var(--color-brand-yellow);
+  color: inherit;
   text-decoration: underline;
 }
 
@@ -1416,7 +1417,7 @@
   font-size: clamp(1.4rem, 2.7vw, 2.4rem);
   line-height: 1;
   text-transform: uppercase;
-  color: var(--color-brand-yellow);
+  color: var(--fg);
   letter-spacing: -0.03em;
 }
 
@@ -1491,7 +1492,7 @@
 
 .contact-icon:hover,
 .contact-icon:focus-visible {
-  color: var(--color-brand-white);
+  color: var(--fg);
 }
 
 .contact-icon:focus-visible {
@@ -1539,7 +1540,7 @@
   display: block;
   width: 100%;
   padding: 0.6rem 2rem 0.6rem 0;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 2px solid color-mix(in srgb, var(--fg) 35%, transparent);
   color: var(--fg);
   font: inherit;
   font-size: clamp(1.1rem, 1.5vw, 1.5rem);
@@ -1550,12 +1551,12 @@
 }
 
 .cselect-trigger.is-placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: color-mix(in srgb, var(--fg) 40%, transparent);
 }
 
 .cselect-trigger:focus-visible,
 .cselect.is-open .cselect-trigger {
-  border-bottom-color: var(--color-brand-yellow);
+  border-bottom-color: var(--fg);
 }
 
 /* Chevron; flips when open. */
@@ -1589,8 +1590,8 @@
   margin: 0;
   padding: 0.35rem 0;
   list-style: none;
-  background: var(--color-brand-black);
-  border: 2px solid var(--color-brand-white);
+  background: var(--bg);
+  border: 2px solid var(--fg);
 }
 
 .cselect-option {
@@ -1601,7 +1602,7 @@
 }
 
 .cselect-option.is-selected {
-  color: var(--color-brand-yellow);
+  color: var(--color-brand-pink);
 }
 
 .cselect-option.is-active {
