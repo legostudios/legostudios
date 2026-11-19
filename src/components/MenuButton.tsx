@@ -1,4 +1,26 @@
+import { PixelIcon } from "./PixelIcon";
+import { toRects } from "../lib/pixels";
+
 export type SquareSkip = "pink" | "sky" | "yellow" | null;
+
+// The square in the same pixel-art style as the contact icon: stepped
+// corners, black pixel outline, white highlight along the top-left edge.
+const GRID = [
+  ".###########.",
+  "#wwwwwwwwwff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#wffffffffff#",
+  "#fffffffffff#",
+  "#fffffffffff#",
+  ".###########.",
+];
+const RECTS = toRects(GRID);
 
 interface MenuButtonProps {
   onClick: () => void;
@@ -6,7 +28,7 @@ interface MenuButtonProps {
   skip?: SquareSkip;
 }
 
-// The menu button: a solid square, top-left on every page, flashing through
+// The menu button: a pixel-art square, top-left on every page, flashing through
 // the brand colours (pink → sky blue → yellow). Clicking it opens the menu
 // (or closes it when the menu is showing).
 export function MenuButton({ onClick, skip = null }: MenuButtonProps) {
@@ -17,7 +39,7 @@ export function MenuButton({ onClick, skip = null }: MenuButtonProps) {
       aria-label="Menu"
       className={`menu-square ${skip ? `menu-square--skip-${skip}` : ""}`}
     >
-      <span className="menu-square-box" aria-hidden="true" />
+      <PixelIcon className="menu-square-box" rects={RECTS} grid={GRID.length} />
     </button>
   );
 }

@@ -15,7 +15,7 @@ interface MenuProps {
   onBack: () => void;
 }
 
-// Full-screen brand-yellow menu with the destinations in huge condensed caps.
+// Full-screen brand-pink menu with the destinations in huge condensed caps.
 export function Menu({ open, onOpenPage, onBack }: MenuProps) {
   const { mounted, visible } = usePresence(open);
   if (!mounted) return null;

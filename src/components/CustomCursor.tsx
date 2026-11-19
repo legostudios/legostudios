@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 
-// A normal arrow pointer that inverts against whatever is behind it (white +
-// mix-blend-mode: difference → black on white, white on black, blue on
-// yellow…). It tracks the mouse exactly — no easing — so it feels like the
-// system cursor, and grows slightly over anything clickable.
+// A small arrow pointer that flashes through the brand colours (with a black
+// outline so it shows on any background). It tracks the mouse exactly — no
+// easing — so it feels like the system cursor, and grows slightly over
+// anything clickable.
 //
 // Only runs on large, fine-pointer (mouse) screens; phones and tablets keep
 // their native behaviour. Text fields keep the native I-beam.
@@ -56,9 +56,17 @@ export function CustomCursor() {
 
   return (
     <div ref={ref} className="invert-cursor" aria-hidden="true">
-      <svg className="invert-cursor-arrow" width="22" height="30" viewBox="0 0 22 30">
-        {/* Classic arrow; the tip at (1,1) is the hotspot. */}
-        <path d="M1 1 L1 23.5 L6.6 18.3 L10.4 27.4 L14.3 25.8 L10.5 16.9 L18 16.9 Z" fill="#ffffff" />
+      <svg className="invert-cursor-arrow" width="15" height="20" viewBox="0 0 22 30">
+        {/* Classic arrow; the tip at (1,1) is the hotspot. Filled with the
+            current brand colour, outlined in black so it shows on any
+            background. */}
+        <path
+          d="M1 1 L1 23.5 L6.6 18.3 L10.4 27.4 L14.3 25.8 L10.5 16.9 L18 16.9 Z"
+          fill="currentColor"
+          stroke="#000000"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
       </svg>
     </div>
   );

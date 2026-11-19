@@ -10,7 +10,7 @@ import { ContactPage } from "./components/pages/ContactPage";
 import { CaseStudyPage } from "./components/CaseStudyPage";
 
 // Navigation is three stacked layers over the home page:
-//   menu (yellow)  →  page (Services / Case Studies / Contact)  →  case study.
+//   menu (pink)  →  page (Services / Case Studies / Contact)  →  case study.
 // Back (top-right on every page) steps down one layer. The home-page
 // Contact link opens the Contact page without the menu, so Back goes home.
 export default function App() {
@@ -60,7 +60,7 @@ export default function App() {
         : page === "caseStudies"
           ? "pink"
           : page === null && menuOpen
-            ? "yellow"
+            ? "pink"
             : null;
 
   return (

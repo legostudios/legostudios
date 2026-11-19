@@ -82,8 +82,10 @@
   top: 0;
   z-index: 2147483647;
   pointer-events: none;
-  mix-blend-mode: difference;
   opacity: 0;
+  color: var(--color-brand-pink);
+  /* Flashes through the brand colours, two steps ahead of the square. */
+  animation: icon-3 0.9s step-end -0.6s infinite;
   transform: translate3d(-100px, -100px, 0);
   will-change: transform;
 }
@@ -103,18 +105,6 @@
 }
 .services-scroll::-webkit-scrollbar {
   display: none;
-}
-
-@font-face {
-  font-family: "Minecraft";
-  src: url("/fonts/Minecraft.ttf") format("truetype");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "VCR OSD Mono";
-  src: url("/fonts/VCR_OSD_MONO_1.001.ttf") format("truetype");
-  font-display: swap;
 }
 
 @font-face {
@@ -158,11 +148,7 @@
   --color-lego-green: #00852b;
   --color-lego-orange: #f57d20;
 
-  --font-pixel: "Press Start 2P", monospace;
-  --font-serif-elegant: "Playfair Display", serif;
-  --font-serif-display: "DM Serif Display", serif;
-  --font-sans: "Space Grotesk", system-ui, sans-serif;
-  --font-display: "Lilita One", cursive;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --animate-bob: bob 1.6s ease-in-out infinite;
 }
@@ -317,11 +303,6 @@
   display: none;
 }
 
-.reference-headline {
-  font-family: "VCR OSD Mono", ui-monospace, "Courier New", monospace;
-  letter-spacing: 0.01em;
-}
-
 .crt-glow {
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
 }
@@ -393,7 +374,7 @@
    phones, tablets, laptops and ultra-wides in any orientation. */
 
 .home-hero {
-  --strip-h: clamp(2.5rem, 2rem + 2.2vmin, 4rem);
+  --strip-h: clamp(2rem, 1.6rem + 1.8vmin, 3.25rem);
   /* Nothing on the home page is selectable or draggable (double-clicks and
      drags would otherwise tint the computer with the selection highlight). */
   -webkit-user-select: none;
@@ -468,10 +449,6 @@
   display: flex;
   width: max-content;
   animation: home-strip-scroll 28s linear infinite;
-}
-
-.home-strip:hover .home-strip-inner {
-  animation-play-state: paused;
 }
 
 .home-strip-track {
@@ -554,11 +531,9 @@
    page whose background matches one colour, that colour is skipped. */
 .menu-square-box {
   display: block;
-  width: 26px;
-  height: 26px;
-  background: var(--color-brand-pink);
+  color: var(--color-brand-pink);
   animation: square-3 0.9s step-end infinite;
-  transition: opacity 150ms ease-out, transform 150ms ease-out;
+  transition: opacity 150ms ease-out;
 }
 
 .menu-square--skip-yellow .menu-square-box { animation: square-pink-sky 0.6s step-end infinite; }
@@ -566,24 +541,24 @@
 .menu-square--skip-pink .menu-square-box { animation: square-sky-yellow 0.6s step-end infinite; }
 
 @keyframes square-3 {
-  0% { background: var(--color-brand-pink); }
-  33.333% { background: var(--color-brand-sky); }
-  66.667% { background: var(--color-brand-yellow); }
+  0% { color: var(--color-brand-pink); }
+  33.333% { color: var(--color-brand-sky); }
+  66.667% { color: var(--color-brand-yellow); }
 }
 
 @keyframes square-pink-sky {
-  0% { background: var(--color-brand-pink); }
-  50% { background: var(--color-brand-sky); }
+  0% { color: var(--color-brand-pink); }
+  50% { color: var(--color-brand-sky); }
 }
 
 @keyframes square-pink-yellow {
-  0% { background: var(--color-brand-pink); }
-  50% { background: var(--color-brand-yellow); }
+  0% { color: var(--color-brand-pink); }
+  50% { color: var(--color-brand-yellow); }
 }
 
 @keyframes square-sky-yellow {
-  0% { background: var(--color-brand-sky); }
-  50% { background: var(--color-brand-yellow); }
+  0% { color: var(--color-brand-sky); }
+  50% { color: var(--color-brand-yellow); }
 }
 
 /* Reduced motion: no flashing — hold one colour that suits the page. */
@@ -592,23 +567,22 @@
   .menu-square--skip-yellow .menu-square-box,
   .menu-square--skip-sky .menu-square-box {
     animation: none;
-    background: var(--color-brand-pink);
+    color: var(--color-brand-pink);
   }
 
   .menu-square--skip-pink .menu-square-box {
     animation: none;
-    background: var(--color-brand-black);
+    color: var(--color-brand-black);
   }
 }
 
 .menu-square:hover .menu-square-box,
 .menu-square:focus-visible .menu-square-box {
-  opacity: 0.7;
-  transform: scale(0.9);
+  opacity: 0.75;
 }
 
 /* ───────────────────────── Menu ─────────────────────────
-   Full-screen brand yellow, destinations in huge condensed caps. Sized from
+   Full-screen brand pink (white type), destinations in huge condensed caps. Sized from
    both viewport width and height so the longest word ("Case Studies") always
    fits, on any device or aspect ratio. */
 
@@ -619,8 +593,8 @@
   display: flex;
   align-items: center;
   padding: 5rem clamp(1.5rem, 9vw, 11rem) 3rem;
-  background: var(--color-brand-yellow);
-  color: var(--color-brand-black);
+  background: var(--color-brand-pink);
+  color: var(--color-brand-white);
   opacity: 0;
   visibility: hidden;
   transition: opacity 300ms ease, visibility 0s linear 300ms;
@@ -639,8 +613,9 @@
   height: 34px;
   display: flex;
   align-items: center;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
@@ -659,14 +634,18 @@
 
 .big-menu-item {
   display: block;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: min(16.5vw, 24vh);
-  line-height: 1.02;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: min(10.5vw, 19vh);
+  line-height: 1.04;
   text-transform: uppercase;
   text-align: left;
   white-space: nowrap;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.035em;
   transition: opacity 200ms ease;
+  /* Room for the last letter: tight tracking lets it overhang its box, and
+     each row clips overflow for the rise-in animation. */
+  padding-right: 0.12em;
 }
 
 /* Hovering one destination dims the others. */
@@ -718,7 +697,7 @@
   align-items: center;
   color: var(--color-brand-pink);
   animation: icon-3 0.9s step-end -0.3s infinite;
-  transition: transform 150ms ease-out;
+  transition: opacity 150ms ease-out;
 }
 
 .home-contact svg {
@@ -727,7 +706,7 @@
 
 .home-contact:hover,
 .home-contact:focus-visible {
-  transform: scale(1.12);
+  opacity: 0.75;
   outline: none;
 }
 
@@ -796,8 +775,9 @@
 
 .page-bar-link,
 .page-bar-meta {
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
@@ -825,12 +805,12 @@
 /* Big condensed title; rises in when the page opens. */
 .page-title {
   margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 400;
-  font-size: min(15vw, 22vh);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: min(10.5vw, 17vh);
   line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.04em;
   transform: translateY(0.3em);
   opacity: 0;
   transition:
@@ -883,10 +863,12 @@
 .page-row-name {
   flex: 1;
   min-width: 0;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.75rem, 5.2vw, 5.25rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 3.3vw, 3.4rem);
   line-height: 1;
   text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
 .page-row-stats {
@@ -943,12 +925,14 @@
 
 .contact-email {
   max-width: 100%;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: min(9.5vw, 13vh);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: min(7vw, 10vh);
   line-height: 1;
   color: var(--color-brand-yellow);
   overflow-wrap: anywhere;
   transition: opacity 150ms ease;
+  letter-spacing: -0.03em;
 }
 
 .contact-email:hover {
@@ -962,11 +946,13 @@
 }
 
 .contact-social {
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3.4vw, 3rem);
   line-height: 1.05;
   text-transform: uppercase;
   transition: opacity 150ms ease;
+  letter-spacing: -0.03em;
 }
 
 .contact-social:hover {
@@ -988,13 +974,14 @@
 }
 
 .cs-title {
-  max-width: 14ch;
+  max-width: 18ch;
   margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 400;
-  font-size: clamp(2.75rem, 9vw, 9rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.9rem, 5.6vw, 5.75rem);
   line-height: 0.95;
   text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
 .cs-hero {
@@ -1052,9 +1039,11 @@
 .cs-stat--black { background: var(--color-brand-black); color: var(--color-brand-white); }
 
 .cs-stat-value {
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(2.25rem, 4.5vw, 4.75rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3vw, 3.25rem);
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .cs-stat-label {
@@ -1088,9 +1077,9 @@
 
 .cs-heading {
   margin: 0 0 1rem;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 400;
-  font-size: clamp(1.6rem, 2.6vw, 2.6rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 1.8vw, 1.8rem);
   line-height: 1;
   text-transform: uppercase;
 }
@@ -1128,10 +1117,12 @@
 }
 
 .cs-next-name {
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(2rem, 6vw, 6rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 4vw, 4rem);
   line-height: 1;
   text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
 @media (hover: hover) {
@@ -1161,11 +1152,12 @@
 
 .contact-form-heading {
   margin: 0 0 clamp(1.5rem, 4vh, 3rem);
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 400;
-  font-size: clamp(2.25rem, 5vw, 5rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3.4vw, 3.4rem);
   line-height: 1;
   text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
 .cform {
@@ -1283,8 +1275,9 @@
   padding: 1rem 2rem;
   background: var(--color-brand-yellow);
   color: var(--color-brand-black);
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 1.2vw, 1.15rem);
   line-height: 1;
   text-transform: uppercase;
   transition: background-color 150ms ease, color 150ms ease;
@@ -1329,17 +1322,20 @@
 
 .cform-done-title {
   margin: 0 0 0.5rem;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 2.7vw, 2.4rem);
   line-height: 1;
   text-transform: uppercase;
   color: var(--color-brand-yellow);
+  letter-spacing: -0.03em;
 }
 
 .cform-again {
   margin-top: 1.5rem;
-  font-family: "Anton", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.9rem, 1.1vw, 1.1rem);
   text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 0.2em;
