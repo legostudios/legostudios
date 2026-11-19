@@ -92,9 +92,8 @@
 
 .invert-cursor-arrow {
   display: block;
-  /* Shift so the arrow tip (1,1) lands exactly on the mouse position. */
-  margin: -1px 0 0 -1px;
-  transform-origin: 1px 1px;
+  /* The top-left pixel is the tip, already at the mouse position. */
+  transform-origin: 0 0;
   transition: transform 120ms ease-out;
 }
 
@@ -757,6 +756,45 @@
   .folder-front {
     transition: opacity 200ms ease;
     transform: none !important;
+  }
+}
+
+/* Home-page Contact button (top-right): a pixel person icon whose fill
+   flashes through the brand colours, one step behind the menu square so the
+   two always show different colours. */
+.home-contact {
+  position: fixed;
+  top: var(--chrome-top);
+  right: var(--chrome-right);
+  z-index: 85;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  color: var(--color-brand-pink);
+  animation: icon-3 0.9s step-end -0.3s infinite;
+  transition: opacity 150ms ease-out;
+}
+
+.home-contact svg {
+  display: block;
+}
+
+.home-contact:hover,
+.home-contact:focus-visible {
+  opacity: 0.75;
+  outline: none;
+}
+
+@keyframes icon-3 {
+  0% { color: var(--color-brand-pink); }
+  33.333% { color: var(--color-brand-sky); }
+  66.667% { color: var(--color-brand-yellow); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-contact {
+    animation: none;
+    color: var(--color-brand-sky);
   }
 }
 

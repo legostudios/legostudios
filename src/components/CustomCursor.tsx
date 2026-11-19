@@ -1,7 +1,25 @@
 import { useEffect, useRef } from "react";
+import { toRects } from "../lib/pixels";
 
-// A small arrow pointer that flashes through the brand colours (with a black
-// outline so it shows on any background). It tracks the mouse exactly — no
+// Pixel-art arrow (7×10, shown at 2× = 14×20px) in the same style as the menu
+// square and contact icon. The top-left pixel is the hotspot.
+const ARROW = [
+  "#......",
+  "##.....",
+  "#w#....",
+  "#wf#...",
+  "#fff#..",
+  "#ffff#.",
+  "#ff####",
+  "#f#f#..",
+  "##.#f#.",
+  "....##.",
+];
+const ARROW_COLS = ARROW[0].length;
+const ARROW_RECTS = toRects(ARROW);
+
+// A small pixel-art arrow pointer that flashes through the brand colours (with
+// a black pixel outline so it shows on any background). It tracks the mouse exactly — no
 // easing — so it feels like the system cursor, and grows slightly over
 // anything clickable.
 //
@@ -27,7 +45,7 @@ export function CustomCursor() {
       const t = e.target as Element | null;
       const overText = !!t?.closest?.(TEXT);
       el.style.opacity = overText ? "0" : "1";
-      arrow.style.transform = !overText && t?.closest?.(HOVER) ? "scale(1.3)" : "scale(1)";
+      arrow.style.transform = !overText && t?.closest?.(HOVER) ? "scale(1.5)" : "scale(1)";
     };
     const onLeave = () => (el.style.opacity = "0");
 
@@ -56,17 +74,16 @@ export function CustomCursor() {
 
   return (
     <div ref={ref} className="invert-cursor" aria-hidden="true">
-      <svg className="invert-cursor-arrow" width="15" height="20" viewBox="0 0 22 30">
-        {/* Classic arrow; the tip at (1,1) is the hotspot. Filled with the
-            current brand colour, outlined in black so it shows on any
-            background. */}
-        <path
-          d="M1 1 L1 23.5 L6.6 18.3 L10.4 27.4 L14.3 25.8 L10.5 16.9 L18 16.9 Z"
-          fill="currentColor"
-          stroke="#000000"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
+      <svg
+        className="invert-cursor-arrow"
+        width={ARROW_COLS * 2}
+        height={ARROW.length * 2}
+        viewBox={`0 0 ${ARROW_COLS} ${ARROW.length}`}
+        shapeRendering="crispEdges"
+      >
+        {ARROW_RECTS.map((r, i) => (
+          <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.c} />
+        ))}
       </svg>
     </div>
   );
