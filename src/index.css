@@ -738,8 +738,10 @@
     filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.22));
   }
 
+  /* Flap opens a touch (flat transform; a 3D tilt left a hairline seam
+     above the folder in some browsers). */
   .menu-folder:hover .folder-front {
-    transform: perspective(600px) rotateX(-14deg);
+    transform: translateY(3%) scaleY(0.97);
   }
 }
 
@@ -1899,11 +1901,6 @@
   .gravity-word {
     font-size: min(7vw, 5.5vh);
   }
-}
-
-.gravity-word[data-outline] {
-  -webkit-text-stroke: 0.025em var(--color-brand-black);
-  paint-order: stroke fill;
 }
 
 .gravity-stage.is-grabbing .gravity-word {

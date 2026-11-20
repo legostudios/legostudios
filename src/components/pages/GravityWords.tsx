@@ -197,7 +197,6 @@ export function GravityWords({ words }: Props) {
             }}
             className="gravity-word"
             style={w.color ? { color: w.color } : undefined}
-            data-outline={w.color?.includes("yellow") ? "" : undefined}
           >
             {w.text}
           </span>
