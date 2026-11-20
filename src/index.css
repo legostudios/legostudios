@@ -1623,12 +1623,7 @@
   pointer-events: auto;
 }
 
-/* Back sits over the panels here: give it a chip in the page colour. */
-.page:has(.stack-wrap) .page-bar-back {
-  padding: 0.35rem 0.6rem;
-  margin-right: -0.6rem;
-  background: var(--bg);
-}
+
 
 .stack-head {
   position: absolute;
@@ -2033,4 +2028,65 @@
 .cselect.is-up .cselect-list {
   top: auto;
   bottom: calc(100% + 0.5rem);
+}
+
+/* ── Back icon (pixel arrow), top-right on the menu and every page ── */
+.page-bar-back,
+.big-menu-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 4px;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-bar-back {
+  margin-right: -4px;
+}
+
+.big-menu-back {
+  margin-right: -4px;
+}
+
+.back-icon {
+  display: block;
+  color: var(--color-brand-pink);
+  /* Flashes through the brand colours, two steps ahead of the square. */
+  animation: icon-3 0.9s step-end -0.6s infinite;
+  transition: opacity 150ms ease-out;
+}
+
+.page-bar-back:hover .back-icon,
+.page-bar-back:focus-visible .back-icon,
+.big-menu-back:hover .back-icon,
+.big-menu-back:focus-visible .back-icon {
+  opacity: 0.75;
+}
+
+.page-bar-back:focus-visible,
+.big-menu-back:focus-visible {
+  outline: 2px solid var(--fg, #000);
+  outline-offset: 2px;
+}
+
+/* Skip the colour of the page behind it, so it never disappears. */
+.big-menu .back-icon,
+.page--pink .back-icon {
+  animation: square-sky-yellow 0.6s step-end -0.3s infinite;
+}
+
+.page--sky .back-icon {
+  animation: square-pink-yellow 0.6s step-end -0.3s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-icon,
+  .big-menu .back-icon,
+  .page--pink .back-icon,
+  .page--sky .back-icon {
+    animation: none;
+    color: var(--color-brand-yellow);
+  }
 }
