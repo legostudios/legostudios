@@ -1688,8 +1688,19 @@
 
 @media (max-aspect-ratio: 4/5) {
   .stack-card {
-    left: 38%;
-    top: 70%;
+    left: var(--stack-m-left, 34%);
+    top: var(--stack-m-top, 58%);
+  }
+
+  /* Phones (measured from the reference's mobile layout): steeper camera so
+     the row climbs more sharply, and stronger perspective so nearer sheets
+     look bigger. */
+  .stack-stage {
+    perspective: 1700px;
+  }
+
+  .stack-world {
+    transform: rotateX(var(--stack-m-rx, -34deg)) rotateY(var(--stack-m-ry, -20deg));
   }
 }
 

@@ -75,11 +75,16 @@ export function StackView({ items, onOpen }: StackViewProps) {
     // from measurements of the reference.
     // Phones (tall screens) use portrait sheets packed a little closer, as the
     // reference does on mobile.
-    const cardW = tall ? Math.min(W * 0.52, H * 0.34) : Math.min(W * 0.28, H * 0.58);
-    const cardH = tall ? cardW * 1.35 : cardW / 1.5;
+    // Phones: smaller portrait sheets, each clearly separate, on a steeper
+    // diagonal (measured from the reference's mobile layout); tunable via
+    // --stack-m-* for testing.
+    const cs = getComputedStyle(el);
+    const v = (name: string, d: number) => Number(cs.getPropertyValue(name)) || d;
+    const cardW = tall ? Math.min(W * v("--stack-m-w", 0.4), H * 0.22) : Math.min(W * 0.28, H * 0.58);
+    const cardH = tall ? cardW * 1.36 : cardW / 1.5;
     // Depth between sheets, and which sheet sits at the centre of the screen.
-    const gap = tall ? cardW * 0.62 : cardW * 0.72;
-    const mid = 3;
+    const gap = tall ? cardW * v("--stack-m-gap", 0.85) : cardW * 0.72;
+    const mid = tall ? v("--stack-m-mid", 3) : 3;
     el.style.setProperty("--card-w", `${cardW}px`);
     el.style.setProperty("--card-h", `${cardH}px`);
     cards.current.forEach((card, k) => {
@@ -109,14 +114,14 @@ export function StackView({ items, onOpen }: StackViewProps) {
       if (!drag.current) {
         if (Math.abs(velocity.current) > 0.004) {
           target.current += velocity.current * f;
-          velocity.current *= Math.pow(touchFling.current ? 0.84 : 0.94, f);
-        } else if (now - lastInput.current > 120) {
+          velocity.current *= Math.pow(touchFling.current ? 0.74 : 0.94, f);
+        } else if (now - lastInput.current > (touchFling.current ? 60 : 120)) {
           velocity.current = 0;
-          target.current += (Math.round(target.current) - target.current) * (1 - Math.pow(1 - 0.22, f));
+          target.current += (Math.round(target.current) - target.current) * (1 - Math.pow(1 - (touchFling.current ? 0.32 : 0.22), f));
         }
       }
       const d = target.current - pos.current;
-      const easing = drag.current ? 0.35 : touchFling.current ? 0.24 : 0.17;
+      const easing = drag.current ? 0.35 : touchFling.current ? 0.34 : 0.17;
       pos.current = reduced ? target.current : pos.current + d * (1 - Math.pow(1 - easing, f));
       // Skip layout work once everything has come to rest.
       const still = Math.abs(d) < 0.002 && Math.abs(Math.round(target.current) - target.current) < 0.002 && velocity.current === 0 && !drag.current;
@@ -229,12 +234,12 @@ export function StackView({ items, onOpen }: StackViewProps) {
       setHovered(null);
     }
     // Mouse: drag along the diagonal. Touch: swipe up (or left) to go
-    // forward, like scrolling a page; a swipe the height of the stack's
-    // card moves about one panel.
+    // forward, like scrolling a page; about 100px of swipe per panel on a
+    // phone (matched to the reference).
     const W = stage.current?.clientWidth ?? 390;
     const H = stage.current?.clientHeight ?? 844;
     target.current = d.touch
-      ? d.startTarget + (-dy - dx * 0.6) / (Math.min(W, H) * 0.42)
+      ? d.startTarget + (-dy - dx * 0.6) / (Math.min(W, H) * 0.25)
       : d.startTarget + (-dx + dy) / 220;
     // Velocity: smoothed over recent moves (panels per 60 fps frame).
     const now = performance.now();
