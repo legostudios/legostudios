@@ -80,10 +80,10 @@ export function StackView({ items, onOpen }: StackViewProps) {
     // --stack-m-* for testing.
     const cs = getComputedStyle(el);
     const v = (name: string, d: number) => Number(cs.getPropertyValue(name)) || d;
-    const cardW = tall ? Math.min(W * v("--stack-m-w", 0.4), H * 0.22) : Math.min(W * 0.28, H * 0.58);
-    const cardH = tall ? cardW * 1.36 : cardW / 1.5;
+    const cardW = tall ? Math.min(W * v("--stack-m-w", 0.42), H * 0.24) : Math.min(W * 0.28, H * 0.58);
+    const cardH = tall ? cardW * v("--stack-m-ratio", 1.45) : cardW / 1.5;
     // Depth between sheets, and which sheet sits at the centre of the screen.
-    const gap = tall ? cardW * v("--stack-m-gap", 0.85) : cardW * 0.72;
+    const gap = tall ? cardW * v("--stack-m-gap", 0.95) : cardW * 0.72;
     const mid = tall ? v("--stack-m-mid", 3) : 3;
     el.style.setProperty("--card-w", `${cardW}px`);
     el.style.setProperty("--card-h", `${cardH}px`);
@@ -92,7 +92,10 @@ export function StackView({ items, onOpen }: StackViewProps) {
       const z = -(p - mid) * gap;
       // Sheets fly past the camera at the front and fade out at the far end.
       const op = p < 0 ? clamp(1 + (p + 1.4) * 1.4, 0, 1) : clamp((BEHIND - 0.5 - p) / 2, 0, 1);
-      card.style.transform = `translate(-50%, -50%) translate3d(0, 0, ${z}px)`;
+      // Phones: a slight left/right zig-zag along the row (as in the
+      // reference on mobile), fixed per panel.
+      const jitter = tall ? Math.sin(k * 2.39) * cardW * v("--stack-m-jit", 0.25) : 0;
+      card.style.transform = `translate(-50%, -50%) translate3d(${jitter}px, 0, ${z}px)`;
       card.style.opacity = String(op);
       card.style.pointerEvents = op > 0.5 ? "auto" : "none";
     });

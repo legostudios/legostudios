@@ -1688,19 +1688,19 @@
 
 @media (max-aspect-ratio: 4/5) {
   .stack-card {
-    left: var(--stack-m-left, 34%);
-    top: var(--stack-m-top, 58%);
+    left: var(--stack-m-left, 36%);
+    top: var(--stack-m-top, 56%);
   }
 
-  /* Phones (measured from the reference's mobile layout): steeper camera so
-     the row climbs more sharply, and stronger perspective so nearer sheets
-     look bigger. */
+  /* Phones (measured from a screen recording of the reference): tall
+     portrait sheets, strong perspective so the nearest run large off the
+     bottom-left, row climbing to the top-right. */
   .stack-stage {
-    perspective: 1700px;
+    perspective: 1200px;
   }
 
   .stack-world {
-    transform: rotateX(var(--stack-m-rx, -34deg)) rotateY(var(--stack-m-ry, -20deg));
+    transform: rotateX(var(--stack-m-rx, -26deg)) rotateY(var(--stack-m-ry, -24deg));
   }
 }
 
