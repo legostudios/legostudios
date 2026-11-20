@@ -2028,3 +2028,9 @@
     flex-direction: row;
   }
 }
+
+/* Dropdown opening upward (not enough room below). */
+.cselect.is-up .cselect-list {
+  top: auto;
+  bottom: calc(100% + 0.5rem);
+}

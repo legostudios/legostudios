@@ -12,6 +12,8 @@ const SOURCES = [
   "Other",
 ];
 
+const INQUIRY_TYPES = ["Service enquiry", "Careers", "Others"];
+
 type Status = "idle" | "sending" | "sent" | "error";
 
 // The contact form. Submissions are delivered by email to `to` (and copied to
@@ -22,6 +24,7 @@ type Status = "idle" | "sending" | "sent" | "error";
 export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
   const [status, setStatus] = useState<Status>("idle");
   const sourceLabelId = `src-${useId().replace(/:/g, "")}`;
+  const inquiryLabelId = `inq-${useId().replace(/:/g, "")}`;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,10 +43,10 @@ export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
         body: JSON.stringify({
           Name: get("name"),
           Email: get("email"),
-          Company: get("company") || "-",
+          "Inquiry type": get("inquiry") || "-",
           "Heard about us": get("source") || "-",
           Message: get("message"),
-          _subject: `New enquiry from ${get("name")}${get("company") ? ` (${get("company")})` : ""}`,
+          _subject: `New enquiry from ${get("name")}${get("inquiry") ? ` (${get("inquiry")})` : ""}`,
           _replyto: get("email"),
           ...(cc.length ? { _cc: cc.join(",") } : {}),
           _template: "table",
@@ -82,10 +85,12 @@ export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
           <span className="cform-label">Email</span>
           <input name="email" type="email" required autoComplete="email" placeholder="you@company.com" />
         </label>
-        <label className="cform-field">
-          <span className="cform-label">Company</span>
-          <input name="company" type="text" autoComplete="organization" placeholder="Company name" />
-        </label>
+        <div className="cform-field">
+          <span className="cform-label" id={inquiryLabelId}>
+            Inquiry type
+          </span>
+          <SourceSelect name="inquiry" labelId={inquiryLabelId} options={INQUIRY_TYPES} placeholder="Select an option" />
+        </div>
         <div className="cform-field">
           <span className="cform-label" id={sourceLabelId}>
             Where did you hear about us?
@@ -98,7 +103,7 @@ export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
             name="message"
             required
             rows={5}
-            placeholder="What are you launching, and who does it need to reach?"
+            placeholder="How can we help you?"
           />
         </label>
       </div>

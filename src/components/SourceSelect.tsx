@@ -14,6 +14,8 @@ interface Props {
 export function SourceSelect({ name, labelId, options, placeholder }: Props) {
   const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
+  // Open upward when there isn't room below, and cap the list to the space.
+  const [place, setPlace] = useState<{ up: boolean; max: number }>({ up: false, max: 320 });
   const [active, setActive] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);
@@ -37,6 +39,14 @@ export function SourceSelect({ name, labelId, options, placeholder }: Props) {
   }, [open, active]);
 
   const openList = () => {
+    const r = root.current?.getBoundingClientRect();
+    if (r) {
+      const below = window.innerHeight - r.bottom - 16;
+      const above = r.top - 16;
+      const want = Math.min(320, options.length * 44 + 12);
+      const up = below < want && above > below;
+      setPlace({ up, max: Math.max(120, Math.min(want, up ? above : below)) });
+    }
     setActive(Math.max(0, options.indexOf(value)));
     setOpen(true);
   };
@@ -86,7 +96,7 @@ export function SourceSelect({ name, labelId, options, placeholder }: Props) {
   };
 
   return (
-    <div ref={root} className={`cselect ${open ? "is-open" : ""}`}>
+    <div ref={root} className={`cselect ${open ? "is-open" : ""} ${place.up ? "is-up" : ""}`}>
       <input type="hidden" name={name} value={value} />
       <button
         type="button"
@@ -104,7 +114,7 @@ export function SourceSelect({ name, labelId, options, placeholder }: Props) {
         {value || placeholder}
       </button>
       {open && (
-        <ul ref={list} id={`${id}-list`} role="listbox" aria-labelledby={labelId} className="cselect-list">
+        <ul ref={list} id={`${id}-list`} role="listbox" aria-labelledby={labelId} className="cselect-list" style={{ maxHeight: place.max }}>
           {options.map((o, i) => (
             <li
               key={o}
