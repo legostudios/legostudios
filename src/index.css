@@ -698,8 +698,13 @@
   height: auto;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.18));
-  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), filter 350ms ease;
+  /* Shadow stays constant (animating it re-rasterises the folder and
+     flashed a hairline above it); always on its own layer so hover doesn't
+     trigger a layer switch mid-animation. */
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .folder-front {
@@ -735,19 +740,15 @@
 @media (hover: hover) {
   .menu-folder:hover .folder-svg {
     transform: translateY(-8px);
-    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.22));
   }
 
-  /* Flap opens a touch (flat transform; a 3D tilt left a hairline seam
-     above the folder in some browsers). */
   .menu-folder:hover .folder-front {
-    transform: translateY(3%) scaleY(0.97);
+    transform: perspective(600px) rotateX(-14deg);
   }
 }
 
 .menu-folder.is-dragging .folder-svg {
   transform: translateY(-12px) rotate(-2deg);
-  filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.28));
 }
 
 .menu-folder:focus-visible .folder-svg {

@@ -140,7 +140,7 @@ export function Folder({ theme }: { theme: FolderTheme }) {
       </g>
 
       {/* Grain over everything. */}
-      <rect x="0" y="0" width="320" height="250" filter={u("grain")} clipPath={u("whole")} style={{ mixBlendMode: "soft-light" }} />
+      <rect x="0" y="0" width="320" height="250" filter={u("grain")} clipPath={u("whole")} opacity="0.35" />
     </svg>
   );
 }
