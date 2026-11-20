@@ -2091,3 +2091,16 @@
     color: var(--color-brand-yellow);
   }
 }
+
+/* Phones / touch: drop the per-frame glass warp (an SVG filter recomputed
+   for every panel each frame) so the stack scrolls smoothly; the misty edges,
+   rim and glare still give the glass look. */
+@media (pointer: coarse), (max-width: 767px) {
+  .stack-card-inner img {
+    filter: none;
+  }
+
+  .stack-card {
+    will-change: transform, opacity;
+  }
+}
