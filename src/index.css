@@ -1510,21 +1510,22 @@ html {
 
 .contact-icon {
   display: block;
-  transition: color 120ms ease;
+  transition: transform 160ms ease;
 }
 
 .contact-icon svg {
   display: block;
 }
 
-/* One brand colour each; white on hover. */
+/* One brand colour each. */
 .contact-icon--yellow { color: var(--color-brand-yellow); }
 .contact-icon--sky { color: var(--color-brand-sky); }
 .contact-icon--pink { color: var(--color-brand-pink); }
 
+/* Hover keeps the colours and just lifts the icon a little. */
 .contact-icon:hover,
 .contact-icon:focus-visible {
-  color: var(--fg);
+  transform: translateY(-3px);
 }
 
 .contact-icon:focus-visible {
