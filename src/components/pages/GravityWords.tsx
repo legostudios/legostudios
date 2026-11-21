@@ -104,6 +104,17 @@ export function GravityWords({ words }: Props) {
     root.addEventListener("pointermove", onEnter);
     root.addEventListener("pointerleave", onLeave);
 
+    // Let go of a dragged word when the button is released anywhere, even
+    // outside the page/window (Matter only listens on the stage, so otherwise
+    // the word stays stuck to the cursor).
+    const release = () => {
+      (mouse as unknown as { button: number }).button = -1;
+    };
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    window.addEventListener("mouseup", release);
+    window.addEventListener("blur", release);
+
     Events.on(grab, "startdrag", () => root.classList.add("is-grabbing"));
     Events.on(grab, "enddrag", () => root.classList.remove("is-grabbing"));
 
@@ -148,6 +159,24 @@ export function GravityWords({ words }: Props) {
       }
       lastPointer = { ...mouse.position };
       Engine.update(engine, dt);
+      // Never let a word end up inside the floor or past the side walls (a
+      // hard drag can push one through). A word stuck below the screen edge
+      // would be invisible and leave the words above it floating.
+      for (const b of bodies) {
+        const bb = b.bounds;
+        let dx = 0;
+        let dy = 0;
+        if (bb.max.y > H) dy = H - bb.max.y;
+        if (bb.min.x < 0) dx = -bb.min.x;
+        else if (bb.max.x > W) dx = W - bb.max.x;
+        if (dx || dy) {
+          Body.setPosition(b, { x: b.position.x + dx, y: b.position.y + dy });
+          Body.setVelocity(b, {
+            x: dx ? 0 : b.velocity.x,
+            y: dy ? Math.min(0, b.velocity.y) : b.velocity.y,
+          });
+        }
+      }
       for (const b of bodies) {
         const el = els.current[(b as Matter.Body & { wordIndex: number }).wordIndex];
         if (el) el.style.transform = `translate(${b.position.x}px, ${b.position.y}px) translate(-50%, -50%) rotate(${b.angle}rad)`;
@@ -178,6 +207,10 @@ export function GravityWords({ words }: Props) {
       root.removeEventListener("pointerenter", onEnter);
       root.removeEventListener("pointermove", onEnter);
       root.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+      window.removeEventListener("mouseup", release);
+      window.removeEventListener("blur", release);
       Events.off(grab, "startdrag");
       Events.off(grab, "enddrag");
       Mouse.clearSourceEvents(mouse);

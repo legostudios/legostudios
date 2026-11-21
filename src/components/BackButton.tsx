@@ -4,18 +4,20 @@ import { BackIcon } from "./BackIcon";
 // How many times the button runs away before it lets itself be caught.
 const DODGES = 2;
 
-// Where it hops to (from its home spot, in px), with a little randomness
-// added each time. The button lives top-right, so it hops left and down.
+// Where it steps to (from its home spot, in px): just beside itself. The
+// button lives top-right, so first to its left, then just below.
 const HOPS = [
-  { x: -150, y: 80 },
-  { x: -40, y: 190 },
+  { x: -52, y: 0 },
+  { x: 0, y: 46 },
 ];
+// After the second dodge it slides back home and stays there to be clicked.
+const RETURN_MS = 650;
 
 const canDodge = () =>
   typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-// The pixel Back arrow. On desktop it playfully runs away from the mouse
-// twice; the third time it stays put and can be clicked. Touch screens and
+// The pixel Back arrow. On desktop it playfully steps aside from the mouse
+// twice, then slides back to its normal place and stays put to be clicked. Touch screens and
 // keyboard users get a normal button. It resets every time its page opens
 // (the page unmounts it when closed).
 export function BackButton({ onClick, className }: { onClick: () => void; className: string }) {
@@ -34,14 +36,12 @@ export function BackButton({ onClick, className }: { onClick: () => void; classN
     const r = el.getBoundingClientRect();
     const homeX = r.left - offset.x;
     const homeY = r.top - offset.y;
-    const jitter = () => (Math.random() - 0.5) * 60;
-    let x = hop.x + jitter();
-    let y = hop.y + jitter();
     // Stay fully on screen.
-    const m = 12;
-    x = Math.min(Math.max(x, m - homeX), window.innerWidth - m - r.width - homeX);
-    y = Math.min(Math.max(y, m - homeY), window.innerHeight - m - r.height - homeY);
+    const m = 8;
+    const x = Math.min(Math.max(hop.x, m - homeX), window.innerWidth - m - r.width - homeX);
+    const y = Math.min(Math.max(hop.y, m - homeY), window.innerHeight - m - r.height - homeY);
     setOffset({ x, y });
+    if (dodges.current >= DODGES) window.setTimeout(() => setOffset({ x: 0, y: 0 }), RETURN_MS);
   };
 
   return (

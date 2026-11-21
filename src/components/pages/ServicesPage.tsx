@@ -8,17 +8,17 @@ interface Props {
 }
 
 // A different colour per service, in the order of the services list:
-// pink, yellow, green, orange, violet, red, dark blue, brown, burgundy.
+// pink, burgundy, green, orange, violet, red, dark blue, brown, yellow.
 const COLORS = [
   "var(--color-brand-pink)", // Clipping
-  "var(--color-brand-yellow)", // Marketing
+  "#800020", // Marketing — burgundy
   "#0f8a55", // Brand Strategy — green
   "#ff6a13", // Campaigns — orange
   "#7b2bff", // Content Distribution — violet
   "#e8221c", // Personal Branding — red
   "#1b2a8a", // IP's — dark blue
   "#7a4a1e", // Creative Production — brown
-  "#800020", // Non boring stuff — burgundy
+  "var(--color-brand-yellow)", // Non boring stuff — yellow
 ];
 
 // Each service falls as one piece, in its own colour.
