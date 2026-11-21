@@ -120,20 +120,22 @@
   display: none;
 }
 
+/* Brand secondary / regular font: Instrument Serif Regular, for all text
+   other than headings. Only the regular cut is used, so the browser must
+   never fake a bold. */
 @font-face {
-  font-family: "Helvetica Neue";
-  src: url("/fonts/HelveticaNeueRoman.otf") format("opentype");
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif-Regular.woff2") format("woff2");
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Helvetica Neue";
-  src: url("/fonts/HelveticaNeueMedium.otf") format("opentype");
-  font-weight: 500;
-  font-display: swap;
+html {
+  font-synthesis: none;
 }
 
+/* Helvetica Neue Bold, kept only for the homepage strip. */
 @font-face {
   font-family: "Helvetica Neue";
   src: url("/fonts/HelveticaNeueBold.otf") format("opentype");
@@ -170,7 +172,7 @@
   --color-lego-green: #00852b;
   --color-lego-orange: #f57d20;
 
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: "Instrument Serif", Georgia, serif;
   --font-heading: "Bitcount Single", ui-monospace, monospace;
 
   --animate-bob: bob 1.6s ease-in-out infinite;
@@ -483,6 +485,7 @@
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+  /* The strip keeps Helvetica Neue Bold (by request). */
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -637,7 +640,7 @@
   height: 34px;
   display: flex;
   align-items: center;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
@@ -858,7 +861,7 @@
   overscroll-behavior: contain;
   background: var(--bg);
   color: var(--fg);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   opacity: 0;
   transition: opacity 350ms ease;
 }
@@ -893,7 +896,7 @@
 
 .page-bar-link,
 .page-bar-meta {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   line-height: 1;
@@ -923,7 +926,7 @@
 /* Big condensed title; rises in when the page opens. */
 .page-title {
   margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: min(10.5vw, 17vh);
   line-height: 0.95;
@@ -981,7 +984,7 @@
 .page-row-name {
   flex: 1;
   min-width: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.2rem, 3.3vw, 3.4rem);
   line-height: 1;
@@ -1043,7 +1046,7 @@
 
 .contact-email {
   max-width: 100%;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: min(7vw, 10vh);
   line-height: 1;
@@ -1064,7 +1067,7 @@
 }
 
 .contact-social {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.4rem, 3.4vw, 3rem);
   line-height: 1.05;
@@ -1094,7 +1097,7 @@
 .cs-title {
   max-width: 18ch;
   margin: 0 0 clamp(1.5rem, 5vh, 3.5rem);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.9rem, 5.6vw, 5.75rem);
   line-height: 0.95;
@@ -1157,7 +1160,7 @@
 .cs-stat--black { background: var(--color-brand-black); color: var(--color-brand-white); }
 
 .cs-stat-value {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.6rem, 3vw, 3.25rem);
   line-height: 1;
@@ -1194,7 +1197,7 @@
 
 .cs-heading {
   margin: 0 0 1rem;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.15rem, 1.8vw, 1.8rem);
   line-height: 1;
@@ -1234,7 +1237,7 @@
 }
 
 .cs-next-name {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.4rem, 4vw, 4rem);
   line-height: 1;
@@ -1269,7 +1272,7 @@
 
 .contact-form-heading {
   margin: 0 0 clamp(1.5rem, 4vh, 3rem);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.6rem, 3.4vw, 3.4rem);
   line-height: 1;
@@ -1390,7 +1393,7 @@
   padding: 1rem 2rem;
   background: var(--fg);
   color: var(--bg);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 1.2vw, 1.15rem);
   line-height: 1;
@@ -1437,7 +1440,7 @@
 
 .cform-done-title {
   margin: 0 0 0.5rem;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.4rem, 2.7vw, 2.4rem);
   line-height: 1;
@@ -1447,7 +1450,7 @@
 
 .cform-again {
   margin-top: 1.5rem;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Instrument Serif", Georgia, serif;
   font-weight: 700;
   font-size: clamp(0.9rem, 1.1vw, 1.1rem);
   text-decoration: underline;
@@ -2000,7 +2003,7 @@
 }
 
 .contact2-form .cform-label {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .contact2-form .cform input,
@@ -2008,7 +2011,7 @@
 .contact2-form .cselect-trigger {
   padding-top: 0.3rem;
   padding-bottom: 0.3rem;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   border-bottom-width: 1px;
 }
 
@@ -2019,12 +2022,12 @@
 }
 
 .contact2-form .cselect::after {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   top: 1.05em;
 }
 
 .contact2-form .cselect-option {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   padding: 0.45rem 0.75rem;
 }
 
@@ -2034,7 +2037,7 @@
 
 .contact2-form .cform-submit {
   padding: 0.6rem 1.2rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 /* Phones: socials and form stack under the word. */
@@ -2134,7 +2137,7 @@
 }
 
 /* Every page heading in the brand pixel font (Bitcount Mono Single, Book
-   Square). Mono pixel letters need normal tracking, not the tight Helvetica
+   Square). Mono pixel letters need normal tracking, not the tight body-text
    letter-spacing. */
 .page-title,
 .cs-title,
