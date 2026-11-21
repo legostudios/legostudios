@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePresence } from "../../hooks/usePresence";
-import { BackIcon } from "../BackIcon";
+import { BackButton } from "../BackButton";
 
 export type PageTheme = "yellow" | "sky" | "pink" | "white" | "black";
 
@@ -55,9 +55,7 @@ export function PageShell({
     >
       <header className="page-bar">
         {meta && <span className="page-bar-meta">{meta}</span>}
-        <button type="button" onClick={onBack} className="page-bar-back" aria-label="Back" title="Back">
-          <BackIcon />
-        </button>
+        <BackButton onClick={onBack} className="page-bar-back" />
       </header>
       <div className="page-body">{children}</div>
     </div>

@@ -2223,3 +2223,19 @@ html {
   line-height: 1.4;
   letter-spacing: 0;
 }
+
+/* The runaway Back arrow: a quick, bouncy hop when it dodges the mouse. */
+.back-runaway {
+  z-index: 20;
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-bar-back.back-runaway {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-runaway {
+    transition: none;
+  }
+}

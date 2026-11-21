@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { usePresence } from "../hooks/usePresence";
 import { Folder, type FolderTheme } from "./Folder";
-import { BackIcon } from "./BackIcon";
+import { BackButton } from "./BackButton";
 
 export type PageId = "services" | "caseStudies" | "contact";
 
@@ -168,9 +168,7 @@ export function Menu({ open, onOpenPage, onBack }: MenuProps) {
       aria-hidden={!open}
       className={`big-menu ${visible ? "is-open" : ""}`}
     >
-      <button type="button" onClick={onBack} className="big-menu-back" aria-label="Back" title="Back">
-        <BackIcon />
-      </button>
+      <BackButton onClick={onBack} className="big-menu-back" />
       <ul className="menu-folders">
         {FOLDERS.map((f, i) => {
           const o = offsetOf(f.id);
