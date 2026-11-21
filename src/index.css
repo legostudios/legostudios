@@ -141,6 +141,15 @@
   font-display: swap;
 }
 
+/* Brand primary / logo font: Bitcount Mono Single, "Book Square" cut
+   (square elements = ELSH 50, book weight = 300). Used for page headings. */
+@font-face {
+  font-family: "Bitcount Single";
+  src: url("/fonts/BitcountSingle.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 @theme {
   /* LEGO Studios brand colours — use these for all new design work. */
   --color-brand-pink: #f238a7;
@@ -162,6 +171,7 @@
   --color-lego-orange: #f57d20;
 
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-heading: "Bitcount Single", ui-monospace, monospace;
 
   --animate-bob: bob 1.6s ease-in-out infinite;
 }
@@ -2114,4 +2124,23 @@
   .stack-card {
     will-change: transform, opacity;
   }
+}
+
+/* Every page heading in the brand pixel font (Bitcount Mono Single, Book
+   Square). Mono pixel letters need normal tracking, not the tight Helvetica
+   letter-spacing. */
+.page-title,
+.cs-title,
+.cs-heading,
+.contact2-form-heading {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-variation-settings: "ELSH" 50;
+  letter-spacing: 0;
+}
+
+/* Small headings get a touch more weight so the pixels stay legible. */
+.cs-heading,
+.contact2-form-heading {
+  font-weight: 400;
 }
