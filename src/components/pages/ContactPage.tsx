@@ -69,41 +69,14 @@ const LINKS = [
   { label: "LinkedIn", href: LINKEDIN, grid: LINKED, tone: "pink", external: true },
 ];
 
-// The word "contact" in square pixels, after the design reference: each
-// letter on a 5×6 grid, one empty column between letters.
-const GLYPHS: Record<string, string[]> = {
-  c: [".###.", "#...#", "#....", "#....", "#...#", ".###."],
-  o: [".....", ".###.", "#...#", "#...#", "#...#", ".###."],
-  n: [".....", "#.##.", "##..#", "#...#", "#...#", "#...#"],
-  t: [".#...", "#####", ".#...", ".#...", ".#...", "..###"],
-  a: [".....", ".###.", "....#", ".####", "#...#", ".##.#"],
-  c2: [".....", ".####", "#....", "#....", "#...#", ".###."],
-};
-const WORD = ["c", "o", "n", "t", "a", "c2", "t"];
-const COLS = WORD.length * 6 - 1;
-const CELLS: [number, number][] = WORD.flatMap((g, li) =>
-  GLYPHS[g].flatMap((row, y) => [...row].flatMap((ch, x) => (ch === "#" ? [[li * 6 + x, y] as [number, number]] : []))),
-);
-
-function PixelWord() {
-  return (
-    <svg className="contact-word" viewBox={`0 0 ${COLS} 6`} aria-hidden="true" focusable="false">
-      {CELLS.map(([x, y]) => (
-        <rect key={`${x}-${y}`} x={x + 0.13} y={y + 0.13} width={0.74} height={0.74} />
-      ))}
-    </svg>
-  );
-}
-
-// Contact — white. The word "contact" in big square pixels across the top;
+// Contact — white. The word "contact" in the brand pixel font across the top;
 // bottom-left the enquiry form in small type; bottom-right the email /
 // Instagram / LinkedIn pixel icons stacked.
 export function ContactPage({ open, onBack }: Props) {
   return (
     <PageShell open={open} theme="white" label="Contact" onBack={onBack}>
       <div className="contact2">
-        <h1 className="sr-only">Contact</h1>
-        <PixelWord />
+        <h1 className="page-title contact-word">contact</h1>
         <div className="contact2-bottom">
           <section className="contact2-form" aria-label="Send a message">
             <h2 className="contact2-form-heading">Send a message</h2>

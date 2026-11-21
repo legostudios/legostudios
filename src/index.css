@@ -1950,11 +1950,18 @@
   gap: clamp(1.5rem, 4vh, 3rem);
 }
 
-.contact-word {
-  display: block;
-  width: 100%;
-  max-height: 34vh;
-  fill: var(--fg);
+/* "contact" in Bitcount, spanning the full width. The font is monospace
+   (0.6em per letter), so 7 letters = 4.2em; capped by height on short screens. */
+.contact2 {
+  container-type: inline-size;
+}
+
+.page-title.contact-word {
+  margin: 0;
+  font-size: min(100cqw / 4.2, 42vh);
+  line-height: 0.8;
+  text-transform: none;
+  white-space: nowrap;
 }
 
 .contact2-bottom {
