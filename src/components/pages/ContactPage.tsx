@@ -14,53 +14,61 @@ interface Props {
   onBack: () => void;
 }
 
-// Pixel-art icons on a 13×13 grid: a rounded square in the icon's brand
-// colour ("f") with a bold black outline and black symbol ("#"), so the
-// envelope, camera and "in" read clearly.
+// Pixel-art icons on a 15×15 grid: a borderless rounded square in the icon's
+// brand colour ("f") with the real logo's structure drawn in black ("#"):
+// an envelope, Instagram's rounded camera with its lens and flash dot, and
+// LinkedIn's "in".
+const ICON_GRID = 15;
 const MAIL = [
-  "..#########..",
-  ".#fffffffff#.",
-  "#fffffffffff#",
-  "#f#########f#",
-  "#f##fffff##f#",
-  "#f#f#fff#f#f#",
-  "#f#ff#f#ff#f#",
-  "#f#fff#fff#f#",
-  "#f#fffffff#f#",
-  "#f#########f#",
-  "#fffffffffff#",
-  ".#fffffffff#.",
-  "..#########..",
+  "...fffffffff...",
+  ".fffffffffffff.",
+  ".fffffffffffff.",
+  "fffffffffffffff",
+  "ff###########ff",
+  "ff##fffffff##ff",
+  "ff#f#fffff#f#ff",
+  "ff#ff#fff#ff#ff",
+  "ff#fff#f#fff#ff",
+  "ff#ffff#ffff#ff",
+  "ff#fffffffff#ff",
+  "ff###########ff",
+  ".fffffffffffff.",
+  ".fffffffffffff.",
+  "...fffffffff...",
 ];
 const INSTA = [
-  "..#########..",
-  ".#fffffffff#.",
-  "#fffffffffff#",
-  "#fff#####fff#",
-  "#ff#ffff##ff#",
-  "#ff#f###f#ff#",
-  "#ff#f#f#f#ff#",
-  "#ff#f###f#ff#",
-  "#ff#fffff#ff#",
-  "#fff#####fff#",
-  "#fffffffffff#",
-  ".#fffffffff#.",
-  "..#########..",
+  "...fffffffff...",
+  ".fffffffffffff.",
+  ".fff#######fff.",
+  "fff#fffffff#fff",
+  "ff#fffffff#f#ff",
+  "ff#fff###fff#ff",
+  "ff#ff#fff#ff#ff",
+  "ff#ff#fff#ff#ff",
+  "ff#ff#fff#ff#ff",
+  "ff#fff###fff#ff",
+  "ff#fffffffff#ff",
+  "fff#fffffff#fff",
+  ".fff#######fff.",
+  ".fffffffffffff.",
+  "...fffffffff...",
 ];
 const LINKED = [
-  "..#########..",
-  ".#fffffffff#.",
-  "#fffffffffff#",
-  "#ff#ffffffff#",
-  "#fffffffffff#",
-  "#ff#f#f##fff#",
-  "#ff#f##ff#ff#",
-  "#ff#f#fff#ff#",
-  "#ff#f#fff#ff#",
-  "#ff#f#fff#ff#",
-  "#fffffffffff#",
-  ".#fffffffff#.",
-  "..#########..",
+  "...fffffffff...",
+  ".fffffffffffff.",
+  ".fffffffffffff.",
+  "fffffffffffffff",
+  "fff##ffffffffff",
+  "fffffffffffffff",
+  "fff##f#####ffff",
+  "fff##f######fff",
+  "fff##f##ff##fff",
+  "fff##f##ff##fff",
+  "fff##f##ff##fff",
+  "fff##f##ff##fff",
+  ".fffffffffffff.",
+  ".fffffffffffff.",
+  "...fffffffff...",
 ];
 
 const LINKS = [
@@ -92,7 +100,7 @@ export function ContactPage({ open, onBack }: Props) {
                   className={`contact-icon contact-icon--${l.tone}`}
                   {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
-                  <PixelIcon rects={toRects(l.grid)} grid={13} size={39} />
+                  <PixelIcon rects={toRects(l.grid)} grid={ICON_GRID} size={45} />
                 </a>
               </li>
             ))}

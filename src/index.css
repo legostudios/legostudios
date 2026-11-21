@@ -1992,7 +1992,7 @@ html {
 .contact2-socials {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: clamp(1.1rem, 2.2vh, 1.6rem);
   margin: 0;
   padding: 0;
   list-style: none;
