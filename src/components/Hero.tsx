@@ -56,12 +56,12 @@ export function Hero() {
         loop
         playsInline
         preload="auto"
-        poster="/home-video-poster.jpg"
+        poster="/home-video-v2-poster.jpg"
         aria-hidden="true"
         tabIndex={-1}
       >
-        <source src="/home-video-720.mp4" type="video/mp4" media="(max-width: 767px)" />
-        <source src="/home-video.mp4" type="video/mp4" />
+        <source src="/home-video-v2-720.mp4" type="video/mp4" media="(max-width: 767px)" />
+        <source src="/home-video-v2.mp4" type="video/mp4" />
       </video>
 
       {/* The computer, centered in the space above the strip and sized to fit
