@@ -1657,7 +1657,7 @@ html {
 /* One heading size for Services, Case Studies and Contact, small enough to
    stay clear of the 3D panels. */
 :root {
-  --section-title: max(1.6rem, min(4.6vw, 7.5vh));
+  --section-title: max(2rem, min(5.8vw, 9.4vh));
 }
 
 .stack-head .page-title {
