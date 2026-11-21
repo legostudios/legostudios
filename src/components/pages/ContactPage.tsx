@@ -17,8 +17,8 @@ interface Props {
 // Pixel-art icons on a 15×15 grid with no background tile: just each logo's
 // own shape — the envelope, Instagram's rounded camera (lens + flash dot) and
 // LinkedIn's bare "in" letters — outlined and detailed in black ("#") and
-// filled with its brand colour ("f"). All span the same 13px width, and the
-// envelope and "in" share the same 11px height, so they read as one size. "." is transparent.
+// filled with its brand colour ("f"). All span the same 13px width so they
+// read as one size. "." is transparent.
 const ICON_GRID = 15;
 const MAIL = [
   "...............",
@@ -56,13 +56,13 @@ const INSTA = [
 ];
 const LINKED = [
   "...............",
-  "...............",
   ".####..........",
   ".#ff#..........",
   ".####..........",
   "...............",
   ".####.#######..",
   ".#ff#.#ffffff#.",
+  ".#ff#.#ff##ff#.",
   ".#ff#.#ff##ff#.",
   ".#ff#.#ff##ff#.",
   ".#ff#.#ff##ff#.",
