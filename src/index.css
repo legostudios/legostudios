@@ -1193,8 +1193,8 @@ html {
 .cs-copy p {
   margin: 0;
   max-width: 60ch;
-  font-size: clamp(1.05rem, 1.45vw, 1.45rem);
-  line-height: 1.5;
+  font-size: clamp(1.1rem, 1.45vw, 1.45rem);
+  line-height: 1.4;
 }
 
 .cs-heading {
@@ -2140,8 +2140,7 @@ html {
 }
 
 /* Every page heading in the brand pixel font (Bitcount Mono Single, Book
-   Square). Mono pixel letters need normal tracking, not the tight body-text
-   letter-spacing. */
+   Square). */
 .page-title,
 .cs-title,
 .cs-heading,
@@ -2154,8 +2153,58 @@ html {
   word-spacing: -0.1em;
 }
 
-/* Small headings get a touch more weight so the pixels stay legible. */
-.cs-heading,
+/* Bitcount must stay at weight 300: at 400+ the square dots fill in solid
+   and it reads as a different font. Small headings therefore get a size big
+   enough for the dots to stay visible (about 22px minimum). */
+.cs-heading {
+  margin: 0 0 clamp(0.75rem, 1.2vw, 1.25rem);
+  font-size: clamp(1.4rem, 2.3vw, 2.3rem);
+  line-height: 1;
+}
+
 .contact2-form-heading {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* The "next case study" name is a headline too. */
+.cs-next-name {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-variation-settings: "ELSH" 50;
+  letter-spacing: var(--heading-track);
+  word-spacing: -0.1em;
+}
+
+/* Case study type scale: one body size shared by the paragraphs and the
+   impact list, headings clearly above it, small labels clearly below. */
+.page--detail {
+  --cs-body: clamp(1.15rem, 1.6vw, 1.6rem);
+}
+
+.cs-copy p {
+  font-size: var(--cs-body);
+  line-height: 1.4;
+}
+
+.cs-impact .page-row {
+  gap: 0;
+  padding-top: clamp(0.4rem, 1vh, 0.75rem);
+  padding-bottom: clamp(0.4rem, 1vh, 0.75rem);
+}
+
+.cs-impact .page-row-num {
+  width: 3.2em;
+  min-width: 0;
+  font-size: calc(var(--cs-body) * 0.7);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.cs-impact-line {
+  font-size: var(--cs-body);
   font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
 }
