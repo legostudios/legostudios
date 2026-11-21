@@ -729,10 +729,15 @@ html {
 }
 
 .menu-folder-label {
-  font-size: clamp(0.9rem, 1.4vw, 1.4rem);
-  font-weight: 700;
+  /* Brand pixel font, at a size where its square dots stay visible. */
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-variation-settings: "ELSH" 50;
+  font-size: clamp(1.4rem, 2.5vw, 2.8rem);
   line-height: 1.1;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--heading-track);
+  word-spacing: -0.1em;
+  white-space: nowrap;
   text-transform: uppercase;
   text-align: center;
   pointer-events: none;
