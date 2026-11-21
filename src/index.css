@@ -174,6 +174,8 @@ html {
 
   --font-sans: "Instrument Serif", Georgia, serif;
   --font-heading: "Bitcount Single", ui-monospace, monospace;
+  /* Heading letter spacing; each letter is 0.6em wide before tracking. */
+  --heading-track: -0.05em;
 
   --animate-bob: bob 1.6s ease-in-out infinite;
 }
@@ -1954,14 +1956,15 @@ html {
 }
 
 /* "contact" in Bitcount, spanning the full width. The font is monospace
-   (0.6em per letter), so 7 letters = 4.2em; capped by height on short screens. */
+   (0.6em per letter, 0.55em after the -0.05em tracking), so 7 letters = 3.85em;
+   capped by height on short screens. */
 .contact2 {
   container-type: inline-size;
 }
 
 .page-title.contact-word {
   margin: 0;
-  font-size: min(100cqw / 4.2, 42vh);
+  font-size: min(100cqw / 3.85, 42vh);
   line-height: 0.8;
   text-transform: none;
   white-space: nowrap;
@@ -2146,7 +2149,9 @@ html {
   font-family: var(--font-heading);
   font-weight: 300;
   font-variation-settings: "ELSH" 50;
-  letter-spacing: 0;
+  /* Tighter than the font's default monospace spacing. */
+  letter-spacing: var(--heading-track);
+  word-spacing: -0.1em;
 }
 
 /* Small headings get a touch more weight so the pixels stay legible. */
