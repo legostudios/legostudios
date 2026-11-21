@@ -1975,6 +1975,13 @@ html {
   white-space: nowrap;
 }
 
+/* Short landscape screens: a little smaller so the form still fits. */
+@media (max-height: 760px) and (min-width: 768px) {
+  .page-title.contact-word {
+    font-size: min(100cqw / 3.85, 32vh);
+  }
+}
+
 .contact2-bottom {
   display: flex;
   align-items: flex-end;
@@ -1993,7 +2000,7 @@ html {
 
 /* The form, small and compact, bottom-right. */
 .contact2-form {
-  width: min(560px, 46%);
+  width: min(680px, 56%);
 }
 
 .contact2-form-heading {
@@ -2003,7 +2010,7 @@ html {
 }
 
 .contact2-form .cform-grid {
-  gap: 0.8rem 1.5rem;
+  gap: 1rem 1.75rem;
 }
 
 .contact2-form .cform-field {
@@ -2011,7 +2018,7 @@ html {
 }
 
 .contact2-form .cform-label {
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .contact2-form .cform input,
@@ -2019,23 +2026,23 @@ html {
 .contact2-form .cselect-trigger {
   padding-top: 0.3rem;
   padding-bottom: 0.3rem;
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   border-bottom-width: 1px;
 }
 
 .contact2-form .cform textarea {
   min-height: 0;
-  height: 3.6rem;
+  height: 4.2rem;
   resize: none;
 }
 
 .contact2-form .cselect::after {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   top: 1.05em;
 }
 
 .contact2-form .cselect-option {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   padding: 0.45rem 0.75rem;
 }
 
@@ -2044,8 +2051,8 @@ html {
 }
 
 .contact2-form .cform-submit {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.4rem;
+  font-size: 1.2rem;
 }
 
 /* Phones: socials and form stack under the word. */
@@ -2168,8 +2175,8 @@ html {
 }
 
 .contact2-form-heading {
-  margin: 0 0 1rem;
-  font-size: 1.4rem;
+  margin: 0 0 1.1rem;
+  font-size: 1.6rem;
   line-height: 1;
 }
 
