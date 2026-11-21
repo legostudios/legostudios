@@ -1521,6 +1521,8 @@ html {
 .contact-icon--yellow { color: var(--color-brand-yellow); }
 .contact-icon--sky { color: var(--color-brand-sky); }
 .contact-icon--pink { color: var(--color-brand-pink); }
+/* LinkedIn in its own blue. */
+.contact-icon--blue { color: #0a66c2; }
 
 /* Hover keeps the colours and just lifts the icon a little. */
 .contact-icon:hover,
@@ -1993,7 +1995,7 @@ html {
 .contact2-socials {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.1rem, 2.2vh, 1.6rem);
+  gap: clamp(0.8rem, 1.6vh, 1.1rem);
   margin: 0;
   padding: 0;
   list-style: none;

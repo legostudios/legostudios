@@ -16,11 +16,11 @@ interface Props {
 
 // Pixel-art icons on a 15×15 grid with no background tile: just each logo's
 // own shape — the envelope, Instagram's rounded camera (lens + flash dot) and
-// LinkedIn's "in" square — outlined and detailed in black ("#") and filled
-// with its brand colour ("f"). "." is transparent.
+// LinkedIn's bare "in" letters — outlined and detailed in black ("#") and
+// filled with its brand colour ("f"). All span the same 13px width so they
+// read as one size. "." is transparent.
 const ICON_GRID = 15;
 const MAIL = [
-  "...............",
   "...............",
   "...............",
   ".#############.",
@@ -31,8 +31,9 @@ const MAIL = [
   ".#ffff#f#ffff#.",
   ".#fffff#fffff#.",
   ".#fffffffffff#.",
+  ".#fffffffffff#.",
+  ".#fffffffffff#.",
   ".#############.",
-  "...............",
   "...............",
   "...............",
 ];
@@ -55,26 +56,26 @@ const INSTA = [
 ];
 const LINKED = [
   "...............",
-  "...#########...",
-  "..#fffffffff#..",
-  ".#fffffffffff#.",
-  ".#ff##fffffff#.",
-  ".#fffffffffff#.",
-  ".#ff##f####ff#.",
-  ".#ff##f#####f#.",
-  ".#ff##f##f##f#.",
-  ".#ff##f##f##f#.",
-  ".#ff##f##f##f#.",
-  ".#fffffffffff#.",
-  "..#fffffffff#..",
-  "...#########...",
+  ".####..........",
+  ".#ff#..........",
+  ".####..........",
+  "...............",
+  ".####.#######..",
+  ".#ff#.#ffffff#.",
+  ".#ff#.#ff##ff#.",
+  ".#ff#.#ff##ff#.",
+  ".#ff#.#ff##ff#.",
+  ".#ff#.#ff##ff#.",
+  ".#ff#.#ff##ff#.",
+  ".#ff#.#ff##ff#.",
+  ".####.########.",
   "...............",
 ];
 
 const LINKS = [
   { label: `Email ${EMAIL}`, href: `mailto:${EMAIL}`, grid: MAIL, tone: "yellow", external: false },
-  { label: "Instagram", href: INSTAGRAM, grid: INSTA, tone: "sky", external: true },
-  { label: "LinkedIn", href: LINKEDIN, grid: LINKED, tone: "pink", external: true },
+  { label: "Instagram", href: INSTAGRAM, grid: INSTA, tone: "pink", external: true },
+  { label: "LinkedIn", href: LINKEDIN, grid: LINKED, tone: "blue", external: true },
 ];
 
 // Contact — white. The word "contact" in the brand pixel font across the top;
