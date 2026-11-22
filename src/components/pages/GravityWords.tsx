@@ -16,6 +16,8 @@ interface Props {
 const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matter;
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
+// Fastest a word may fall (px per half-step).
+const MAX_FALL = 9;
 
 // Words that drop in under gravity, falling straight down and stacking flat
 // at the bottom. Grab and throw them; the pointer playfully knocks words it
@@ -118,6 +120,18 @@ export function GravityWords({ words }: Props) {
     Events.on(grab, "startdrag", () => root.classList.add("is-grabbing"));
     Events.on(grab, "enddrag", () => root.classList.remove("is-grabbing"));
 
+    // Once the whole pile has been still for about a second the simulation
+    // pauses, so resting words stay perfectly still (no creeping or
+    // vibration). Any push, grab, press or resize resumes it.
+    let resting = false;
+    let stillFrames = 0;
+    const prev = new Map<Matter.Body, { x: number; y: number; a: number }>();
+    const wake = () => {
+      resting = false;
+      stillFrames = 0;
+    };
+    root.addEventListener("pointerdown", wake);
+
     // Simulation + DOM update loop.
     let raf = 0;
     let last = performance.now();
@@ -139,6 +153,7 @@ export function GravityWords({ words }: Props) {
           const dy = Math.max(bb.min.y - p.y, 0, p.y - bb.max.y);
           const d = Math.hypot(dx, dy);
           if (d < 50 && speed > 0.5) {
+            wake();
             // Release the word so it can tumble, with a little random spin.
             const fb = b as Matter.Body & { freeInertia: number };
             if (b.inertia === Infinity) {
@@ -158,23 +173,46 @@ export function GravityWords({ words }: Props) {
         }
       }
       lastPointer = { ...mouse.position };
-      Engine.update(engine, dt);
-      // Never let a word end up inside the floor or past the side walls (a
-      // hard drag can push one through). A word stuck below the screen edge
-      // would be invisible and leave the words above it floating.
+      if (grab.body) wake();
+      if (resting) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+      // Two smaller steps per frame and a capped fall speed, so a landing
+      // word doesn't press into the pile and get sprung back out (bounce).
+      for (let i = 0; i < 2; i++) {
+        for (const b of bodies) {
+          if (b.velocity.y > MAX_FALL) Body.setVelocity(b, { x: b.velocity.x, y: MAX_FALL });
+        }
+        Engine.update(engine, dt / 2);
+      }
+      // At rest = nothing actually moved this frame (a resting word still
+      // reports a little speed from gravity before the floor cancels it).
+      let moving = false;
+      for (const b of bodies) {
+        const pr = prev.get(b);
+        if (!pr || Math.abs(b.position.x - pr.x) > 0.03 || Math.abs(b.position.y - pr.y) > 0.03 || Math.abs(b.angle - pr.a) > 0.0004) moving = true;
+        prev.set(b, { x: b.position.x, y: b.position.y, a: b.angle });
+      }
+      stillFrames = moving ? 0 : stillFrames + 1;
+      if (stillFrames > 60) resting = true;
+      // Rescue a word that has been pushed deep into the floor or past a side
+      // wall (a hard drag can do that); a word stuck below the screen edge
+      // would be invisible and leave the words above it floating. Resting
+      // words always overlap the floor by a hair (normal contact), so only a
+      // real sink is corrected — touching normal contacts every frame makes
+      // the whole pile bounce and vibrate.
+      const SINK = 12;
       for (const b of bodies) {
         const bb = b.bounds;
         let dx = 0;
         let dy = 0;
-        if (bb.max.y > H) dy = H - bb.max.y;
-        if (bb.min.x < 0) dx = -bb.min.x;
-        else if (bb.max.x > W) dx = W - bb.max.x;
+        if (bb.max.y > H + SINK) dy = H - bb.max.y;
+        if (bb.min.x < -SINK) dx = -bb.min.x;
+        else if (bb.max.x > W + SINK) dx = W - bb.max.x;
         if (dx || dy) {
           Body.setPosition(b, { x: b.position.x + dx, y: b.position.y + dy });
-          Body.setVelocity(b, {
-            x: dx ? 0 : b.velocity.x,
-            y: dy ? Math.min(0, b.velocity.y) : b.velocity.y,
-          });
+          Body.setVelocity(b, { x: dx ? 0 : b.velocity.x, y: dy ? 0 : b.velocity.y });
         }
       }
       for (const b of bodies) {
@@ -187,6 +225,7 @@ export function GravityWords({ words }: Props) {
 
     // Keep the walls at the screen edges when the window changes size.
     const onResize = () => {
+      wake();
       const nW = root.clientWidth;
       const nH = root.clientHeight;
       Body.setPosition(walls[0], { x: nW / 2, y: nH + T / 2 });
@@ -207,6 +246,7 @@ export function GravityWords({ words }: Props) {
       root.removeEventListener("pointerenter", onEnter);
       root.removeEventListener("pointermove", onEnter);
       root.removeEventListener("pointerleave", onLeave);
+      root.removeEventListener("pointerdown", wake);
       window.removeEventListener("pointerup", release);
       window.removeEventListener("pointercancel", release);
       window.removeEventListener("mouseup", release);
