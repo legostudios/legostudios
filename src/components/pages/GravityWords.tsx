@@ -17,7 +17,7 @@ const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matt
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 // Fastest a word may fall (px per half-step).
-const MAX_FALL = 9;
+const MAX_FALL = 20;
 
 // Words that drop in under gravity, falling straight down and stacking flat
 // at the bottom. Grab and throw them; the pointer playfully knocks words it
@@ -31,7 +31,7 @@ export function GravityWords({ words }: Props) {
     if (!root) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const engine = Engine.create({
-      gravity: { x: 0, y: 1, scale: 0.0022 },
+      gravity: { x: 0, y: 1, scale: 0.0045 },
       // Stricter contact solving so stacked words never sink into each other.
       positionIterations: 24,
       velocityIterations: 16,
@@ -160,7 +160,9 @@ export function GravityWords({ words }: Props) {
               Body.setInertia(b, fb.freeInertia);
               Body.setAngularVelocity(b, rand(-0.06, 0.06));
             }
-            const k = (1 - d / 50) * speed * 0.00009 * b.mass;
+            // (Scaled for two half-steps per frame and the stronger gravity:
+            // a force only lasts the first half-step.)
+            const k = (1 - d / 50) * speed * 0.0007 * b.mass;
             const sx = Math.sign(b.position.x - p.x) || Math.sign(v.x) || 1;
             // Away from the pointer, along its motion, upward, plus a random
             // kick, applied off-centre so the word spins.
@@ -185,6 +187,34 @@ export function GravityWords({ words }: Props) {
           if (b.velocity.y > MAX_FALL) Body.setVelocity(b, { x: b.velocity.x, y: MAX_FALL });
         }
         Engine.update(engine, dt / 2);
+      }
+      // A word resting on an edge with nothing under its middle tips off, as
+      // a real object would: words fall level (no rotation) until then, so
+      // switch its rotation on and give it a nudge toward the overhang.
+      for (const b of bodies) {
+        if (b === grab.body || b.inertia !== Infinity) continue;
+        const bb = b.bounds;
+        if (bb.max.y >= H - 4) continue; // on the floor
+        const cx = b.position.x;
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (const o of bodies) {
+          if (o === b) continue;
+          const ob = o.bounds;
+          // Directly underneath and touching.
+          if (Math.abs(ob.min.y - bb.max.y) > 6) continue;
+          const l = Math.max(bb.min.x, ob.min.x);
+          const r = Math.min(bb.max.x, ob.max.x);
+          if (r <= l) continue;
+          lo = Math.min(lo, l);
+          hi = Math.max(hi, r);
+        }
+        if (lo === Infinity) continue; // nothing touching below: already falling
+        if (cx >= lo - 2 && cx <= hi + 2) continue; // middle is supported
+        const dir = cx < lo ? -1 : 1;
+        Body.setInertia(b, (b as Matter.Body & { freeInertia: number }).freeInertia);
+        Body.setAngularVelocity(b, dir * 0.03);
+        wake();
       }
       // At rest = nothing actually moved this frame (a resting word still
       // reports a little speed from gravity before the floor cancels it).

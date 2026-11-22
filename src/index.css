@@ -128,7 +128,7 @@
   src: url("/fonts/InstrumentSerif-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 html {
@@ -138,9 +138,9 @@ html {
 /* Helvetica Neue Bold, kept only for the homepage strip. */
 @font-face {
   font-family: "Helvetica Neue";
-  src: url("/fonts/HelveticaNeueBold.otf") format("opentype");
+  src: url("/fonts/HelveticaNeueBold.woff2") format("woff2");
   font-weight: 700;
-  font-display: swap;
+  font-display: block;
 }
 
 /* Brand primary / logo font: Bitcount Mono Single, "Book Square" cut
@@ -149,7 +149,7 @@ html {
   font-family: "Bitcount Single";
   src: url("/fonts/BitcountSingle.woff2") format("woff2");
   font-weight: 100 900;
-  font-display: swap;
+  font-display: block;
 }
 
 @theme {
