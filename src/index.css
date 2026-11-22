@@ -2240,10 +2240,11 @@ html {
   }
 }
 
-/* ── Case Studies on phones (≤768px): flat 2D cascade ──────────────────────
-   StackView adds .stack-stage--flat and places each card with translate +
-   scale only. Every 3D property is switched off here: no camera turn, no
-   perspective, no preserve-3d, no hover slide. */
+/* ── Case Studies on phones (≤768px) ───────────────────────────────────────
+   StackView projects the reference camera (5° fov, cards yawed −30°) into a
+   matrix3d per card. The stage itself stays flat: no CSS perspective, no
+   preserve-3d, no hover slide. Only transform and opacity change while
+   scrolling. */
 .stack-stage--flat {
   perspective: none;
   overflow: hidden;
@@ -2261,70 +2262,36 @@ html {
 .stack-stage--flat .stack-card {
   left: 0;
   top: 0;
-  transform-origin: 50% 50%;
+  /* Hidden until the first projected frame, so nothing flashes at the origin. */
+  opacity: 0;
+  transform-origin: 0 0;
   transform-style: flat;
   will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Glass card: rounded, a thin translucent white border with a bright top
-   highlight, a light white tint over the (slightly see-through) image with
-   the cards behind blurred through it, a diagonal sheen and a soft drop
-   shadow so overlapping cards separate. The blur never animates; only the
-   card's transform does. */
+/* Motion only. Glass (tint, rim, sheen, edge fade) is the shared
+   .stack-card-inner / .stack-glass rules, so a phone card matches a desktop
+   card. Corners stay square. */
 .stack-stage--flat .stack-card-inner,
 .stack-stage--flat .stack-card.is-hovered .stack-card-inner {
   transform: none;
   transition: none;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-.stack-stage--flat .stack-card-inner img {
-  -webkit-mask-image: none;
-  mask-image: none;
-  object-fit: cover;
-  opacity: 0.9;
-}
-
-/* Light white tint plus a diagonal sheen across the glass. */
-.stack-stage--flat .stack-glass {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.08);
-}
-
-/* The image copy that grows from the tapped card into the study's main
-   image (see flyOpen in StackView). */
-.stack-fly {
+/* The tapped card, drawn above the opening study. The inner sheet is a
+   .stack-card-inner, so it uses the same glass as the stack. */
+.stack-fly-card {
   position: fixed;
+  left: 0;
+  top: 0;
   z-index: 95;
-  overflow: hidden;
   pointer-events: none;
-  transform-origin: 50% 50%;
-  will-change: transform, clip-path;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
 }
 
-.stack-fly img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.stack-fly.is-flying {
-  transition:
-    transform 480ms cubic-bezier(0.22, 1, 0.36, 1),
-    clip-path 480ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 180ms ease;
-}
-
-.stack-fly.is-done {
-  opacity: 0;
+.stack-fly-card .stack-card-inner {
+  transform: none;
+  transition: none;
 }
