@@ -357,12 +357,15 @@ export function StackView({ items, onOpen }: StackViewProps) {
     fly.className = "stack-fly-card";
     fly.style.width = `${pose0.layoutW}px`;
     fly.style.height = `${pose0.layoutH}px`;
+    const sheet = document.createElement("div");
+    sheet.className = "stack-card-inner";
     const img = document.createElement("img");
     img.src = image;
     img.alt = "";
     const glass = document.createElement("span");
     glass.className = "stack-glass";
-    fly.append(img, glass);
+    sheet.append(img, glass);
+    fly.append(sheet);
     document.body.appendChild(fly);
     hiddenKey.current = key;
     const t0 = performance.now();

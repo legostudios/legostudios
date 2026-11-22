@@ -2270,76 +2270,28 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Glass card: rounded, a thin translucent white border with a bright top
-   highlight, a light white tint over the (slightly see-through) image with
-   the cards behind blurred through it, a diagonal sheen and a soft drop
-   shadow so overlapping cards separate. The blur never animates; only the
-   card's transform does. */
+/* Motion only. Glass (tint, rim, sheen, edge fade) is the shared
+   .stack-card-inner / .stack-glass rules, so a phone card matches a desktop
+   card. Corners stay square. */
 .stack-stage--flat .stack-card-inner,
 .stack-stage--flat .stack-card.is-hovered .stack-card-inner {
   transform: none;
   transition: none;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-.stack-stage--flat .stack-card-inner img {
-  -webkit-mask-image: none;
-  mask-image: none;
-  object-fit: cover;
-  opacity: 0.9;
-}
-
-/* Light white tint plus a diagonal sheen across the glass. */
-.stack-stage--flat .stack-glass {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.08);
-}
-
-/* The tapped card, drawn above the opening study while it yaws flat and
-   lands on the study photo. Same glass as the cards in the stack. */
+/* The tapped card, drawn above the opening study. The inner sheet is a
+   .stack-card-inner, so it uses the same glass as the stack. */
 .stack-fly-card {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 95;
-  overflow: hidden;
   pointer-events: none;
   transform-origin: 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 30px rgba(0, 0, 0, 0.25);
   will-change: transform, opacity;
 }
 
-.stack-fly-card img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.9;
-}
-
-.stack-fly-card .stack-glass {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.08);
+.stack-fly-card .stack-card-inner {
+  transform: none;
+  transition: none;
 }
