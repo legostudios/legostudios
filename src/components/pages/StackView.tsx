@@ -22,43 +22,6 @@ const IN_FRONT = 3;
 const DRAG_THRESHOLD = 6;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const smooth = (t: number) => t * t * (3 - 2 * t);
-// Stable pseudo-random number in [0, 1) for a panel index (so each panel
-// keeps its own size, proportion and tilt as it travels).
-const hash = (k: number) => {
-  const x = Math.sin(k * 127.1 + 311.7) * 43758.5453;
-  return x - Math.floor(x);
-};
-
-// ── Phone composition (tall screens) ──────────────────────────────────────
-// A one-point-perspective collage: panels recede toward a vanishing point
-// near the top-right corner and grow as they come forward, leaving at the
-// bottom-left. Alternate panels sit either side of the path (a loose
-// zig-zag), and each has its own size, proportion and slight tilt, so the
-// composition reads as an editorial collage rather than a row of tiles.
-// Every value is a share of the screen, so it adapts to any phone.
-const M = {
-  // Focal panel centre and vanishing point (shares of width / height). The
-  // vanishing point sits beyond the top-right corner so the row climbs at a
-  // steady diagonal and far panels stay readable.
-  ax: 0.36,
-  ay: 0.62,
-  vx: 1.1,
-  vy: 0.0,
-  // Scale falls by this factor per panel of depth (perspective).
-  depth: 1.14,
-  // Base panel width (share of screen width), capped by screen height.
-  w: 0.58,
-  maxH: 0.33,
-  // Zig-zag: sideways offset either side of the path (share of panel width).
-  zig: 0.3,
-  // Panels fade out at the far end and once they have flown past.
-  farFade: [9, 11.5],
-  nearFade: [-1.6, -2.4],
-};
-// Proportions (height / width) the panels cycle through.
-const RATIOS = [1.3, 1.02, 1.42, 1.16, 0.9, 1.24];
 
 
 // A 3D stack of image panels on a diagonal — the nearest at the bottom-left,
@@ -99,59 +62,6 @@ export function StackView({ items, onOpen }: StackViewProps) {
   const n = items.length;
   const itemAt = (k: number) => ((k % n) + n) % n;
 
-  // Phones: place each panel directly on screen (transforms only, no layout
-  // work per frame). See M above for the composition.
-  const layoutPhone = useCallback((W: number, H: number) => {
-    const baseW = Math.min(W * M.w, H * M.maxH);
-    const ax = W * M.ax;
-    const ay = H * M.ay;
-    const vx = W * M.vx;
-    const vy = H * M.vy;
-    // Unit vector across the path (for the zig-zag), pointing down-right.
-    const len = Math.hypot(vx - ax, vy - ay);
-    const nx = -(vy - ay) / len;
-    const ny = (vx - ax) / len;
-    cards.current.forEach((card, k) => {
-      const p = k - pos.current;
-      const r1 = hash(k);
-      const r2 = hash(k + 57);
-      const r3 = hash(k + 131);
-      // Own size and proportion, set once per panel (not every frame).
-      const w = Math.round(baseW * lerp(0.84, 1.1, r1));
-      const h = Math.round(w * RATIOS[((k % RATIOS.length) + RATIOS.length) % RATIOS.length]);
-      const size = `${w}x${h}`;
-      if (card.dataset.size !== size) {
-        card.dataset.size = size;
-        card.style.width = `${w}px`;
-        card.style.height = `${h}px`;
-      }
-      // Perspective: scale shrinks with depth; position converges on the
-      // vanishing point by the same factor.
-      // In front of the focal panel they grow faster, so they sweep off the
-      // bottom-left instead of lingering over the composition.
-      const s = p >= 0 ? Math.pow(M.depth, -p) : 1 - p * 0.42;
-      const side = k % 2 === 0 ? -1 : 1;
-      const zig = side * baseW * M.zig * lerp(0.75, 1.15, r2) * s;
-      const x = vx + (ax - vx) * s + nx * zig;
-      const y = vy + (ay - vy) * s + ny * zig;
-      // Tilt: turned a little away (left edge nearer) and gently rolled;
-      // panels straighten up as they come to the front — a soft pop-out.
-      const t = smooth(clamp((p + 1.5) / 6, 0, 1));
-      const ry = lerp(-9, -30, t) + (r3 - 0.5) * 8;
-      const rz = (r2 - 0.5) * 5 + side * lerp(0.5, 1.5, t);
-      const op =
-        p > M.farFade[0]
-          ? clamp(1 - (p - M.farFade[0]) / (M.farFade[1] - M.farFade[0]), 0, 1)
-          : p < M.nearFade[0]
-            ? clamp(1 - (M.nearFade[0] - p) / (M.nearFade[0] - M.nearFade[1]), 0, 1)
-            : 1;
-      card.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%) scale(${s.toFixed(4)}) perspective(520px) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
-      card.style.opacity = op.toFixed(3);
-      card.style.zIndex = String(1000 - Math.round(p * 10));
-      card.style.pointerEvents = op > 0.5 ? "auto" : "none";
-    });
-  }, []);
-
   // Lay out every panel for the current position.
   const layout = useCallback(() => {
     const el = stage.current;
@@ -159,11 +69,6 @@ export function StackView({ items, onOpen }: StackViewProps) {
     const W = el.clientWidth;
     const H = el.clientHeight;
     const tall = H > W * 1.1;
-    el.classList.toggle("stack-stage--path", tall);
-    if (tall) {
-      layoutPhone(W, H);
-      return;
-    }
     // Parallel glass sheets, one behind another, seen by a camera turned and
     // tilted (see .stack-world): the row climbs from the bottom-left to the
     // top-right and each sheet's long edges slope down to the right — solved
@@ -190,18 +95,11 @@ export function StackView({ items, onOpen }: StackViewProps) {
       // Phones: a slight left/right zig-zag along the row (as in the
       // reference on mobile), fixed per panel.
       const jitter = tall ? Math.sin(k * 2.39) * cardW * v("--stack-m-jit", 0.25) : 0;
-      // Coming back from the phone layout (window resized): drop its sizes.
-      if (card.dataset.size) {
-        delete card.dataset.size;
-        card.style.width = "";
-        card.style.height = "";
-        card.style.zIndex = "";
-      }
       card.style.transform = `translate(-50%, -50%) translate3d(${jitter}px, 0, ${z}px)`;
       card.style.opacity = String(op);
       card.style.pointerEvents = op > 0.5 ? "auto" : "none";
     });
-  }, [layoutPhone]);
+  }, []);
 
   // Animation loop: ease toward the target, coast after a fling, and settle
   // on the nearest panel once input stops.
@@ -255,14 +153,6 @@ export function StackView({ items, onOpen }: StackViewProps) {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [layout, reduced]);
-
-  // Phones: on open, the collage drifts forward out of the depth into place
-  // (it starts a few panels further back and eases in).
-  useEffect(() => {
-    const el = stage.current;
-    if (!el || reduced) return;
-    if (el.clientHeight > el.clientWidth * 1.1) pos.current = target.current - 2.5;
-  }, [reduced]);
 
   useEffect(() => {
     window.addEventListener("resize", layout);

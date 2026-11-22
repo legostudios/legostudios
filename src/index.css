@@ -1727,38 +1727,6 @@ html {
   }
 }
 
-/* Phones: the panels are placed directly on screen by StackView (one-point
-   perspective collage), so the camera turn and the fixed anchor are off. */
-.stack-stage--path .stack-world {
-  transform: none;
-}
-
-.stack-stage--path .stack-card {
-  left: 0;
-  top: 0;
-  transform-origin: 50% 50%;
-}
-
-/* Crisp images with a thin glass rim and soft glare (no misty pink-washed
-   edge), and a soft shadow so each panel reads as a physical piece. */
-.stack-stage--path .stack-card-inner {
-  box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.7),
-    inset -1px -1px 0 rgba(30, 20, 10, 0.25),
-    0 10px 28px rgba(60, 0, 30, 0.22);
-}
-
-.stack-stage--path .stack-card-inner img {
-  -webkit-mask-image: none;
-  mask-image: none;
-  opacity: 1;
-}
-
-.stack-stage--path .stack-glass {
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.06) 30%, rgba(255, 255, 255, 0) 50%);
-}
-
 .stack-card {
   width: var(--card-w, 300px);
   height: var(--card-h, 400px);
@@ -2270,4 +2238,148 @@ html {
   .back-runaway {
     transition: none;
   }
+}
+
+/* ── Case Studies on phones: pinned, scroll-driven collage ──────────────────
+   The section is taller than the screen; its sticky, screen-tall box stays
+   pinned while the page scrolls through it, and CaseStudiesMobile moves each
+   card from its start to its end transform with the scroll progress. The
+   index after it is ordinary page flow. */
+.page:has(.csm) .page-bar {
+  /* Floats over the pinned collage without taking up space. */
+  margin-bottom: calc(var(--bar-h) * -1);
+  background: transparent;
+  pointer-events: none;
+}
+
+.page:has(.csm) .page-bar > * {
+  pointer-events: auto;
+}
+
+.page:has(.csm) .page-body {
+  padding: 0;
+}
+
+.csm {
+  position: relative;
+  height: 280svh;
+}
+
+.csm--still {
+  height: 100svh;
+}
+
+.csm-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.csm-head {
+  position: absolute;
+  z-index: 20;
+  top: calc(var(--bar-h) + clamp(0.25rem, 2svh, 1.25rem));
+  left: var(--gutter);
+  pointer-events: none;
+}
+
+.csm-head .page-title {
+  margin: 0;
+  font-size: var(--section-title);
+  transform: none;
+}
+
+.csm-card {
+  position: absolute;
+  display: block;
+  width: var(--w);
+  height: calc(var(--w) * var(--r));
+  /* Centre the card on its (left, top) point; these never change. */
+  margin-left: calc(var(--w) / -2);
+  margin-top: calc(var(--w) * var(--r) / -2);
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  will-change: transform;
+  /* Same glass rim as the desktop panels, plus a soft shadow for depth. */
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.7),
+    inset -1px -1px 0 rgba(30, 20, 10, 0.25),
+    0 12px 30px rgba(60, 0, 30, 0.25);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.csm-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Soft glare across the glass. */
+.csm-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0) 50%);
+}
+
+.csm-card:focus-visible {
+  outline: 2px solid var(--color-brand-white);
+  outline-offset: 3px;
+}
+
+/* The index after the collage, in normal flow. */
+.csm-index {
+  padding: clamp(1.5rem, 5svh, 3rem) var(--gutter) clamp(4rem, 12svh, 7rem);
+}
+
+.csm-index ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.csm-index button {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 0.15rem 0;
+  width: 100%;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  color: var(--color-brand-white);
+  text-align: left;
+}
+
+.csm-index li:last-child button {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.csm-index-num {
+  grid-row: span 2;
+  padding-top: 0.35em;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.csm-index-name {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-variation-settings: "ELSH" 50;
+  letter-spacing: var(--heading-track);
+  word-spacing: -0.1em;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.csm-index-meta {
+  font-size: 1rem;
+  opacity: 0.85;
 }
