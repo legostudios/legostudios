@@ -24,32 +24,40 @@ const DRAG_THRESHOLD = 6;
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 // ── Phones (≤768px): a flat 2D cascade ────────────────────────────────────
-// Cards face the screen (no 3D): a diagonal from the top-right (back) to the
-// bottom-left (front). The front card is exactly scale(1); each step back is
-// 0.125 smaller, so the fifth card is at 0.5. Steps are 42% of the card each
-// way (scaled with the card behind), so each card covers only about a third
-// of the one behind it. Motion is translate + scale only, tied 1:1 to the
-// finger; after a fling it glides to a stop with no snapping.
+// Cards face the screen (0° rotation): a diagonal from the top-right (back)
+// to the bottom-left (front), in one-point perspective — each step back the
+// card shrinks by the same factor and its centre moves the same share of the
+// way toward a vanishing point at the top-right, so spacing tightens with
+// depth like real depth. The front card is about 80vw wide, the 7th back
+// about 12vw; 7–8 cards are on screen and each covers most of the one behind
+// it. Cards keep their image's real proportions. Motion is translate + scale
+// only; the stack follows the finger with light smoothing (it glides and
+// settles when the finger stops), with no snapping or bounce.
 const FLAT_QUERY = "(max-width: 768px)";
 const FLAT = {
-  // Front card size (share of viewport width / height).
-  w: 0.48,
-  h: 0.38,
-  // Front card centre (share of width / height).
-  fx: 0.3,
-  fy: 0.7,
-  // Step between cards (share of the card's own width / height).
-  step: 0.42,
-  // Scale lost per step back (front 1 → fifth 0.5).
-  shrink: 0.125,
-  // Visible window: cards fade out past the 5th slot and as they leave.
-  backFade: [3.2, 4],
-  frontFade: [-0.3, -0.85],
-  // How much faster a card travels once it has passed the front (exit).
-  exit: 2.2,
-  // Momentum decay per 60fps frame after a fling (native-scroll-like).
-  decay: 0.95,
+  // Front card width (share of viewport width) and the far card's.
+  front: 0.8,
+  far: 0.12,
+  // How many steps from the front card to the far card.
+  steps: 7,
+  // Front card centre and vanishing point (shares of width / height).
+  fx: 0.36,
+  fy: 0.67,
+  vx: 0.98,
+  vy: 0.04,
+  // Cards fade in at the far end and fade out as they leave the front.
+  backFade: [6.4, 7.6],
+  frontFade: [-0.45, -0.9],
+  // Past the front, cards travel this much faster so they clear the
+  // bottom-left quickly instead of hanging over the front card.
+  exit: 3,
+  // Smoothing toward the finger / scroll position (share per 60fps frame).
+  smooth: 0.2,
+  // Momentum decay per 60fps frame after a fling.
+  decay: 0.94,
 };
+// Scale lost per step back (front 1 → far card).
+const FLAT_R = Math.pow(FLAT.far / FLAT.front, 1 / FLAT.steps);
 
 
 // A 3D stack of image panels on a diagonal — the nearest at the bottom-left,
@@ -70,6 +78,8 @@ export function StackView({ items, onOpen }: StackViewProps) {
   const touchFling = useRef(false);
   // Phones: the flat 2D cascade (see FLAT).
   const flat = useRef(false);
+  // Real proportions (height / width) of each image, once loaded.
+  const ratios = useRef(new Map<string, number>());
   const [base, setBase] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   // Name of the hovered panel, shown beside the mouse pointer.
@@ -101,29 +111,29 @@ export function StackView({ items, onOpen }: StackViewProps) {
     flat.current = window.matchMedia(FLAT_QUERY).matches;
     el.classList.toggle("stack-stage--flat", flat.current);
     if (flat.current) {
-      const cw = W * FLAT.w;
-      const ch = H * FLAT.h;
-      el.style.setProperty("--card-w", `${cw}px`);
-      el.style.setProperty("--card-h", `${ch}px`);
+      const cw = W * FLAT.front;
       const fx = W * FLAT.fx;
       const fy = H * FLAT.fy;
-      const ux = cw * FLAT.step;
-      const uy = ch * FLAT.step;
-      const pMax = 0.5 / FLAT.shrink;
+      const vx = W * FLAT.vx;
+      const vy = H * FLAT.vy;
       cards.current.forEach((card, k) => {
         const p = k - pos.current;
-        let sc = 1;
-        let d: number;
-        if (p >= 0) {
-          // Distance along the path = sum of the (shrinking) steps.
-          const q = Math.min(p, pMax);
-          sc = 1 - FLAT.shrink * q;
-          d = q - (FLAT.shrink * q * q) / 2 + Math.max(0, p - pMax) * 0.5;
-        } else {
-          d = p * FLAT.exit;
+        // Card box at its front size, in the image's own proportions; set
+        // only when it changes (never per frame).
+        const ratio = ratios.current.get(items[itemAt(k)].image) ?? 1.5;
+        const ch = cw * ratio;
+        const size = `${Math.round(cw)}x${Math.round(ch)}`;
+        if (card.dataset.size !== size) {
+          card.dataset.size = size;
+          card.style.width = `${cw}px`;
+          card.style.height = `${ch}px`;
         }
-        const x = fx + ux * d - cw / 2;
-        const y = fy - uy * d - ch / 2;
+        // Perspective: scale and the pull toward the vanishing point share
+        // one factor. Past the front, cards keep growing as they leave.
+        const sc = Math.pow(FLAT_R, p);
+        const pull = p >= 0 ? sc : Math.pow(FLAT_R, p * FLAT.exit);
+        const x = vx + (fx - vx) * pull - cw / 2;
+        const y = vy + (fy - vy) * pull - ch / 2;
         const op =
           p > FLAT.backFade[0]
             ? clamp((FLAT.backFade[1] - p) / (FLAT.backFade[1] - FLAT.backFade[0]), 0, 1)
@@ -165,11 +175,16 @@ export function StackView({ items, onOpen }: StackViewProps) {
       // reference on mobile), fixed per panel.
       const jitter = tall ? Math.sin(k * 2.39) * cardW * v("--stack-m-jit", 0.25) : 0;
       if (card.style.zIndex) card.style.zIndex = "";
+      if (card.dataset.size) {
+        delete card.dataset.size;
+        card.style.width = "";
+        card.style.height = "";
+      }
       card.style.transform = `translate(-50%, -50%) translate3d(${jitter}px, 0, ${z}px)`;
       card.style.opacity = String(op);
       card.style.pointerEvents = op > 0.5 ? "auto" : "none";
     });
-  }, []);
+  }, [items, n]);
 
   // Animation loop: ease toward the target, coast after a fling, and settle
   // on the nearest panel once input stops.
@@ -199,11 +214,12 @@ export function StackView({ items, onOpen }: StackViewProps) {
       }
       const d = target.current - pos.current;
       const easing = drag.current ? 0.35 : touchFling.current ? 0.34 : 0.17;
-      // Phones follow the input 1:1 (no easing lag).
-      pos.current = reduced || flat.current ? target.current : pos.current + d * (1 - Math.pow(1 - easing, f));
+      // Phones follow the input with light smoothing (glide and settle).
+      const rate = flat.current ? FLAT.smooth : easing;
+      pos.current = reduced ? target.current : Math.abs(d) < 0.0005 && flat.current ? target.current : pos.current + d * (1 - Math.pow(1 - rate, f));
       // Skip layout work once everything has come to rest.
       const still = flat.current
-        ? pos.current === lastPos && velocity.current === 0 && !drag.current
+        ? pos.current === lastPos && pos.current === target.current && velocity.current === 0 && !drag.current
         : Math.abs(d) < 0.002 && Math.abs(Math.round(target.current) - target.current) < 0.002 && velocity.current === 0 && !drag.current;
       lastPos = pos.current;
       if (still && !flat.current) {
@@ -269,9 +285,9 @@ export function StackView({ items, onOpen }: StackViewProps) {
   }, []);
 
   // Phones: pixels of vertical swipe that move the stack one card, equal to
-  // the vertical step between cards at the front, so the cards track the
-  // finger 1:1.
-  const flatUnit = () => (stage.current?.clientHeight ?? 844) * FLAT.h * FLAT.step;
+  // the vertical step between the front card and the next, so the cards
+  // track the finger.
+  const flatUnit = () => (stage.current?.clientHeight ?? 844) * (FLAT.fy - FLAT.vy) * (1 - FLAT_R);
 
   // Phones: opening a card grows it from exactly where it sits into the
   // study's main image (no jump). A copy of the image flies over the page
@@ -305,13 +321,14 @@ export function StackView({ items, onOpen }: StackViewProps) {
         width: `${to.width}px`,
         height: `${to.height}px`,
         transform: `translate3d(${dx}px, ${dy}px, 0) scale(${k})`,
-        clipPath: `inset(${insetY}px ${insetX}px)`,
+        // Rounded like the glass card (radius scaled with the copy).
+        clipPath: `inset(${insetY}px ${insetX}px round ${14 / k}px)`,
       });
       document.body.appendChild(fly);
       void fly.offsetWidth;
       fly.classList.add("is-flying");
       fly.style.transform = "translate3d(0, 0, 0) scale(1)";
-      fly.style.clipPath = "inset(0px 0px)";
+      fly.style.clipPath = "inset(0px 0px round 0px)";
       window.setTimeout(() => {
         fly.classList.add("is-done");
         window.setTimeout(() => fly.remove(), 200);
@@ -459,7 +476,19 @@ export function StackView({ items, onOpen }: StackViewProps) {
                 aria-label={item.title}
                 tabIndex={-1}
               >
-                <img src={item.image} alt="" draggable={false} />
+                <img
+                  src={item.image}
+                  alt=""
+                  draggable={false}
+                  onLoad={(e) => {
+                    // Phones size each card to its image's real proportions.
+                    const im = e.currentTarget;
+                    if (im.naturalWidth && !ratios.current.has(item.image)) {
+                      ratios.current.set(item.image, im.naturalHeight / im.naturalWidth);
+                      layout();
+                    }
+                  }}
+                />
                 <span className="stack-glass" aria-hidden="true" />
               </button>
             </div>

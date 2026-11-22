@@ -2266,26 +2266,38 @@ html {
   will-change: transform, opacity;
 }
 
+/* Glass card: rounded, a thin translucent white border with a bright top
+   highlight, a light white tint over the (slightly see-through) image with
+   the cards behind blurred through it, a diagonal sheen and a soft drop
+   shadow so overlapping cards separate. The blur never animates; only the
+   card's transform does. */
 .stack-stage--flat .stack-card-inner,
 .stack-stage--flat .stack-card.is-hovered .stack-card-inner {
   transform: none;
   transition: none;
-  /* Flat card: thin rim and a soft shadow for depth between layers. */
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.7),
-    inset -1px -1px 0 rgba(30, 20, 10, 0.25),
-    0 10px 26px rgba(60, 0, 30, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-/* Front card flat and easy to read: the full image, no misty fade. */
 .stack-stage--flat .stack-card-inner img {
   -webkit-mask-image: none;
   mask-image: none;
-  opacity: 1;
+  object-fit: cover;
+  opacity: 0.9;
 }
 
+/* Light white tint plus a diagonal sheen across the glass. */
 .stack-stage--flat .stack-glass {
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0) 50%);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 255, 255, 0.08);
 }
 
 /* The image copy that grows from the tapped card into the study's main
