@@ -1727,6 +1727,38 @@ html {
   }
 }
 
+/* Phones: the panels are placed directly on screen by StackView (one-point
+   perspective collage), so the camera turn and the fixed anchor are off. */
+.stack-stage--path .stack-world {
+  transform: none;
+}
+
+.stack-stage--path .stack-card {
+  left: 0;
+  top: 0;
+  transform-origin: 50% 50%;
+}
+
+/* Crisp images with a thin glass rim and soft glare (no misty pink-washed
+   edge), and a soft shadow so each panel reads as a physical piece. */
+.stack-stage--path .stack-card-inner {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.7),
+    inset -1px -1px 0 rgba(30, 20, 10, 0.25),
+    0 10px 28px rgba(60, 0, 30, 0.22);
+}
+
+.stack-stage--path .stack-card-inner img {
+  -webkit-mask-image: none;
+  mask-image: none;
+  opacity: 1;
+}
+
+.stack-stage--path .stack-glass {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.06) 30%, rgba(255, 255, 255, 0) 50%);
+}
+
 .stack-card {
   width: var(--card-w, 300px);
   height: var(--card-h, 400px);
