@@ -2295,3 +2295,15 @@ html {
   transform: none;
   transition: none;
 }
+
+/* No browser selection / focus rings or tap highlights anywhere on the site
+   (the blue box that appeared around the menu square and other buttons after
+   clicking or tapping). */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*:focus,
+*:focus-visible {
+  outline: none;
+}
