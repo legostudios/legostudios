@@ -2307,3 +2307,30 @@ html {
 *:focus-visible {
   outline: none;
 }
+
+/* Lego Studios logo on the computer's CRT screen. The computer image fills
+   its square box; the screen is at x 379–827, y 258–593 of the 1200×1200
+   image. The logo's black background melts into the dark screen (screen
+   blend) so the colours glow like a CRT; its stripes run in from the
+   screen's left edge, as in the logo. */
+.computer-screen {
+  position: absolute;
+  left: calc(379 / 1200 * 100%);
+  top: calc(258 / 1200 * 100%);
+  width: calc(448 / 1200 * 100%);
+  height: calc(335 / 1200 * 100%);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 7% / 9%;
+  pointer-events: none;
+}
+
+.computer-screen img {
+  display: block;
+  width: 94%;
+  height: auto;
+  mix-blend-mode: screen;
+  user-select: none;
+  -webkit-user-drag: none;
+}
