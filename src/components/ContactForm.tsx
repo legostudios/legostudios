@@ -17,15 +17,13 @@ const INQUIRY_TYPES = ["Service enquiry", "Careers", "Others"];
 type Status = "idle" | "sending" | "sent" | "error";
 
 // After this long the button says "Still sending…"; after the limit we stop
-// waiting for FormSubmit (it can be very slow) and offer a direct email.
+// waiting and offer a direct email instead.
 const SLOW_MS = 5000;
 const LIMIT_MS = 30000;
 
-// The contact form. Submissions are delivered by email to `to` (and copied to
-// every address in `cc`) through
-// FormSubmit (formsubmit.co) — no backend of our own. FormSubmit asks the
-// inbox owner to confirm once, via an activation email sent on the first
-// submission; until then nothing is delivered.
+// The contact form. Submissions go to our Vercel function (api/contact.ts),
+// which emails them through Resend to hello@ with a copy to jashwanth@.
+// `to` / `cc` are only used for the direct-email fallback if sending fails.
 export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
   const [status, setStatus] = useState<Status>("idle");
   const [slow, setSlow] = useState(false);
@@ -62,24 +60,21 @@ export function ContactForm({ to, cc = [] }: { to: string; cc?: string[] }) {
     const slowTimer = window.setTimeout(() => setSlow(true), SLOW_MS);
     const limitTimer = window.setTimeout(() => ctrl.abort(), LIMIT_MS);
     try {
-      const res = await fetch(`https://formsubmit.co/ajax/${to}`, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         signal: ctrl.signal,
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          Name: get("name"),
-          Email: get("email"),
-          "Inquiry type": get("inquiry") || "-",
-          "Heard about us": get("source") || "-",
-          Message: get("message"),
-          _subject: subject,
-          _replyto: get("email"),
-          ...(cc.length ? { _cc: cc.join(",") } : {}),
-          _template: "table",
+          name: get("name"),
+          email: get("email"),
+          inquiry: get("inquiry"),
+          source: get("source"),
+          message: get("message"),
+          honey: get("_honey"),
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { success?: string | boolean };
-      if (!res.ok || String(data.success) !== "true") throw new Error("send failed");
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean };
+      if (!res.ok || data.ok !== true) throw new Error("send failed");
       form.reset();
       setStatus("sent");
     } catch {
