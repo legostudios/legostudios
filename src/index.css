@@ -2308,31 +2308,37 @@ html {
   outline: none;
 }
 
-/* Lego Studios logo on the computer's CRT screen. The computer image fills
-   its square box; the screen is at x 379–827, y 258–593 of the 1200×1200
-   image. The logo's black background melts into the dark screen (screen
-   blend) so the colours glow like a CRT; its stripes run in from the
-   screen's left edge, as in the logo. */
+/* Animated Lego Studios logo on the computer's CRT screen. The computer
+   image fills its square box; the screen is at x 379–827, y 258–593 of the
+   1200×1200 image. The clip is made at the screen's own shape with its
+   near-black background, so it fills the glass edge to edge (no box), and
+   the overlay adds the CRT's soft centre glow and darker curved edges. */
 .computer-screen {
   position: absolute;
   left: calc(379 / 1200 * 100%);
   top: calc(258 / 1200 * 100%);
   width: calc(448 / 1200 * 100%);
   height: calc(335 / 1200 * 100%);
-  display: flex;
-  align-items: center;
   overflow: hidden;
   border-radius: 7% / 9%;
+  background: #090907;
   pointer-events: none;
 }
 
 .computer-screen video {
   display: block;
-  width: 94%;
-  height: auto;
-  aspect-ratio: 900 / 428;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  mix-blend-mode: screen;
-  user-select: none;
-  -webkit-user-drag: none;
+}
+
+.computer-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 45%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 85% 85% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.7);
 }
