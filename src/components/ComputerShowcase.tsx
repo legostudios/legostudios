@@ -14,8 +14,8 @@ export function ComputerShowcase() {
           the still frame shows instantly while it loads. */}
       <div className="computer-screen" aria-hidden="true">
         <video
-          src="/logo-screen-v2.mp4"
-          poster="/logo-screen-v2-poster.webp"
+          src="/logo-screen-v4.mp4"
+          poster="/logo-screen-v4-poster.webp"
           autoPlay
           muted
           loop
