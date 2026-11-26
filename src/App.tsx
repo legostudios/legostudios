@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { CustomCursor } from "./components/CustomCursor";
 import { Hero } from "./components/Hero";
 import { MenuButton, type SquareSkip } from "./components/MenuButton";
 import { ContactIcon } from "./components/ContactIcon";
 import { Menu, type PageId } from "./components/Menu";
-import { ServicesPage } from "./components/pages/ServicesPage";
+// Services (with its physics engine) loads as a separate file right after the
+// homepage is up, so it doesn't slow the first screen down.
+const ServicesPage = lazy(() => import("./components/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })));
 import { CaseStudiesPage } from "./components/pages/CaseStudiesPage";
 import { ContactPage } from "./components/pages/ContactPage";
 import { CaseStudyPage } from "./components/CaseStudyPage";
@@ -136,7 +138,9 @@ export default function App() {
 
       <Menu open={menuOpen} onOpenPage={setPage} onBack={back} />
 
-      <ServicesPage open={page === "services"} onBack={back} />
+      <Suspense fallback={null}>
+        <ServicesPage open={page === "services"} onBack={back} />
+      </Suspense>
       <CaseStudiesPage
         open={page === "caseStudies"}
         onBack={back}

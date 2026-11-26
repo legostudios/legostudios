@@ -56,7 +56,7 @@ export function Hero() {
         loop
         playsInline
         preload="auto"
-        poster="/home-video-v3-poster.jpg"
+        poster="/home-video-v3-poster.webp"
         aria-hidden="true"
         tabIndex={-1}
       >

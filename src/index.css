@@ -2326,10 +2326,12 @@ html {
   pointer-events: none;
 }
 
-.computer-screen img {
+.computer-screen video {
   display: block;
   width: 94%;
   height: auto;
+  aspect-ratio: 900 / 428;
+  object-fit: cover;
   mix-blend-mode: screen;
   user-select: none;
   -webkit-user-drag: none;

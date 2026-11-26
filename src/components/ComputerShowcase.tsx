@@ -1,4 +1,4 @@
-// The Macintosh with the Lego Studios logo glowing on its dark CRT screen.
+// The Macintosh with the animated Lego Studios logo glowing on its CRT screen.
 // The screen sits at x 379–827, y 258–593 of the 1200×1200 computer image,
 // which fills its square box; .computer-screen is placed there (index.css).
 export function ComputerShowcase() {
@@ -10,8 +10,20 @@ export function ComputerShowcase() {
         draggable={false}
         className="absolute inset-0 h-full w-full object-contain"
       />
+      {/* The animated logo loops silently on the screen (87 KB, no audio);
+          the still frame shows instantly while it loads. */}
       <div className="computer-screen" aria-hidden="true">
-        <img src="/logo-screen.webp" alt="" draggable={false} />
+        <video
+          src="/logo-screen.mp4"
+          poster="/logo-screen-poster.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          tabIndex={-1}
+        />
       </div>
     </div>
   );

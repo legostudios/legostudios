@@ -3,6 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- The first things on screen load first: the homepage video's still
+       frame and the computer. -->
+  <link rel="preload" href="/home-video-v3-poster.webp" as="image" fetchpriority="high" />
+  <link rel="preload" href="/computer.webp" as="image" />
   <!-- Brand fonts start downloading with the page (no fallback-font flash). -->
   <link rel="preload" href="/fonts/InstrumentSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/BitcountSingle.woff2" as="font" type="font/woff2" crossorigin />
