@@ -2310,19 +2310,17 @@ html {
 
 /* Animated Lego Studios logo on the computer's CRT screen. The computer
    image fills its square box; the screen is at x 379–827, y 258–593 of the
-   1200×1200 image, and its dark recess (glass plus inner bevel) spans
-   x 378–839, y 244–595, which this box covers completely so none of the
-   photo's own screen shows around it. The clip is made at the screen's own shape with its
+   1200×1200 image. The clip is made at the screen's own shape with its
    near-black background, so it fills the glass edge to edge (no box), and
    the overlay adds the CRT's soft centre glow and darker curved edges. */
 .computer-screen {
   position: absolute;
-  left: calc(378 / 1200 * 100%);
-  top: calc(244 / 1200 * 100%);
-  width: calc(461 / 1200 * 100%);
-  height: calc(351 / 1200 * 100%);
+  left: calc(379 / 1200 * 100%);
+  top: calc(258 / 1200 * 100%);
+  width: calc(448 / 1200 * 100%);
+  height: calc(335 / 1200 * 100%);
   overflow: hidden;
-  border-radius: 6% / 8%;
+  border-radius: 7% / 9%;
   background: #090907;
   pointer-events: none;
 }
@@ -2334,37 +2332,13 @@ html {
   object-fit: cover;
 }
 
-/* CRT scanlines across the whole glass (edge to edge, not just where the
-   clip's own texture is), drawn above the clip. */
-.computer-screen::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.035) 0,
-    rgba(255, 255, 255, 0.035) 1px,
-    rgba(0, 0, 0, 0.2) 1px,
-    rgba(0, 0, 0, 0.2) 2px,
-    rgba(0, 0, 0, 0) 2px,
-    rgba(0, 0, 0, 0) 3px
-  );
-  mix-blend-mode: normal;
-}
-
 .computer-screen::after {
   content: "";
-  z-index: 2;
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background:
     radial-gradient(ellipse 70% 65% at 50% 45%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%),
     radial-gradient(ellipse 85% 85% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
-  /* Recessed into the frame: darker toward the bevel, like the photo. */
-  box-shadow:
-    inset 0 0 2px 1px rgba(0, 0, 0, 0.9),
-    inset 0 0 22px rgba(0, 0, 0, 0.75);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.7);
 }
