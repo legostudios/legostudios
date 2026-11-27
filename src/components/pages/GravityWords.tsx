@@ -13,7 +13,7 @@ interface Props {
   words: GravityWord[];
 }
 
-const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matter;
+const { Engine, Bodies, Body, Composite, Mouse, MouseConstraint, Events, Query } = Matter;
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 // Fastest a word may fall (px per half-step).
@@ -196,18 +196,17 @@ export function GravityWords({ words }: Props) {
         const bb = b.bounds;
         if (bb.max.y >= H - 4) continue; // on the floor
         const cx = b.position.x;
+        // Probe just below the word's bottom edge against the other words'
+        // real shapes (a tilted word's bounding box is much bigger than it).
+        const others = bodies.filter((o) => o !== b);
         let lo = Infinity;
         let hi = -Infinity;
-        for (const o of bodies) {
-          if (o === b) continue;
-          const ob = o.bounds;
-          // Directly underneath and touching.
-          if (Math.abs(ob.min.y - bb.max.y) > 6) continue;
-          const l = Math.max(bb.min.x, ob.min.x);
-          const r = Math.min(bb.max.x, ob.max.x);
-          if (r <= l) continue;
-          lo = Math.min(lo, l);
-          hi = Math.max(hi, r);
+        const step = Math.max(6, (bb.max.x - bb.min.x) / 24);
+        for (let x = bb.min.x + 2; x <= bb.max.x - 2; x += step) {
+          if (Query.point(others, { x, y: bb.max.y + 4 }).length) {
+            lo = Math.min(lo, x);
+            hi = Math.max(hi, x);
+          }
         }
         if (lo === Infinity) continue; // nothing touching below: already falling
         if (cx >= lo - 2 && cx <= hi + 2) continue; // middle is supported

@@ -135,7 +135,7 @@ html {
   font-synthesis: none;
 }
 
-/* Helvetica Neue Bold, kept only for the homepage strip. */
+/* Helvetica Neue Bold: the homepage strip and the Services names. */
 @font-face {
   font-family: "Helvetica Neue";
   src: url("/fonts/HelveticaNeueBold.woff2") format("woff2");
@@ -1915,6 +1915,8 @@ html {
   top: 0;
   padding: 0 0.04em;
   color: var(--fg);
+  /* Services names in Helvetica Neue Bold (same file as the homepage strip). */
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: min(5vw, 8.5vh);
   line-height: 1;
