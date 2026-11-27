@@ -2308,31 +2308,38 @@ html {
   outline: none;
 }
 
-/* Lego Studios logo on the computer's CRT screen. The computer image fills
-   its square box; the screen is at x 379–827, y 258–593 of the 1200×1200
-   image. The logo's black background melts into the dark screen (screen
-   blend) so the colours glow like a CRT; its stripes run in from the
-   screen's left edge, as in the logo. */
+/* Lego Studios CRT loop on the computer's screen. The computer image fills
+   its square box. The screen's dark recess (glass plus inner bevel) spans
+   x 378–839, y 244–595 of the 1200×1200 image; this box covers it fully so
+   none of the photo's own screen shows around the video. The 4:3 video
+   (scanlines, vignette and glow built in) fills it edge to edge. */
 .computer-screen {
   position: absolute;
-  left: calc(379 / 1200 * 100%);
-  top: calc(258 / 1200 * 100%);
-  width: calc(448 / 1200 * 100%);
-  height: calc(335 / 1200 * 100%);
-  display: flex;
-  align-items: center;
+  left: calc(378 / 1200 * 100%);
+  top: calc(244 / 1200 * 100%);
+  width: calc(461 / 1200 * 100%);
+  height: calc(351 / 1200 * 100%);
   overflow: hidden;
-  border-radius: 7% / 9%;
+  border-radius: 6% / 8%;
+  background: #090907;
   pointer-events: none;
 }
 
 .computer-screen video {
   display: block;
-  width: 94%;
-  height: auto;
-  aspect-ratio: 900 / 428;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  mix-blend-mode: screen;
-  user-select: none;
-  -webkit-user-drag: none;
+}
+
+/* Recessed into the frame: a thin dark rim where the glass meets the
+   bevel, like the photo. */
+.computer-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 2px 1px rgba(0, 0, 0, 0.9),
+    inset 0 0 14px rgba(0, 0, 0, 0.55);
 }

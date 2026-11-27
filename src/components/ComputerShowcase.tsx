@@ -10,12 +10,12 @@ export function ComputerShowcase() {
         draggable={false}
         className="absolute inset-0 h-full w-full object-contain"
       />
-      {/* The animated logo loops silently on the screen (87 KB, no audio);
+      {/* The animated logo loops silently on the screen (136 KB, no audio, 4:3 to fill the screen);
           the still frame shows instantly while it loads. */}
       <div className="computer-screen" aria-hidden="true">
         <video
-          src="/logo-screen.mp4"
-          poster="/logo-screen-poster.webp"
+          src="/logo-screen-crt.mp4"
+          poster="/logo-screen-crt-poster.webp"
           autoPlay
           muted
           loop
