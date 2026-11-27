@@ -2345,3 +2345,12 @@ html {
     inset 0 0 2px 1px rgba(0, 0, 0, 0.9),
     inset 0 0 14px rgba(0, 0, 0, 0.55);
 }
+
+/* More open spacing for the Services / Case Studies headings and the
+   contact form's "Send a message" (same size on Services and Case Studies
+   via --section-title). */
+.stack-head .page-title,
+.contact2-form-heading {
+  letter-spacing: 0.06em;
+  word-spacing: 0.1em;
+}
